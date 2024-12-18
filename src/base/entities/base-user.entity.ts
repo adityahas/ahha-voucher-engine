@@ -1,14 +1,9 @@
-import {
-  CreateDateColumn,
-  DeleteDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { JoinColumn, ManyToOne } from 'typeorm';
+import { User } from '../../user/entities/user.entity';
+import { BaseEntity } from './base.entity';
 
-export class BaseEntity {
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  updated_at: Date;
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  deleted_at: Date | null;
+export class UserBaseEntity extends BaseEntity {
+  @ManyToOne(() => User, (userBaseEntity) => userBaseEntity.id)
+  @JoinColumn({ name: 'created_by_id', referencedColumnName: 'id' })
+  created_by: UserBaseEntity;
 }
