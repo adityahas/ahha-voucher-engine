@@ -3,8 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  ManyToMany, JoinTable
-} from "typeorm";
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { VoucherValidity } from './voucher-validity.entity';
 import { VoucherBinding } from './voucher-binding.entity';
 import { VoucherClaim } from './voucher-claim.entity';
@@ -63,9 +64,7 @@ export class Voucher extends BaseEntity {
   })
   usages: VoucherUsage[];
 
-  @ManyToMany(() => User, (user) => user.id, {
-    cascade: true,
-  })
+  @ManyToMany(() => User, (user) => user.id)
   @JoinTable()
   target_users: User[];
 }
