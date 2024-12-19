@@ -3,8 +3,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  ManyToMany,
-} from 'typeorm';
+  ManyToMany, JoinTable
+} from "typeorm";
 import { VoucherValidity } from './voucher-validity.entity';
 import { VoucherBinding } from './voucher-binding.entity';
 import { VoucherClaim } from './voucher-claim.entity';
@@ -15,7 +15,7 @@ import { User } from '../../user/entities/user.entity';
 
 @Entity('vouchers')
 export class Voucher extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column({ type: 'varchar', unique: true, nullable: false })
@@ -27,27 +27,45 @@ export class Voucher extends BaseEntity {
   @Column({ type: 'int', default: 1 })
   quota: number;
 
-  @ManyToMany(() => VoucherCategory, (voucherCategory) => voucherCategory.id)
+  @JoinTable()
+  @ManyToMany(() => VoucherCategory, (voucherCategory) => voucherCategory.id, {
+    cascade: true,
+  })
   categories: VoucherCategory[];
 
-  @ManyToMany(() => VoucherCategory, (voucherCategory) => voucherCategory.id)
+  @ManyToMany(() => VoucherCategory, (voucherCategory) => voucherCategory.id, {
+    cascade: true,
+  })
+  @JoinTable()
   allow_combine_categories: VoucherCategory[];
 
   @OneToMany(
     () => VoucherValidity,
     (voucherValidity) => voucherValidity.voucher,
+    {
+      cascade: true,
+    },
   )
   validities: VoucherValidity[];
 
-  @OneToMany(() => VoucherBinding, (voucherBinding) => voucherBinding.voucher)
+  @OneToMany(() => VoucherBinding, (voucherBinding) => voucherBinding.voucher, {
+    cascade: true,
+  })
   bindings: VoucherBinding[];
 
-  @OneToMany(() => VoucherClaim, (voucherClaim) => voucherClaim.voucher)
+  @OneToMany(() => VoucherClaim, (voucherClaim) => voucherClaim.voucher, {
+    cascade: true,
+  })
   claims: VoucherClaim[];
 
-  @OneToMany(() => VoucherUsage, (voucherUsage) => voucherUsage.voucher)
+  @OneToMany(() => VoucherUsage, (voucherUsage) => voucherUsage.voucher, {
+    cascade: true,
+  })
   usages: VoucherUsage[];
 
-  @ManyToMany(() => User, (user) => user.id)
+  @ManyToMany(() => User, (user) => user.id, {
+    cascade: true,
+  })
+  @JoinTable()
   target_users: User[];
 }
