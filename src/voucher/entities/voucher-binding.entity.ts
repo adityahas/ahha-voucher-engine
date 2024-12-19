@@ -12,7 +12,7 @@ import { BaseEntity } from '../../base/entities/base.entity';
  * Voucher can be bound to user's role, product type, product SKU, product vendor, etc
  */
 
-enum VoucherBindingType {
+export enum VoucherBindingType {
   ROLE = 'role',
   PRODUCT_TYPE = 'product_type',
   PRODUCT_SKU = 'product_sku',
