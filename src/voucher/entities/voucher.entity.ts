@@ -1,9 +1,17 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+} from 'typeorm';
 import { VoucherValidity } from './voucher-validity.entity';
 import { VoucherBinding } from './voucher-binding.entity';
 import { VoucherClaim } from './voucher-claim.entity';
 import { VoucherUsage } from './voucher-usage.entity';
 import { BaseEntity } from '../../base/entities/base.entity';
+import { VoucherCategory } from './voucher-category.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Entity('vouchers')
 export class Voucher extends BaseEntity {
@@ -19,13 +27,16 @@ export class Voucher extends BaseEntity {
   @Column({ type: 'int', default: 1 })
   quota: number;
 
-  @Column({ type: 'boolean', default: false })
-  is_combinable: boolean;
+  @ManyToMany(() => VoucherCategory, (voucherCategory) => voucherCategory.id)
+  categories: VoucherCategory[];
 
-  @Column({ type: 'varchar', nullable: true })
-  combine_rule: string;
+  @ManyToMany(() => VoucherCategory, (voucherCategory) => voucherCategory.id)
+  allow_combine_categories: VoucherCategory[];
 
-  @OneToMany(() => VoucherValidity, (voucherValidity) => voucherValidity.voucher)
+  @OneToMany(
+    () => VoucherValidity,
+    (voucherValidity) => voucherValidity.voucher,
+  )
   validities: VoucherValidity[];
 
   @OneToMany(() => VoucherBinding, (voucherBinding) => voucherBinding.voucher)
@@ -36,4 +47,7 @@ export class Voucher extends BaseEntity {
 
   @OneToMany(() => VoucherUsage, (voucherUsage) => voucherUsage.voucher)
   usages: VoucherUsage[];
+
+  @ManyToMany(() => User, (user) => user.id)
+  target_users: User[];
 }

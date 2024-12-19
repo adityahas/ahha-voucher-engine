@@ -22,12 +22,19 @@ export class VoucherService {
   }
 
   async findOne(id: number): Promise<Voucher> {
-    return this.voucherRepository.findOne(id);
+    return this.voucherRepository.findOne({
+      where: { id },
+    });
   }
 
-  async update(id: number, updateVoucherDto: UpdateVoucherDto): Promise<Voucher> {
+  async update(
+    id: number,
+    updateVoucherDto: UpdateVoucherDto,
+  ): Promise<Voucher> {
     await this.voucherRepository.update(id, updateVoucherDto);
-    return this.voucherRepository.findOne(id);
+    return this.voucherRepository.findOne({
+      where: { id },
+    });
   }
 
   async remove(id: number): Promise<void> {
