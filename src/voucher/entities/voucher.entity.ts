@@ -54,14 +54,10 @@ export class Voucher extends BaseEntity {
   })
   bindings: VoucherBinding[];
 
-  @OneToMany(() => VoucherClaim, (voucherClaim) => voucherClaim.voucher, {
-    cascade: true,
-  })
+  @OneToMany(() => VoucherClaim, (voucherClaim) => voucherClaim.voucher)
   claims: VoucherClaim[];
 
-  @OneToMany(() => VoucherUsage, (voucherUsage) => voucherUsage.voucher, {
-    cascade: true,
-  })
+  @OneToMany(() => VoucherUsage, (voucherUsage) => voucherUsage.voucher)
   usages: VoucherUsage[];
 
   @ManyToMany(() => User, (user) => user.id)
