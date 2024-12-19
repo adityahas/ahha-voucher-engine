@@ -1,4 +1,10 @@
-import { IsBoolean, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from '@nestjs/class-validator';
 
 export class CreateVoucherDto {
   @IsString()

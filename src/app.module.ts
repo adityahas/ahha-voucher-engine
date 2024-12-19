@@ -7,12 +7,14 @@ import { DatabaseModule } from './database/database.module';
 import { QuestModule } from './quest/quest.module';
 import { BaseModule } from './base/base.module';
 import { AdminUserModule } from './admin-user/admin-user.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot(),
+    DatabaseModule,
     UserModule,
     VoucherModule,
-    DatabaseModule,
     QuestModule,
     BaseModule,
     AdminUserModule,
