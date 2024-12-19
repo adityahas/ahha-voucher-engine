@@ -1,10 +1,10 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   OneToMany,
   ManyToMany,
   JoinTable,
+  PrimaryColumn,
 } from 'typeorm';
 import { VoucherValidity } from './voucher-validity.entity';
 import { VoucherBinding } from './voucher-binding.entity';
@@ -16,10 +16,7 @@ import { User } from '../../user/entities/user.entity';
 
 @Entity('vouchers')
 export class Voucher extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: number;
-
-  @Column({ type: 'varchar', unique: true, nullable: false })
+  @PrimaryColumn({ type: 'varchar', unique: true, nullable: false })
   code: string;
 
   @Column({ type: 'text', nullable: true })
@@ -29,14 +26,22 @@ export class Voucher extends BaseEntity {
   quota: number;
 
   @JoinTable()
-  @ManyToMany(() => VoucherCategory, (voucherCategory) => voucherCategory.id, {
-    cascade: true,
-  })
+  @ManyToMany(
+    () => VoucherCategory,
+    (voucherCategory) => voucherCategory.slug,
+    {
+      cascade: true,
+    },
+  )
   categories: VoucherCategory[];
 
-  @ManyToMany(() => VoucherCategory, (voucherCategory) => voucherCategory.id, {
-    cascade: true,
-  })
+  @ManyToMany(
+    () => VoucherCategory,
+    (voucherCategory) => voucherCategory.slug,
+    {
+      cascade: true,
+    },
+  )
   @JoinTable()
   allow_combine_categories: VoucherCategory[];
 
@@ -60,7 +65,7 @@ export class Voucher extends BaseEntity {
   @OneToMany(() => VoucherUsage, (voucherUsage) => voucherUsage.voucher)
   usages: VoucherUsage[];
 
-  @ManyToMany(() => User, (user) => user.id)
+  @ManyToMany(() => User, (user) => user.id, { cascade: true })
   @JoinTable()
   target_users: User[];
 }

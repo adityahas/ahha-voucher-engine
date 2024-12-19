@@ -10,6 +10,7 @@ import {
 import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
+import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
 
 @Controller('voucher')
 export class VoucherController {
@@ -25,14 +26,19 @@ export class VoucherController {
     return this.voucherService.findAll();
   }
 
+  @Get('/eligible')
+  getEligibleVouchers(@Body() dto: GetVoucherEligibleVoucherDto) {
+    return this.voucherService.getEligibleVouchers(dto);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.voucherService.findOne(+id);
+    return this.voucherService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateVoucherDto: UpdateVoucherDto) {
-    return this.voucherService.update(+id, updateVoucherDto);
+    return this.voucherService.update(id, updateVoucherDto);
   }
 
   @Delete(':id')

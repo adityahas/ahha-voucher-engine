@@ -1,10 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { BaseEntity } from '../../base/entities/base.entity';
 
 @Entity('voucher_categories')
 export class VoucherCategory extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn({ type: 'varchar', unique: true, nullable: false })
+  slug: string;
 
   @Column({ type: 'varchar' })
   name: string;
