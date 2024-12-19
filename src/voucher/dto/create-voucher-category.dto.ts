@@ -3,6 +3,10 @@ import { IsString, IsNotEmpty } from '@nestjs/class-validator';
 export class CreateVoucherCategoryDto {
   @IsString()
   @IsNotEmpty()
+  slug: string;
+
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsString()
