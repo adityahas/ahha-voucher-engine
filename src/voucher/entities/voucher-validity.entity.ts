@@ -38,9 +38,9 @@ export class VoucherValidity extends BaseEntity {
   @Column({ type: 'timetz', nullable: true })
   end_date: Date;
 
-  @Column({ type: 'time without time zone', default: () => '00:00:00' })
+  @Column({ type: 'time without time zone', default: '00:00:00' })
   start_time: Date;
 
-  @Column({ type: 'time with time zone', default: () => '23:59:59' })
+  @Column({ type: 'time with time zone', default: '23:59:59' })
   end_time: Date;
 }

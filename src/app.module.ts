@@ -3,16 +3,29 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { VoucherModule } from './voucher/voucher.module';
-import { DatabaseModule } from './database/database.module';
 import { QuestModule } from './quest/quest.module';
 import { BaseModule } from './base/base.module';
 import { AdminUserModule } from './admin-user/admin-user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(),
-    DatabaseModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      synchronize: process.env.DB_SYNC == 'true',
+      dropSchema: process.env.DB_DROP_SCHEMA == 'true',
+      logging: process.env.DB_LOGGING != 'false',
+      autoLoadEntities: process.env.DB_AUTOLOAD_ENTITIES === 'true',
+    }),
+    // DatabaseModule,
     UserModule,
     VoucherModule,
     QuestModule,
