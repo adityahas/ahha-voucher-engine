@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { BaseEntity } from '../../base/entities/base.entity';
+import { BaseEntity } from '../../../base/entities/base.entity';
 
 @Entity('voucher_categories')
 export class VoucherCategory extends BaseEntity {
