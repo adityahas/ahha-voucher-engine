@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DataSource, DataSourceOptions } from 'typeorm';
-import { ClientsService } from '../clients/clients.service';
+import { DataSource } from 'typeorm';
+import { ClientsService } from '../client/client.service';
 
 /**
  * This service is responsible for managing the databases.
- * It provides methods to interact with the database with multiple data sources (clients).
+ * It provides methods to interact with the database with multiple data sources (client).
  */
 
 @Injectable()
@@ -18,26 +18,31 @@ export class DatabaseService {
       return this._dataSources.get(name);
     }
 
-    const client = await this.clientService.findBy({
-      database_name: name,
-    });
+    const client = await this.clientService.findByDatabaseName(name);
 
     if (!client) {
       throw new NotFoundException(`Database ${name} not found.`);
     }
 
-    const dataSource = new DataSource({
-      name,
-      type: 'postgres',
-      host: client.database_host,
-      port: client.database_port,
-      username: client.database_username,
-      password: client.database_password,
-      database: client.database_name,
-    });
-    await dataSource.initialize();
-    this._dataSources.set(name, dataSource);
-    return dataSource;
+    try {
+      const dataSource = new DataSource({
+        name,
+        type: 'postgres',
+        host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT),
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: client.database_name,
+        entities: ['dist/modules/**/*.entity{.ts,.js}'],
+        synchronize: process.env.DB_SYNC === 'true',
+      });
+      await dataSource.initialize();
+      this._dataSources.set(name, dataSource);
+      return dataSource;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to connect to the database.');
+    }
   }
 
   getConnection(name: string): DataSource {
@@ -53,5 +58,9 @@ export class DatabaseService {
       await dataSource.close();
       this._dataSources.delete(name);
     }
+  }
+
+  checkConnectionExists(name: string): boolean {
+    return this._dataSources.has(name);
   }
 }

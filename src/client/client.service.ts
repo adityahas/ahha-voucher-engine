@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Client } from './clients.entity';
+import { Client } from './entities/client.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -18,9 +18,9 @@ export class ClientsService {
     return [];
   }
 
-  async findOne(id: string): Promise<any> {
+  async findOne(database_name: string): Promise<any> {
     return this.clientRepository.findOne({
-      where: { id },
+      where: { database_name },
     });
   }
 
@@ -28,9 +28,9 @@ export class ClientsService {
     return updateClientDto;
   }
 
-  async findBy(param: { database_name: string }) {
+  async findByDatabaseName(databaseName: string) {
     return this.clientRepository.findOne({
-      where: param,
+      where: { database_name: databaseName },
     });
   }
 }
