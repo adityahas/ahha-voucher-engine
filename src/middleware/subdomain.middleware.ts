@@ -3,7 +3,7 @@ import {
   NestMiddleware,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -22,13 +22,12 @@ export class SubdomainMiddleware implements NestMiddleware {
       .getRepository('clients')
       .findOne({ where: { subdomain } });
 
-    console.log('client', client);
-
     if (!client) {
       throw new UnauthorizedException('Invalid subdomain.');
     }
 
-    req['client'] = client; // Attach client to the request
+    req['client'] = client;
+    req['database_name'] = client.database_name;
     next();
   }
 }
