@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Voucher } from './voucher.entity';
-import { BaseEntity } from '../../base/entities/base.entity';
+import { BaseEntity } from '../../../base/entities/base.entity';
 
 /*
  * Voucher can have one or more of this validity dates: daily, birthday, weekly, monthly, one-time, etc

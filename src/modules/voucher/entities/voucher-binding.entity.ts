@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Voucher } from './voucher.entity';
-import { BaseEntity } from '../../base/entities/base.entity';
+import { BaseEntity } from '../../../base/entities/base.entity';
 
 /*
  * Voucher can be bound to user's role, product type, product SKU, product vendor, etc

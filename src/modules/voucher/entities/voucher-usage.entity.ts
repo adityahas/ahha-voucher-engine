@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Voucher } from './voucher.entity';
 import { User } from '../../user/entities/user.entity';
-import { BaseEntity } from '../../base/entities/base.entity';
+import { BaseEntity } from '../../../base/entities/base.entity';
 
 @Entity('voucher_usages')
 export class VoucherUsage extends BaseEntity {

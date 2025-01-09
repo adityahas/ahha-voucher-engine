@@ -11,7 +11,7 @@ import { Type } from '@nestjs/class-transformer';
 import { CreateVoucherCategoryDto } from './create-voucher-category.dto';
 import { CreateVoucherValidityDto } from './create-voucher-validity.dto';
 import { CreateVoucherBindingDto } from './create-voucher-binding.dto';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from 'src/modules/user/dto/create-user.dto';
 
 export class CreateVoucherDto {
   @IsString()

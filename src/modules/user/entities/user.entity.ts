@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { BaseEntity } from '../../base/entities/base.entity';
+import { BaseEntity } from '../../../base/entities/base.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
