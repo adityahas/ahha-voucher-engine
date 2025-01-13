@@ -49,9 +49,9 @@ export class DatabaseService {
     }
   }
 
-  getConnection(name: string): DataSource {
+  async getConnection(name: string): Promise<DataSource> {
     if (!this._dataSources.has(name)) {
-      throw new NotFoundException(`Connection ${name} not found.`);
+      await this.createConnection(name);
     }
     return this._dataSources.get(name);
   }

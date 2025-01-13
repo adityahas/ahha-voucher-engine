@@ -11,19 +11,19 @@ export class UserService extends BaseService {
   }
 
   async findAll(databaseName: string): Promise<User[]> {
-    const userRepository = this.getRepository(databaseName, User);
+    const userRepository = await this.getRepository(databaseName, User);
     return userRepository.find();
   }
 
   async findOne(databaseName: string, id: string): Promise<User> {
-    const userRepository = this.getRepository(databaseName, User);
+    const userRepository = await this.getRepository(databaseName, User);
     return userRepository.findOne({
       where: { id },
     });
   }
 
   async create(databaseName: string, user: CreateUserDto): Promise<User> {
-    const userRepository = this.getRepository(databaseName, User);
+    const userRepository = await this.getRepository(databaseName, User);
     return userRepository.save(user);
   }
 
@@ -32,7 +32,7 @@ export class UserService extends BaseService {
     id: string,
     user: CreateUserDto,
   ): Promise<User> {
-    const userRepository = this.getRepository(databaseName, User);
+    const userRepository = await this.getRepository(databaseName, User);
     await userRepository.update(id, user);
     return userRepository.findOne({
       where: { id },
