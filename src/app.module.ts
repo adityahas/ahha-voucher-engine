@@ -11,6 +11,7 @@ import { DatabaseModule } from './database/database.module';
 import { ClientsModule } from './client/client.module';
 import { SubdomainMiddleware } from './middleware/subdomain.middleware';
 import { CredentialMiddleware } from './middleware/credential.middleware';
+import { EncryptionModule } from './encryption/encryption.module';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ dotenv.config();
     VoucherModule,
     QuestModule,
     AdminModule,
+    EncryptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
