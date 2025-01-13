@@ -16,7 +16,7 @@ export class VoucherService extends BaseService {
     databaseName: string,
     createVoucherDto: CreateVoucherDto,
   ): Promise<Voucher> {
-    const voucherRepository = this.getRepository(databaseName, Voucher);
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
 
     // // Check if voucher category exists
     // const voucherCategories = await this.voucherCategoryRepository.findBy({
@@ -24,19 +24,19 @@ export class VoucherService extends BaseService {
     // });
     //
     // console.log('voucherCategories', voucherCategories);
-    const voucher = voucherRepository.create(createVoucherDto);
+    const voucher = await voucherRepository.create(createVoucherDto);
     return voucherRepository.save(voucher);
   }
 
   async findAll(databaseName: string): Promise<Voucher[]> {
-    const voucherRepository = this.getRepository(databaseName, Voucher);
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
     return voucherRepository.find({
       relations: ['categories', 'target_users', 'bindings', 'validities'],
     });
   }
 
   async findOne(databaseName: string, id: string): Promise<Voucher> {
-    const voucherRepository = this.getRepository(databaseName, Voucher);
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
     return voucherRepository.findOne({
       where: { code: id },
     });
@@ -47,7 +47,7 @@ export class VoucherService extends BaseService {
     id: string,
     updateVoucherDto: UpdateVoucherDto,
   ): Promise<Voucher> {
-    const voucherRepository = this.getRepository(databaseName, Voucher);
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
     await voucherRepository.update(id, updateVoucherDto);
     return voucherRepository.findOne({
       where: { code: id },
@@ -55,7 +55,7 @@ export class VoucherService extends BaseService {
   }
 
   async remove(databaseName: string, id: number): Promise<void> {
-    const voucherRepository = this.getRepository(databaseName, Voucher);
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
     await voucherRepository.delete(id);
   }
 
@@ -63,7 +63,7 @@ export class VoucherService extends BaseService {
     databaseName: string,
     searchCriteria: GetVoucherEligibleVoucherDto,
   ): Promise<Voucher[]> {
-    const voucherRepository = this.getRepository(databaseName, Voucher);
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
     const queryBuilder = voucherRepository.createQueryBuilder('voucher');
     let isWhereClauseAdded = false;
 

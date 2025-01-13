@@ -5,11 +5,11 @@ import { EntityTarget } from 'typeorm/common/EntityTarget';
 export class BaseService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  getRepository<T>(
+  async getRepository<T>(
     databaseName: string,
     entityClass: EntityTarget<T>,
-  ): Repository<T> {
-    const ds = this.dbService.getConnection(databaseName);
+  ): Promise<Repository<T>> {
+    const ds = await this.dbService.getConnection(databaseName);
     return ds.getRepository<T>(entityClass);
   }
 }
