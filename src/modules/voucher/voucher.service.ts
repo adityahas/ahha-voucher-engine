@@ -1,62 +1,70 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { Voucher } from './entities/voucher.entity';
-import { VoucherCategory } from './entities/voucher-category.entity';
 import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
+import { BaseService } from '../../base/base.service';
+import { DatabaseService } from '../../database/database.service';
 
 @Injectable()
-export class VoucherService {
-  constructor(
-    @InjectRepository(Voucher)
-    private readonly voucherRepository: Repository<Voucher>,
-    @InjectRepository(VoucherCategory)
-    private readonly voucherCategoryRepository: Repository<VoucherCategory>,
-  ) {}
+export class VoucherService extends BaseService {
+  constructor(databaseService: DatabaseService) {
+    super(databaseService);
+  }
 
-  async create(createVoucherDto: CreateVoucherDto): Promise<Voucher> {
+  async create(
+    databaseName: string,
+    createVoucherDto: CreateVoucherDto,
+  ): Promise<Voucher> {
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
+
     // // Check if voucher category exists
     // const voucherCategories = await this.voucherCategoryRepository.findBy({
     //   slug: In(createVoucherDto.categories.map((category) => category.slug)),
     // });
     //
     // console.log('voucherCategories', voucherCategories);
-    const voucher = this.voucherRepository.create(createVoucherDto);
-    return this.voucherRepository.save(voucher);
+    const voucher = await voucherRepository.create(createVoucherDto);
+    return voucherRepository.save(voucher);
   }
 
-  async findAll(): Promise<Voucher[]> {
-    return this.voucherRepository.find({
+  async findAll(databaseName: string): Promise<Voucher[]> {
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
+    return voucherRepository.find({
       relations: ['categories', 'target_users', 'bindings', 'validities'],
     });
   }
 
-  async findOne(id: string): Promise<Voucher> {
-    return this.voucherRepository.findOne({
+  async findOne(databaseName: string, id: string): Promise<Voucher> {
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
+    return voucherRepository.findOne({
       where: { code: id },
     });
   }
 
   async update(
+    databaseName: string,
     id: string,
     updateVoucherDto: UpdateVoucherDto,
   ): Promise<Voucher> {
-    await this.voucherRepository.update(id, updateVoucherDto);
-    return this.voucherRepository.findOne({
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
+    await voucherRepository.update(id, updateVoucherDto);
+    return voucherRepository.findOne({
       where: { code: id },
     });
   }
 
-  async remove(id: number): Promise<void> {
-    await this.voucherRepository.delete(id);
+  async remove(databaseName: string, id: number): Promise<void> {
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
+    await voucherRepository.delete(id);
   }
 
   async getEligibleVouchers(
+    databaseName: string,
     searchCriteria: GetVoucherEligibleVoucherDto,
   ): Promise<Voucher[]> {
-    const queryBuilder = this.voucherRepository.createQueryBuilder('voucher');
+    const voucherRepository = await this.getRepository(databaseName, Voucher);
+    const queryBuilder = voucherRepository.createQueryBuilder('voucher');
     let isWhereClauseAdded = false;
 
     if (searchCriteria.user_id) {

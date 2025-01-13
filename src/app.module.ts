@@ -1,13 +1,17 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { VoucherModule } from './modules/voucher/voucher.module';
 import { QuestModule } from './modules/quest/quest.module';
-import { BaseModule } from './base/base.module';
-import { AdminUserModule } from './modules/admin-user/admin-user.module';
+import { AdminModule } from './admin/admin.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
+import { DatabaseModule } from './database/database.module';
+import { ClientsModule } from './client/client.module';
+import { SubdomainMiddleware } from './middleware/subdomain.middleware';
+import { CredentialMiddleware } from './middleware/credential.middleware';
+import { EncryptionModule } from './encryption/encryption.module';
 
 dotenv.config();
 
@@ -23,16 +27,24 @@ dotenv.config();
       synchronize: process.env.DB_SYNC == 'true',
       dropSchema: process.env.DB_DROP_SCHEMA == 'true',
       logging: process.env.DB_LOGGING != 'false',
-      autoLoadEntities: process.env.DB_AUTOLOAD_ENTITIES === 'true',
+      entities: [
+        'dist/admin/**/*.entity{.ts,.js}',
+        'dist/client/**/*.entity{.ts,.js}',
+      ],
     }),
-    // DatabaseModule,
+    DatabaseModule,
+    ClientsModule,
     UserModule,
     VoucherModule,
     QuestModule,
-    BaseModule,
-    AdminUserModule,
+    AdminModule,
+    EncryptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
+  }
+}
