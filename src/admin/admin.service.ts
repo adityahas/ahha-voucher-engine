@@ -1,0 +1,64 @@
+import { Injectable } from '@nestjs/common';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminDto } from './dto/update-admin.dto';
+import { LoginAdminDto } from './dto/login-admin.dto';
+import { DatabaseService } from '../database/database.service';
+import { BaseService } from '../base/base.service';
+import { Admin } from './entities/admin.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+@Injectable()
+export class AdminService extends BaseService {
+  constructor(
+    private readonly databaseService: DatabaseService,
+    @InjectRepository(Admin)
+    private readonly adminRepository: Repository<Admin>,
+  ) {
+    super(databaseService);
+  }
+
+  async login(databaseName: string, loginAdminDto: LoginAdminDto) {
+    const admin = await this.adminRepository
+      .createQueryBuilder('admins')
+      .leftJoinAndSelect('admins.client', 'clients')
+      .where('admins.email = :email', { email: loginAdminDto.email })
+      .andWhere('admins.password = :password', {
+        password: loginAdminDto.password,
+      })
+      .andWhere('admins.client_database_name = :databaseName', {
+        databaseName: databaseName,
+      })
+      .getOne();
+
+    if (!admin) {
+      throw new Error('Invalid email or password');
+    }
+    if (!this.databaseService.checkConnectionExists(databaseName)) {
+      await this.databaseService.createConnection(databaseName);
+    }
+
+    // Todo: generate token
+    return admin;
+  }
+
+  create(createAdminDto: CreateAdminDto) {
+    return 'This action adds a new admin';
+  }
+
+  findAll() {
+    return `This action returns all admin`;
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} admin`;
+  }
+
+  update(id: number, updateAdminDto: UpdateAdminDto) {
+    return `This action updates a #${id} admin`;
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} admin`;
+  }
+}
