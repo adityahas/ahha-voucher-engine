@@ -14,7 +14,7 @@ import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
 import { BaseController } from '../../base/base.controller';
 
-@Controller('voucher')
+@Controller('vouchers')
 export class VoucherController extends BaseController {
   constructor(private readonly voucherService: VoucherService) {
     super();
