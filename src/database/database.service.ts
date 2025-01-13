@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { ClientsService } from '../client/client.service';
+import { EncryptionService } from '../encryption/encryption.service';
 
 /**
  * This service is responsible for managing the databases.
@@ -11,7 +12,10 @@ import { ClientsService } from '../client/client.service';
 export class DatabaseService {
   private _dataSources: Map<string, any> = new Map();
 
-  constructor(private readonly clientService: ClientsService) {}
+  constructor(
+    private readonly clientService: ClientsService,
+    private readonly encryptionService: EncryptionService,
+  ) {}
 
   async createConnection(name: string): Promise<DataSource> {
     if (this._dataSources.has(name)) {
@@ -28,10 +32,10 @@ export class DatabaseService {
       const dataSource = new DataSource({
         name,
         type: 'postgres',
-        host: process.env.DB_HOST,
+        host: client.database_host,
         port: Number(process.env.DB_PORT),
-        username: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWORD,
+        username: client.database_username,
+        password: this.encryptionService.decrypt(client.database_password),
         database: client.database_name,
         entities: ['dist/modules/**/*.entity{.ts,.js}'],
         synchronize: process.env.DB_SYNC === 'true',
