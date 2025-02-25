@@ -6,16 +6,20 @@ import { Admin } from './entities/admin.entity';
 import { ClientsService } from '../client/client.service';
 import { Client } from '../client/entities/client.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { jwtConstants } from '../auth/constants';
+import { JwtStrategy } from '../auth/jwt.strategy';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Admin, Client]),
+    PassportModule,
     JwtModule.register({
-      secret: 'yourSecretKey',
-      signOptions: { expiresIn: '1h' },
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
     }),
   ],
   controllers: [AdminController],
-  providers: [AdminService, ClientsService],
+  providers: [AdminService, ClientsService, JwtStrategy],
 })
 export class AdminModule {}
