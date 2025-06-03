@@ -12,6 +12,8 @@ async function bootstrap() {
     }),
   );
   app.enableCors();
-  await app.listen(9002);
+  await app.listen(process.env.HTTP_PORT || 9002, () => {
+    console.log(`Running on ${process.env.HTTP_PORT || 9002}`);
+  });
 }
 bootstrap();
