@@ -9,6 +9,8 @@ import { Voucher } from './voucher.entity';
 import { BaseEntity } from '../../../base/entities/base.entity';
 
 /*
+ * VoucherBinding menghubungkan voucher dengan entitas eksternal (produk, brand, atau lainnya)
+ * berdasarkan bind_type dan bind_value.
  * Voucher can be bound to user's role, product type, product SKU, product vendor, etc
  */
 
