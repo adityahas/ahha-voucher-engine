@@ -7,6 +7,7 @@ import { BaseService } from '../base/base.service';
 import { Admin } from './entities/admin.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AdminService extends BaseService {
@@ -14,6 +15,7 @@ export class AdminService extends BaseService {
     private readonly databaseService: DatabaseService,
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
+    private readonly jwtService: JwtService,
   ) {
     super(databaseService);
   }
@@ -38,8 +40,10 @@ export class AdminService extends BaseService {
       await this.databaseService.createConnection(databaseName);
     }
 
-    // Todo: generate token
-    return admin;
+    const payload = { email: admin.email, sub: admin.id };
+    const token = this.jwtService.sign(payload);
+
+    return { admin, token };
   }
 
   create(createAdminDto: CreateAdminDto) {
