@@ -35,23 +35,14 @@ export async function seedClients(dataSource: DataSource) {
   console.log('Client seeded');
 }
 
-const clientsSeeder = [
+export const clientsSeeder = [
   {
     subdomain: 'client1',
     api_key: 'client1-api-key',
-    database_name: 'ahha_client_1_db',
+    database_name: 'railway',
     database_username: 'postgres',
-    database_password: 'P4ssw0rd!',
+    database_password: 'vwjWyalyMXzlhYBPONkjObmQYmdFwXnM',
     database_port: '5432',
-    database_host: 'localhost',
-  },
-  {
-    subdomain: 'client2',
-    api_key: 'client2-api-key',
-    database_name: 'ahha_client_2_db',
-    database_username: 'postgres',
-    database_password: 'P4ssw0rd!',
-    database_port: '5432',
-    database_host: 'localhost',
+    database_host: 'postgres--jbm.railway.internal',
   },
 ];
