@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { ClientsService } from '../client/client.service';
 import { EncryptionService } from '../encryption/encryption.service';
+import * as bcrypt from 'bcrypt';
 
 /**
  * This service is responsible for managing the databases.
@@ -66,5 +67,9 @@ export class DatabaseService {
 
   checkConnectionExists(name: string): boolean {
     return this._dataSources.has(name);
+  }
+
+  async comparePassword(raw: string, hashed: string): Promise<boolean> {
+    return bcrypt.compare(raw, hashed);
   }
 }

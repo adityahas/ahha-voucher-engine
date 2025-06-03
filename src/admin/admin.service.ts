@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { LoginAdminDto } from './dto/login-admin.dto';
@@ -21,20 +21,22 @@ export class AdminService extends BaseService {
   }
 
   async login(databaseName: string, loginAdminDto: LoginAdminDto) {
-    const admin = await this.adminRepository
-      .createQueryBuilder('admins')
-      .leftJoinAndSelect('admins.client', 'clients')
-      .where('admins.email = :email', { email: loginAdminDto.email })
-      .andWhere('admins.password = :password', {
-        password: loginAdminDto.password,
-      })
-      .andWhere('admins.client_database_name = :databaseName', {
-        databaseName: databaseName,
-      })
-      .getOne();
+    const admin = await this.adminRepository.findOne({
+      where: { email: loginAdminDto.email },
+      relations: ['client'],
+    });
 
     if (!admin) {
-      throw new Error('Invalid email or password');
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isMatch = await this.databaseService.comparePassword(
+      loginAdminDto.password,
+      admin.password,
+    );
+
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid email or password');
     }
     if (!this.databaseService.checkConnectionExists(databaseName)) {
       await this.databaseService.createConnection(databaseName);
