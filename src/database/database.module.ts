@@ -1,9 +1,13 @@
+import { Global, Module } from '@nestjs/common';
+import { DatabaseService } from './database.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Client } from '../client/entities/client.entity';
+import { ClientsService } from '../client/client.service';
 
-import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.providers';
-
+@Global()
 @Module({
-  providers: [...databaseProviders],
-  exports: [...databaseProviders],
+  imports: [TypeOrmModule.forFeature([Client])],
+  providers: [DatabaseService, ClientsService],
+  exports: [DatabaseService],
 })
 export class DatabaseModule {}
