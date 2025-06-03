@@ -1,14 +1,11 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Voucher } from './voucher.entity';
 import { User } from '../../user/entities/user.entity';
 import { BaseEntity } from '../../../base/entities/base.entity';
 
+/**
+ * VoucherUsage merepresentasikan data penggunaan voucher oleh user dalam suatu transaksi.
+ */
 @Entity('voucher_usages')
 export class VoucherUsage extends BaseEntity {
   @PrimaryGeneratedColumn()

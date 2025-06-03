@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
-  PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
 import { VoucherValidity } from './voucher-validity.entity';
 import { VoucherBinding } from './voucher-binding.entity';
 import { VoucherClaim } from './voucher-claim.entity';
@@ -14,6 +7,10 @@ import { BaseEntity } from '../../../base/entities/base.entity';
 import { VoucherCategory } from './voucher-category.entity';
 import { User } from '../../user/entities/user.entity';
 
+/**
+ * Voucher adalah entitas utama yang merepresentasikan kupon yang dapat diklaim oleh user.
+ * Setiap voucher memiliki kategori, masa berlaku, binding, dan daftar target user.
+ */
 @Entity('vouchers')
 export class Voucher extends BaseEntity {
   @PrimaryColumn({ type: 'varchar', unique: true, nullable: false })

@@ -9,6 +9,7 @@ import { Voucher } from './voucher.entity';
 import { BaseEntity } from '../../../base/entities/base.entity';
 
 /*
+ * VoucherValidity mendefinisikan periode aktif voucher, baik tanggal maupun jamnya.
  * Voucher can have one or more of this validity dates: daily, birthday, weekly, monthly, one-time, etc
  */
 
