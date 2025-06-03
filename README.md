@@ -1,85 +1,114 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🧾 Ahha Voucher Engine
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Ahha Voucher Engine adalah sistem backend berbasis NestJS dan TypeORM yang dirancang untuk mengelola distribusi dan penggunaan voucher dalam skenario multi-tenant (SaaS).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🔧 Teknologi
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Backend Framework**: NestJS
+- **ORM**: TypeORM
+- **Database**: PostgreSQL
+- **Auth**: JWT
+- **Encryption**: AES (EncryptionService)
+- **Multitenancy**: Per client memiliki konfigurasi database masing-masing
 
-## Project setup
+---
 
-```bash
-$ npm install
-```
+## 🧠 Arsitektur Utama
 
-## Compile and run the project
+### 1. Multi-Tenant Architecture
 
-```bash
-# development
-$ npm run start
+Sistem ini mendukung model **database-per-tenant**. Setiap `Client` memiliki konfigurasi database sendiri (host, port, username, password, nama DB) yang disimpan dalam tabel `clients`. Saat request masuk, subdomain diekstrak dan dipakai untuk menentukan koneksi database aktif.
 
-# watch mode
-$ npm run start:dev
+#### 🔁 Middleware:
+- `SubdomainMiddleware` menangkap subdomain dan menyimpannya dalam objek request.
+- `CredentialMiddleware` menyisipkan koneksi database yang sesuai.
 
-# production mode
-$ npm run start:prod
-```
+### 2. Modul Utama
 
-## Run tests
+#### 📦 Voucher
+Entitas utama yang mengatur:
+- `code`, `description`, `quota`
+- `categories`, `validities`, `bindings`, `target_users`
 
-```bash
-# unit tests
-$ npm run test
+#### 🧷 Voucher Category
+Kategori seperti `food`, `electronics`, dll. Dihubungkan via relasi ManyToMany ke voucher.
 
-# e2e tests
-$ npm run test:e2e
+#### ⏳ Voucher Validity
+Rentang tanggal dan waktu voucher berlaku.
 
-# test coverage
-$ npm run test:cov
-```
+#### 🔗 Voucher Binding
+Binding voucher ke produk/brand/store tertentu menggunakan `bind_type` dan `bind_value`.
 
-## Resources
+#### 👥 Target Users
+Daftar user yang boleh menggunakan voucher.
 
-Check out a few resources that may come in handy when working with NestJS:
+#### 📤 Voucher Claim
+Riwayat klaim voucher oleh user.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+#### ✅ Voucher Usage
+Riwayat pemakaian voucher dalam transaksi.
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 🔐 Autentikasi & Admin
 
-## Stay in touch
+### Admin
+- Didaftarkan per client.
+- Login menggunakan email dan password (bcrypt).
+- Mendapatkan token JWT untuk autentikasi.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## 🚀 Endpoint Penting
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- `POST /admin/login` – login admin
+- `POST /vouchers` – membuat voucher baru
+- `GET /vouchers` – mengambil semua voucher
+- `POST /vouchers/claim` – klaim voucher
+- `POST /vouchers/use` – gunakan voucher
+
+> Semua endpoint berjalan dalam konteks tenant berdasarkan subdomain.
+
+---
+
+## 🌱 Seeder
+
+Tersedia seeder untuk:
+- `clients`: konfigurasi multitenant
+- `admins`: akun login awal
+- Seeder bisa dijalankan via `yarn seed`
+
+---
+
+## 🧪 Development Notes
+
+- Gunakan domain seperti `client1.localhost.dev` untuk simulasi subdomain.
+- Tambahkan entri di `/etc/hosts`:
+  ```
+  127.0.0.1 client1.localhost.dev
+  ```
+- Pastikan PostgreSQL berjalan dan `uuid-ossp` extension aktif.
+
+---
+
+## 📁 Struktur Folder
+
+- `src/modules` – Domain logic seperti voucher
+- `src/admin`, `src/client` – Manajemen admin & tenant
+- `src/database` – Dynamic DB handler per tenant
+- `src/encryption` – AES encryption helper
+- `src/seeder` – Seeder client dan admin
+
+---
+
+## 📌 TODO (Pengembangan Selanjutnya)
+
+- Fitur import voucher secara bulk
+- Manajemen role-based access
+- Webhook untuk notifikasi penggunaan voucher
+- Dashboard analitik penggunaan voucher
+
+---
+
