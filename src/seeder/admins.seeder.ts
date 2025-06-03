@@ -34,12 +34,6 @@ export const adminsSeeder = [
     name: 'Client 1 Admin',
     email: 'admin@client1.com',
     password: 'admin123',
-    client: { database_name: 'ahha_client_1_db' },
-  },
-  {
-    name: 'Client 2 Admin',
-    email: 'admin@client2.com',
-    password: 'admin123',
-    client: { database_name: 'ahha_client_2_db' },
+    client: { database_name: 'railway' },
   },
 ];
