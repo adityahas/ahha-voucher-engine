@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: false, // Comment out if you want to insert nested objects without uuid
+      whitelist: true, // Comment out if you want to insert nested objects without uuid
       forbidNonWhitelisted: true,
       transform: true,
     }),
