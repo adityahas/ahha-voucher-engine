@@ -12,6 +12,11 @@ import { ClientsModule } from './client/client.module';
 import { SubdomainMiddleware } from './middleware/subdomain.middleware';
 import { CredentialMiddleware } from './middleware/credential.middleware';
 import { EncryptionModule } from './encryption/encryption.module';
+import { TradingModule } from './modules/trading/trading.module';
+import { CollectibleItemsModule } from './modules/collectible-items/collectible-items.module';
+import { GamificationGachaModule } from './modules/gamification-gacha/gamification-gacha.module';
+import { TierModule } from './modules/tier/tier.module';
+import { GamificationDailyCheckinModule } from './modules/gamification-daily-checkin/gamification-daily-checkin.module';
 
 dotenv.config();
 
@@ -39,6 +44,11 @@ dotenv.config();
     QuestModule,
     AdminModule,
     EncryptionModule,
+    TradingModule,
+    CollectibleItemsModule,
+    GamificationGachaModule,
+    TierModule,
+    GamificationDailyCheckinModule,
   ],
   controllers: [AppController],
   providers: [AppService],
