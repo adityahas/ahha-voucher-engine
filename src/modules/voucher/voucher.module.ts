@@ -23,7 +23,16 @@ import { Client } from '../../client/entities/client.entity';
       VoucherValidity,
     ]),
   ],
-  providers: [VoucherService, ClientsService],
+  providers: [
+    {
+      provide: 'VOUCHER_SERVICE',
+      useFactory: async (connection) => {
+        return new VoucherService(connection);
+      },
+      inject: ['CONNECTION'],
+    },
+    ClientsService,
+  ],
   controllers: [VoucherController],
 })
 export class VoucherModule {}

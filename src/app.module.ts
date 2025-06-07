@@ -17,6 +17,7 @@ import { CollectibleItemsModule } from './modules/collectible-items/collectible-
 import { GamificationGachaModule } from './modules/gamification-gacha/gamification-gacha.module';
 import { TierModule } from './modules/tier/tier.module';
 import { GamificationDailyCheckinModule } from './modules/gamification-daily-checkin/gamification-daily-checkin.module';
+import { TenancyModule } from './tenancy/tenancy.module';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ dotenv.config();
     }),
     DatabaseModule,
     ClientsModule,
+    TenancyModule,
     UserModule,
     VoucherModule,
     QuestModule,

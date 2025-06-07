@@ -1,35 +1,39 @@
-import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
-import { BaseController } from '../../base/base.controller';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
-export class UserController extends BaseController {
-  constructor(private readonly userService: UserService) {
-    super();
-  }
+export class UserController {
+  constructor(
+    @Inject('USER_SERVICE')
+    private readonly userService: UserService,
+  ) {}
 
   @Get()
-  findAll(@Req() req: Request) {
-    return this.userService.findAll(this.getDatabaseName(req));
+  findAll() {
+    return this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Req() req: Request, @Param('id') id: string) {
-    return this.userService.findOne(this.getDatabaseName(req), id);
+  findOne(@Param('id') id: string) {
+    return this.userService.findOne(id);
   }
 
   @Post()
-  create(@Req() req: Request, @Body() user: CreateUserDto) {
-    return this.userService.create(this.getDatabaseName(req), user);
+  create(@Body() user: CreateUserDto) {
+    return this.userService.create(user);
   }
 
   @Put(':id')
-  update(
-    @Req() req: Request,
-    @Param('id') id: string,
-    @Body() user: CreateUserDto,
-  ) {
-    return this.userService.update(this.getDatabaseName(req), id, user);
+  update(@Param('id') id: string, @Body() user: CreateUserDto) {
+    return this.userService.update(id, user);
   }
 }

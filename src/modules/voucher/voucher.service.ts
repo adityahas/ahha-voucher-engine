@@ -3,68 +3,57 @@ import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { Voucher } from './entities/voucher.entity';
 import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
-import { BaseService } from '../../base/base.service';
-import { DatabaseService } from '../../database/database.service';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
-export class VoucherService extends BaseService {
-  constructor(databaseService: DatabaseService) {
-    super(databaseService);
+export class VoucherService {
+  private repository: Repository<Voucher>;
+
+  constructor(dataSource: DataSource) {
+    this.repository = dataSource.getRepository(Voucher);
   }
 
-  async create(
-    databaseName: string,
-    createVoucherDto: CreateVoucherDto,
-  ): Promise<Voucher> {
-    const voucherRepository = await this.getRepository(databaseName, Voucher);
-
+  async create(createVoucherDto: CreateVoucherDto): Promise<Voucher> {
     // // Check if voucher category exists
     // const voucherCategories = await this.voucherCategoryRepository.findBy({
     //   slug: In(createVoucherDto.categories.map((category) => category.slug)),
     // });
     //
     // console.log('voucherCategories', voucherCategories);
-    const voucher = await voucherRepository.create(createVoucherDto);
-    return voucherRepository.save(voucher);
+    const voucher = this.repository.create(createVoucherDto);
+    return this.repository.save(voucher);
   }
 
-  async findAll(databaseName: string): Promise<Voucher[]> {
-    const voucherRepository = await this.getRepository(databaseName, Voucher);
-    return voucherRepository.find({
+  async findAll(): Promise<Voucher[]> {
+    return this.repository.find({
       relations: ['categories', 'target_users', 'bindings', 'validities'],
     });
   }
 
-  async findOne(databaseName: string, id: string): Promise<Voucher> {
-    const voucherRepository = await this.getRepository(databaseName, Voucher);
-    return voucherRepository.findOne({
+  async findOne(id: string): Promise<Voucher> {
+    return this.repository.findOne({
       where: { code: id },
     });
   }
 
   async update(
-    databaseName: string,
     id: string,
     updateVoucherDto: UpdateVoucherDto,
   ): Promise<Voucher> {
-    const voucherRepository = await this.getRepository(databaseName, Voucher);
-    await voucherRepository.update(id, updateVoucherDto);
-    return voucherRepository.findOne({
+    await this.repository.update(id, updateVoucherDto);
+    return this.repository.findOne({
       where: { code: id },
     });
   }
 
-  async remove(databaseName: string, id: number): Promise<void> {
-    const voucherRepository = await this.getRepository(databaseName, Voucher);
-    await voucherRepository.delete(id);
+  async remove(id: number): Promise<void> {
+    await this.repository.delete(id);
   }
 
   async getEligibleVouchers(
-    databaseName: string,
     searchCriteria: GetVoucherEligibleVoucherDto,
   ): Promise<Voucher[]> {
-    const voucherRepository = await this.getRepository(databaseName, Voucher);
-    const queryBuilder = voucherRepository.createQueryBuilder('voucher');
+    const queryBuilder = this.repository.createQueryBuilder('voucher');
     let isWhereClauseAdded = false;
 
     if (searchCriteria.user_id) {
