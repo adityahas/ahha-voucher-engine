@@ -1,69 +1,52 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  Req,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
-import { BaseController } from '../../base/base.controller';
 
 @Controller('vouchers')
-export class VoucherController extends BaseController {
-  constructor(private readonly voucherService: VoucherService) {
-    super();
-  }
+export class VoucherController {
+  constructor(
+    @Inject('VOUCHER_SERVICE')
+    private readonly voucherService: VoucherService,
+  ) {}
 
   @Post()
-  create(@Req() req: Request, @Body() createVoucherDto: CreateVoucherDto) {
-    return this.voucherService.create(
-      this.getDatabaseName(req),
-      createVoucherDto,
-    );
+  create(@Body() createVoucherDto: CreateVoucherDto) {
+    return this.voucherService.create(createVoucherDto);
   }
 
   @Get()
-  findAll(@Req() req: Request) {
-    return this.voucherService.findAll(this.getDatabaseName(req));
+  findAll() {
+    return this.voucherService.findAll();
   }
 
   @Get('/eligible')
-  getEligibleVouchers(
-    @Req() req: Request,
-    @Body() dto: GetVoucherEligibleVoucherDto,
-  ) {
-    return this.voucherService.getEligibleVouchers(
-      this.getDatabaseName(req),
-      dto,
-    );
+  getEligibleVouchers(@Body() dto: GetVoucherEligibleVoucherDto) {
+    return this.voucherService.getEligibleVouchers(dto);
   }
 
   @Get(':id')
-  findOne(@Req() req: Request, @Param('id') id: string) {
-    return this.voucherService.findOne(this.getDatabaseName(req), id);
+  findOne(@Param('id') id: string) {
+    return this.voucherService.findOne(id);
   }
 
   @Patch(':id')
-  update(
-    @Req() req: Request,
-    @Param('id') id: string,
-    @Body() updateVoucherDto: UpdateVoucherDto,
-  ) {
-    return this.voucherService.update(
-      this.getDatabaseName(req),
-      id,
-      updateVoucherDto,
-    );
+  update(@Param('id') id: string, @Body() updateVoucherDto: UpdateVoucherDto) {
+    return this.voucherService.update(id, updateVoucherDto);
   }
 
   @Delete(':id')
-  remove(@Req() req: Request, @Param('id') id: string) {
-    return this.voucherService.remove(this.getDatabaseName(req), +id);
+  remove(@Param('id') id: string) {
+    return this.voucherService.remove(+id);
   }
 }
