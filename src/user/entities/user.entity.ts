@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '../../base/entities/base.entity';
+import { Role } from '../../acl/role.entity';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -20,4 +21,7 @@ export class User extends BaseEntity {
 
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean;
+
+  @ManyToOne(() => Role, (role) => role.users, { eager: true })
+  role: Role;
 }

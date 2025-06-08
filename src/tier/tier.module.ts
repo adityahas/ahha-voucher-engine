@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
 
-@Module({})
+import { TierController } from './tier.controller';
+
+@Module({
+  controllers: [TierController],
+})
 export class TierModule {}

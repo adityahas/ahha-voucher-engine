@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { Permissions } from '../common/decorators/permissions.decorator';
 import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
@@ -25,6 +26,7 @@ export class VoucherController {
     return this.voucherService.create(createVoucherDto);
   }
 
+  @Permissions('voucher.read')
   @Get()
   findAll() {
     return this.voucherService.findAll();

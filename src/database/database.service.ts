@@ -38,7 +38,7 @@ export class DatabaseService {
         username: client.database_username,
         password: this.encryptionService.decrypt(client.database_password),
         database: client.database_name,
-        entities: ['dist/modules/**/*.entity{.ts,.js}'],
+        entities: ['dist/**/*.entity.ts', 'dist/**/*.entity.js'],
         synchronize: process.env.DB_SYNC === 'true',
       });
       await dataSource.initialize();

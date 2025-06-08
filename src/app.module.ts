@@ -18,6 +18,8 @@ import { GamificationGachaModule } from './gamification-gacha/gamification-gacha
 import { TierModule } from './tier/tier.module';
 import { GamificationDailyCheckinModule } from './gamification-daily-checkin/gamification-daily-checkin.module';
 import { TenancyModule } from './tenancy/tenancy.module';
+import { APP_GUARD } from '@nestjs/core';
+import { PermissionsGuard } from './common/guards/permissions.guard';
 
 dotenv.config();
 
@@ -33,10 +35,7 @@ dotenv.config();
       synchronize: process.env.DB_SYNC == 'true',
       dropSchema: process.env.DB_DROP_SCHEMA == 'true',
       logging: process.env.DB_LOGGING != 'false',
-      entities: [
-        'dist/admin/**/*.entity{.ts,.js}',
-        'dist/client/**/*.entity{.ts,.js}',
-      ],
+      entities: ['dist/**/*.entity.ts', 'dist/**/*.entity.js'],
     }),
     DatabaseModule,
     ClientsModule,
@@ -53,7 +52,13 @@ dotenv.config();
     GamificationDailyCheckinModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
+    },
+    AppService,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
