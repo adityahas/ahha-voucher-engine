@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Voucher } from './voucher.entity';
-import { BaseEntity } from '../../../base/entities/base.entity';
+import { BaseEntity } from '../../base/entities/base.entity';
 
 /*
  * VoucherValidity mendefinisikan periode aktif voucher, baik tanggal maupun jamnya.

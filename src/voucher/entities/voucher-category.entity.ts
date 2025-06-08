@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { BaseEntity } from '../../../base/entities/base.entity';
+import { BaseEntity } from '../../base/entities/base.entity';
 
 /**
  * VoucherCategory mendefinisikan kategori dari voucher, seperti makanan, minuman, dll,

@@ -1,5 +1,5 @@
 import { JoinColumn, ManyToOne } from 'typeorm';
-import { User } from '../../modules/user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { BaseEntity } from './base.entity';
 
 export class UserBaseEntity extends BaseEntity {

@@ -1,9 +1,9 @@
 import {
-  IsString,
-  IsNotEmpty,
-  IsEmail,
   IsBoolean,
+  IsEmail,
+  IsNotEmpty,
   IsOptional,
+  IsString,
 } from '@nestjs/class-validator';
 
 export class CreateUserDto {

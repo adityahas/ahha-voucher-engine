@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Voucher } from './voucher.entity';
-import { BaseEntity } from '../../../base/entities/base.entity';
+import { BaseEntity } from '../../base/entities/base.entity';
 
 /*
  * VoucherBinding menghubungkan voucher dengan entitas eksternal (produk, brand, atau lainnya)

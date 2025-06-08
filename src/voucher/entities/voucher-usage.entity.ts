@@ -1,17 +1,17 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Voucher } from './voucher.entity';
 import { User } from '../../user/entities/user.entity';
-import { BaseEntity } from '../../../base/entities/base.entity';
+import { BaseEntity } from '../../base/entities/base.entity';
 
 /**
- * VoucherClaim menyimpan informasi user yang telah mengklaim voucher tertentu.
+ * VoucherUsage merepresentasikan data penggunaan voucher oleh user dalam suatu transaksi.
  */
-@Entity('voucher_claims')
-export class VoucherClaim extends BaseEntity {
+@Entity('voucher_usages')
+export class VoucherUsage extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Voucher, (voucher) => voucher.claims)
+  @ManyToOne(() => Voucher, (voucher) => voucher.usages)
   @JoinColumn({ name: 'voucher_id' })
   voucher: Voucher;
 
@@ -20,5 +20,5 @@ export class VoucherClaim extends BaseEntity {
   user: User;
 
   @Column({ type: 'timetz', default: () => 'CURRENT_TIMESTAMP' })
-  claimed_at: Date;
+  used_at: Date;
 }
