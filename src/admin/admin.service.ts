@@ -23,7 +23,7 @@ export class AdminService {
       relations: ['client'],
     });
 
-    if (!admin) {
+    if (!admin || admin.client.database_name !== databaseName) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
