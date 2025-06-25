@@ -1,6 +1,8 @@
 import { DataSource } from 'typeorm';
 import { Admin } from '../admin/entities/admin.entity';
 import * as bcrypt from 'bcrypt';
+import { TENANT_ADMIN_ROLE_ID } from './acl.seeder';
+import { clientsSeeder } from './clients.seeder';
 
 export async function seedAdmins(dataSource: DataSource) {
   const adminRepo = dataSource.getRepository(Admin);
@@ -21,6 +23,7 @@ export async function seedAdmins(dataSource: DataSource) {
       email: adminData.email,
       password: hashedPassword,
       client: { database_name: adminData.client.database_name },
+      role: { id: TENANT_ADMIN_ROLE_ID }, // Tenant Admin role ID
     });
 
     await adminRepo.save(admin);
@@ -29,11 +32,9 @@ export async function seedAdmins(dataSource: DataSource) {
   console.log('Admins seeded');
 }
 
-export const adminsSeeder = [
-  {
-    name: 'Client 1 Admin',
-    email: 'admin@client1.com',
-    password: 'admin123',
-    client: { database_name: 'railway' },
-  },
-];
+export const adminsSeeder = clientsSeeder.map((value) => ({
+  name: `Admin ${value.subdomain}`,
+  email: `admin@${value.subdomain}.com`,
+  password: 'admin123',
+  client: { database_name: value.database_name },
+}));

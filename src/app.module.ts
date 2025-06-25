@@ -5,7 +5,6 @@ import { UserModule } from './user/user.module';
 import { VoucherModule } from './voucher/voucher.module';
 import { QuestModule } from './quest/quest.module';
 import { AdminModule } from './admin/admin.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 import { DatabaseModule } from './database/database.module';
 import { ClientsModule } from './client/client.module';
@@ -25,18 +24,6 @@ dotenv.config();
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      synchronize: process.env.DB_SYNC == 'true',
-      dropSchema: process.env.DB_DROP_SCHEMA == 'true',
-      logging: process.env.DB_LOGGING != 'false',
-      entities: ['dist/**/*.entity.ts', 'dist/**/*.entity.js'],
-    }),
     DatabaseModule,
     ClientsModule,
     TenancyModule,

@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '../../base/entities/base.entity';
 import { Client } from '../../client/entities/client.entity';
+import { Role } from '../../acl/role.entity';
 
 @Entity('admins')
 export class Admin extends BaseEntity {
@@ -28,4 +29,8 @@ export class Admin extends BaseEntity {
     referencedColumnName: 'database_name',
   })
   client: Client;
+
+  @ManyToOne(() => Role, (role) => role.admins, { eager: true })
+  @JoinColumn({ name: 'role_id', referencedColumnName: 'id' })
+  role: Role;
 }
