@@ -45,4 +45,13 @@ export const clientsSeeder = [
     database_port: '5432',
     database_host: 'localhost',
   },
+  {
+    subdomain: 'client2',
+    api_key: 'client2-api-key',
+    database_name: 'ahha_client2_db',
+    database_username: 'postgres',
+    database_password: 'P4ssw0rd!',
+    database_port: '5432',
+    database_host: 'localhost',
+  },
 ];
