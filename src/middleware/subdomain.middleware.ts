@@ -27,7 +27,6 @@ export class SubdomainMiddleware implements NestMiddleware {
     }
 
     req['client'] = client;
-    req['database_name'] = client.database_name;
     next();
   }
 }
