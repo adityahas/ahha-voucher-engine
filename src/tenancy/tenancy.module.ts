@@ -21,16 +21,16 @@ export const CONNECTION = 'CONNECTION';
         clientService: ClientsService,
         databaseService: DatabaseService,
       ): Promise<DataSource> => {
-        const name = request['client'].database_name;
-        if (!name) {
+        const databaseName = request['client'].database_name;
+        if (!databaseName) {
           throw new Error('Database name not specified.');
         }
 
-        const dataSource = databaseService.getConnection(name);
-        const client = await clientService.findByDatabaseName(name);
+        const dataSource = databaseService.getConnection(databaseName);
+        const client = await clientService.findByDatabaseName(databaseName);
 
         if (!client || !dataSource) {
-          throw new NotFoundException(`Database ${name} not found.`);
+          throw new NotFoundException(`Database ${databaseName} not found.`);
         }
 
         return dataSource;
