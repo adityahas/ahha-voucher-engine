@@ -4,6 +4,7 @@ import { seedAdmins } from './admins.seeder';
 import { Admin } from '../admin/entities/admin.entity';
 import { Client } from '../client/entities/client.entity';
 import { seedClients } from './clients.seeder';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 const dataSource = new DataSource({
   type: 'postgres',
@@ -11,6 +12,7 @@ const dataSource = new DataSource({
   port: +process.env.DB_PORT,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
+  namingStrategy: new SnakeNamingStrategy(),
   database: process.env.DB_NAME,
   entities: [Admin, Client],
   synchronize: false,
