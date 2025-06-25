@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { ClientsService } from '../client/client.service';
 import { EncryptionService } from '../encryption/encryption.service';
 import * as bcrypt from 'bcrypt';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 /**
  * This service is responsible for managing the databases.
@@ -38,6 +39,7 @@ export class DatabaseService {
         username: client.database_username,
         password: this.encryptionService.decrypt(client.database_password),
         database: client.database_name,
+        namingStrategy: new SnakeNamingStrategy(),
         entities: ['dist/modules/**/*.entity{.ts,.js}'],
         synchronize: process.env.DB_SYNC === 'true',
       });
