@@ -3,22 +3,19 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { DatabaseService } from '../database/database.service';
-import { BaseService } from '../base/base.service';
 import { Admin } from './entities/admin.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
-export class AdminService extends BaseService {
+export class AdminService {
   constructor(
     private readonly databaseService: DatabaseService,
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
     private readonly jwtService: JwtService,
-  ) {
-    super(databaseService);
-  }
+  ) {}
 
   async login(databaseName: string, loginAdminDto: LoginAdminDto) {
     const admin = await this.adminRepository.findOne({
@@ -26,7 +23,7 @@ export class AdminService extends BaseService {
       relations: ['client'],
     });
 
-    if (!admin) {
+    if (!admin || admin.client.database_name !== databaseName) {
       throw new UnauthorizedException('Invalid email or password');
     }
 

@@ -17,6 +17,8 @@ import { CollectibleItemsModule } from './modules/collectible-items/collectible-
 import { GamificationGachaModule } from './modules/gamification-gacha/gamification-gacha.module';
 import { TierModule } from './modules/tier/tier.module';
 import { GamificationDailyCheckinModule } from './modules/gamification-daily-checkin/gamification-daily-checkin.module';
+import { TenancyModule } from './tenancy/tenancy.module';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 dotenv.config();
 
@@ -29,6 +31,7 @@ dotenv.config();
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
+      namingStrategy: new SnakeNamingStrategy(),
       synchronize: process.env.DB_SYNC == 'true',
       dropSchema: process.env.DB_DROP_SCHEMA == 'true',
       logging: process.env.DB_LOGGING != 'false',
@@ -39,6 +42,7 @@ dotenv.config();
     }),
     DatabaseModule,
     ClientsModule,
+    TenancyModule,
     UserModule,
     VoucherModule,
     QuestModule,

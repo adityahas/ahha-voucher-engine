@@ -22,7 +22,6 @@ export class Voucher extends BaseEntity {
   @Column({ type: 'int', default: 1 })
   quota: number;
 
-  @JoinTable()
   @ManyToMany(
     () => VoucherCategory,
     (voucherCategory) => voucherCategory.slug,
@@ -30,6 +29,9 @@ export class Voucher extends BaseEntity {
       cascade: true,
     },
   )
+  @JoinTable({
+    name: 'vouchers_categories',
+  })
   categories: VoucherCategory[];
 
   @ManyToMany(
@@ -39,7 +41,9 @@ export class Voucher extends BaseEntity {
       cascade: true,
     },
   )
-  @JoinTable()
+  @JoinTable({
+    name: 'vouchers_allow_combine_categories',
+  })
   allow_combine_categories: VoucherCategory[];
 
   @OneToMany(
@@ -67,6 +71,8 @@ export class Voucher extends BaseEntity {
   usages: VoucherUsage[];
 
   @ManyToMany(() => User, (user) => user.id, { cascade: true })
-  @JoinTable()
+  @JoinTable({
+    name: 'vouchers_target_users',
+  })
   target_users: User[];
 }

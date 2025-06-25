@@ -39,10 +39,19 @@ export const clientsSeeder = [
   {
     subdomain: 'client1',
     api_key: 'client1-api-key',
-    database_name: 'railway',
+    database_name: 'ahha_client1_db',
     database_username: 'postgres',
-    database_password: 'vwjWyalyMXzlhYBPONkjObmQYmdFwXnM',
+    database_password: 'P4ssw0rd!',
     database_port: '5432',
-    database_host: 'postgres--jbm.railway.internal',
+    database_host: 'localhost',
+  },
+  {
+    subdomain: 'client2',
+    api_key: 'client2-api-key',
+    database_name: 'ahha_client2_db',
+    database_username: 'postgres',
+    database_password: 'P4ssw0rd!',
+    database_port: '5432',
+    database_host: 'localhost',
   },
 ];

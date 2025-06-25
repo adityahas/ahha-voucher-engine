@@ -3,8 +3,12 @@ import {
   NestMiddleware,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
+/*
+ * Middleware to validate API key from request headers against the client's API key.
+ * This middleware runs after subdomain middleware
+ */
 @Injectable()
 export class CredentialMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
