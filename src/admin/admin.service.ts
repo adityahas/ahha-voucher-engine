@@ -39,7 +39,7 @@ export class AdminService {
       await this.databaseService.createConnection(databaseName);
     }
 
-    const payload = { email: admin.email, sub: admin.id };
+    const payload = { email: admin.email, sub: admin.id, role: admin.role };
     const token = this.jwtService.sign(payload);
 
     return { admin, token };

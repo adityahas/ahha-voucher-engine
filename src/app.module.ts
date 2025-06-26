@@ -19,6 +19,7 @@ import { TierModule } from './modules/tier/tier.module';
 import { GamificationDailyCheckinModule } from './modules/gamification-daily-checkin/gamification-daily-checkin.module';
 import { TenancyModule } from './tenancy/tenancy.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { AclModule } from './acl/acl.module';
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ dotenv.config();
     DatabaseModule,
     ClientsModule,
     TenancyModule,
+    AclModule,
     UserModule,
     VoucherModule,
     QuestModule,
