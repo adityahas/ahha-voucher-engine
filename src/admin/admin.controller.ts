@@ -7,13 +7,14 @@ import {
   Patch,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { BaseController } from '../base/base.controller';
-import { UseAdminJwtGuard } from '../auth/auth.decorator';
+import { AdminJwtGuard } from '../auth/admin-jwt.guard';
 
 @Controller('admin')
 export class AdminController extends BaseController {
@@ -27,31 +28,31 @@ export class AdminController extends BaseController {
   }
 
   @Post()
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   create(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.create(createAdminDto);
   }
 
   @Get()
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   findAll() {
     return this.adminService.findAll();
   }
 
   @Get(':id')
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   findOne(@Param('id') id: string) {
     return this.adminService.findOne(+id);
   }
 
   @Patch(':id')
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
     return this.adminService.update(+id, updateAdminDto);
   }
 
   @Delete(':id')
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   remove(@Param('id') id: string) {
     return this.adminService.remove(+id);
   }

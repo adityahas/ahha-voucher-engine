@@ -7,12 +7,13 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
-import { UseAdminJwtGuard } from '../../auth/auth.decorator';
+import { AdminJwtGuard } from '../../auth/admin-jwt.guard';
 
 @Controller('vouchers')
 export class VoucherController {
@@ -22,37 +23,37 @@ export class VoucherController {
   ) {}
 
   @Post()
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   create(@Body() createVoucherDto: CreateVoucherDto) {
     return this.voucherService.create(createVoucherDto);
   }
 
   @Get()
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   findAll() {
     return this.voucherService.findAll();
   }
 
   @Get('/eligible')
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   getEligibleVouchers(@Body() dto: GetVoucherEligibleVoucherDto) {
     return this.voucherService.getEligibleVouchers(dto);
   }
 
   @Get(':id')
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   findOne(@Param('id') id: string) {
     return this.voucherService.findOne(id);
   }
 
   @Patch(':id')
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   update(@Param('id') id: string, @Body() updateVoucherDto: UpdateVoucherDto) {
     return this.voucherService.update(id, updateVoucherDto);
   }
 
   @Delete(':id')
-  @UseAdminJwtGuard()
+  @UseGuards(AdminJwtGuard)
   remove(@Param('id') id: string) {
     return this.voucherService.remove(+id);
   }
