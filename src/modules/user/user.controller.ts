@@ -6,10 +6,13 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UseAdminJwtGuard } from '../../auth/auth.decorator';
+import { AclGuard } from '../../acl/acl.guard';
+import { Permissions } from '../../acl/permissions.decorator';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UserController {
@@ -19,25 +22,29 @@ export class UserController {
   ) {}
 
   @Get()
-  @UseAdminJwtGuard()
+  @UseGuards(AuthGuard('jwt'), AclGuard)
+  @Permissions('read:users')
   findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  @UseAdminJwtGuard()
+  @UseGuards(AuthGuard('jwt'), AclGuard)
+  @Permissions('read:users')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
   }
 
   @Post()
-  @UseAdminJwtGuard()
+  @UseGuards(AuthGuard('jwt'), AclGuard)
+  @Permissions('write:users')
   create(@Body() user: CreateUserDto) {
     return this.userService.create(user);
   }
 
   @Put(':id')
-  @UseAdminJwtGuard()
+  @UseGuards(AuthGuard('jwt'), AclGuard)
+  @Permissions('write:users')
   update(@Param('id') id: string, @Body() user: CreateUserDto) {
     return this.userService.update(id, user);
   }
