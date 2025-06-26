@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { VoucherController } from './voucher.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,6 +10,7 @@ import { VoucherUsage } from './entities/voucher-usage.entity';
 import { VoucherValidity } from './entities/voucher-validity.entity';
 import { ClientsService } from '../../client/client.service';
 import { Client } from '../../client/entities/client.entity';
+import { AclModule } from '../../acl/acl.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { Client } from '../../client/entities/client.entity';
       VoucherUsage,
       VoucherValidity,
     ]),
+    forwardRef(() => AclModule),
   ],
   providers: [
     {

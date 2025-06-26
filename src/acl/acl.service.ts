@@ -10,6 +10,10 @@ export class AclService {
       'write:profile',
       'read:users',
       'write:users',
+      'read:vouchers',
+      'write:vouchers',
+      'read:quests',
+      'write:quests',
     ],
   };
 

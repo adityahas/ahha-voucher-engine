@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { jwtConstants } from '../auth/constants';
 import { JwtStrategy } from '../auth/jwt.strategy';
+import { AclModule } from '../acl/acl.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { JwtStrategy } from '../auth/jwt.strategy';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60s' },
     }),
+    forwardRef(() => AclModule),
   ],
   controllers: [AdminController],
   providers: [AdminService, ClientsService, JwtStrategy],

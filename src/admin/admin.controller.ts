@@ -15,6 +15,8 @@ import { UpdateAdminDto } from './dto/update-admin.dto';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { BaseController } from '../base/base.controller';
 import { AdminJwtGuard } from '../auth/admin-jwt.guard';
+import { AclGuard } from '../acl/acl.guard';
+import { Permissions } from '../acl/permissions.decorator';
 
 @Controller('admin')
 export class AdminController extends BaseController {
@@ -28,31 +30,36 @@ export class AdminController extends BaseController {
   }
 
   @Post()
-  @UseGuards(AdminJwtGuard)
+  @UseGuards(AdminJwtGuard, AclGuard)
+  @Permissions('write:users')
   create(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.create(createAdminDto);
   }
 
   @Get()
-  @UseGuards(AdminJwtGuard)
+  @UseGuards(AdminJwtGuard, AclGuard)
+  @Permissions('read:users')
   findAll() {
     return this.adminService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(AdminJwtGuard)
+  @UseGuards(AdminJwtGuard, AclGuard)
+  @Permissions('read:users')
   findOne(@Param('id') id: string) {
     return this.adminService.findOne(+id);
   }
 
   @Patch(':id')
-  @UseGuards(AdminJwtGuard)
+  @UseGuards(AdminJwtGuard, AclGuard)
+  @Permissions('write:users')
   update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
     return this.adminService.update(+id, updateAdminDto);
   }
 
   @Delete(':id')
-  @UseGuards(AdminJwtGuard)
+  @UseGuards(AdminJwtGuard, AclGuard)
+  @Permissions('write:users')
   remove(@Param('id') id: string) {
     return this.adminService.remove(+id);
   }

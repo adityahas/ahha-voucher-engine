@@ -1,3 +1,6 @@
+import { AdminJwtGuard } from '../../auth/admin-jwt.guard';
+import { AclGuard } from '../../acl/acl.guard';
+import { Permissions } from '../../acl/permissions.decorator';
 import {
   Body,
   Controller,
@@ -10,9 +13,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AclGuard } from '../../acl/acl.guard';
-import { Permissions } from '../../acl/permissions.decorator';
-import { AdminJwtGuard } from '../../auth/admin-jwt.guard';
 
 @Controller('users')
 export class UserController {
