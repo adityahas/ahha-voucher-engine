@@ -1,10 +1,10 @@
 // create-voucher.dto.ts
 import {
-  IsString,
+  IsArray,
+  IsInt,
   IsNotEmpty,
   IsOptional,
-  IsInt,
-  IsArray,
+  IsString,
   ValidateNested,
 } from '@nestjs/class-validator';
 import { Type } from '@nestjs/class-transformer';

@@ -1,10 +1,10 @@
 import {
-  IsString,
+  IsEnum,
+  IsISO8601,
   IsNotEmpty,
   IsOptional,
-  IsDateString,
-  IsEnum, IsISO8601
-} from "@nestjs/class-validator";
+  IsString,
+} from '@nestjs/class-validator';
 import { VoucherValidityType } from '../entities/voucher-validity.entity';
 
 export class CreateVoucherValidityDto {

@@ -6,15 +6,15 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { QuestService } from './quest.service';
 import { CreateQuestDto } from './dto/create-quest.dto';
 import { UpdateQuestDto } from './dto/update-quest.dto';
 
-import { AdminJwtGuard } from '../../auth/admin-jwt.guard';
-import { AclGuard } from '../../acl/acl.guard';
-import { Permissions } from '../../acl/permissions.decorator';
-import { UseGuards } from '@nestjs/common';
+import { AdminJwtGuard } from '../../../auth/admin-jwt.guard';
+import { AclGuard } from '../../../acl/acl.guard';
+import { Permissions } from '../../../acl/permissions.decorator';
 
 @Controller('quest')
 export class QuestController {
