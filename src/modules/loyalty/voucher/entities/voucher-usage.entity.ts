@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Voucher } from './voucher.entity';
-import { User } from '../../user/entities/user.entity';
-import { BaseEntity } from '../../../base/entities/base.entity';
+import { User } from '../../../user/entities/user.entity';
+import { BaseEntity } from '../../../../base/entities/base.entity';
 
 /**
  * VoucherUsage merepresentasikan data penggunaan voucher oleh user dalam suatu transaksi.

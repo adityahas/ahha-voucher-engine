@@ -3,9 +3,9 @@ import { VoucherValidity } from './voucher-validity.entity';
 import { VoucherBinding } from './voucher-binding.entity';
 import { VoucherClaim } from './voucher-claim.entity';
 import { VoucherUsage } from './voucher-usage.entity';
-import { BaseEntity } from '../../../base/entities/base.entity';
+import { BaseEntity } from '../../../../base/entities/base.entity';
 import { VoucherCategory } from './voucher-category.entity';
-import { User } from '../../user/entities/user.entity';
+import { User } from '../../../user/entities/user.entity';
 
 /**
  * Voucher adalah entitas utama yang merepresentasikan kupon yang dapat diklaim oleh user.

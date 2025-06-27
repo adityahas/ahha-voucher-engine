@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty } from '@nestjs/class-validator';
+import { IsNotEmpty, IsString } from '@nestjs/class-validator';
 
 export class CreateVoucherCategoryDto {
   @IsString()
