@@ -29,4 +29,3 @@ export class User extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean;
 }
-

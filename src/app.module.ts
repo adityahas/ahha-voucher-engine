@@ -16,9 +16,7 @@ import { TradingModule } from './modules/loyalty/trading/trading.module';
 import { CollectibleItemsModule } from './modules/loyalty/collectible-items/collectible-items.module';
 import { GamificationGachaModule } from './modules/loyalty/gamification-gacha/gamification-gacha.module';
 import { TierModule } from './modules/loyalty/tier/tier.module';
-import {
-  GamificationDailyCheckinModule,
-} from './modules/loyalty/gamification-daily-checkin/gamification-daily-checkin.module';
+import { GamificationDailyCheckinModule } from './modules/loyalty/gamification-daily-checkin/gamification-daily-checkin.module';
 import { TenancyModule } from './tenancy/tenancy.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AclModule } from './acl/acl.module';
