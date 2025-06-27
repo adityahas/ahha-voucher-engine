@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './modules/user/user.module';
 import { VoucherModule } from './modules/loyalty/voucher/voucher.module';
 import { QuestModule } from './modules/loyalty/quest/quest.module';
 import { AdminModule } from './admin/admin.module';
@@ -16,10 +15,14 @@ import { TradingModule } from './modules/loyalty/trading/trading.module';
 import { CollectibleItemsModule } from './modules/loyalty/collectible-items/collectible-items.module';
 import { GamificationGachaModule } from './modules/loyalty/gamification-gacha/gamification-gacha.module';
 import { TierModule } from './modules/loyalty/tier/tier.module';
-import { GamificationDailyCheckinModule } from './modules/loyalty/gamification-daily-checkin/gamification-daily-checkin.module';
+import {
+  GamificationDailyCheckinModule,
+} from './modules/loyalty/gamification-daily-checkin/gamification-daily-checkin.module';
 import { TenancyModule } from './tenancy/tenancy.module';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AclModule } from './acl/acl.module';
+import { RdsModule } from './modules/rds/rds.module';
+import { UserModule } from './modules/user/user.module';
 
 dotenv.config();
 
@@ -55,6 +58,7 @@ dotenv.config();
     GamificationGachaModule,
     TierModule,
     GamificationDailyCheckinModule,
+    RdsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

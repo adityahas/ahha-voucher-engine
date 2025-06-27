@@ -15,6 +15,8 @@ export class AclService {
       'read:quests',
       'write:quests',
     ],
+    [Role.SALES]: ['read:products', 'read:warehouses'],
+    [Role.DRIVER]: ['read:orders', 'write:orders'],
   };
 
   can(role: Role, permission: string): boolean {

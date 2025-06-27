@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
+import { Client } from '../client/entities/client.entity';
 
 @Injectable()
 export class SubdomainMiddleware implements NestMiddleware {
@@ -19,7 +20,7 @@ export class SubdomainMiddleware implements NestMiddleware {
 
     //TODO: Probably need to implement redis caching here
     const client = await this.dataSource
-      .getRepository('clients')
+      .getRepository(Client)
       .findOne({ where: { subdomain } });
 
     if (!client) {
