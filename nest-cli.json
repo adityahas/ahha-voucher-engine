@@ -1,8 +1,133 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
-  "compilerOptions": {
-    "deleteOutDir": true
+  "monorepo": true,
+  "projects": {
+    "acl": {
+      "type": "library",
+      "root": "libs/acl",
+      "entryFile": "index",
+      "sourceRoot": "libs/acl/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/acl/tsconfig.lib.json"
+      }
+    },
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
+    },
+    "base": {
+      "type": "library",
+      "root": "libs/base",
+      "entryFile": "index",
+      "sourceRoot": "libs/base/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/base/tsconfig.lib.json"
+      }
+    },
+    "client": {
+      "type": "library",
+      "root": "libs/client",
+      "entryFile": "index",
+      "sourceRoot": "libs/client/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/client/tsconfig.lib.json"
+      }
+    },
+    "cms": {
+      "type": "application",
+      "root": "apps/cms",
+      "entryFile": "main",
+      "sourceRoot": "apps/cms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/cms/tsconfig.app.json"
+      }
+    },
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "encryption": {
+      "type": "library",
+      "root": "libs/encryption",
+      "entryFile": "index",
+      "sourceRoot": "libs/encryption/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/encryption/tsconfig.lib.json"
+      }
+    },
+    "loyalty": {
+      "type": "application",
+      "root": "apps/loyalty",
+      "entryFile": "index",
+      "sourceRoot": "apps/loyalty/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/loyalty/tsconfig.lib.json"
+      }
+    },
+    "main": {
+      "type": "application",
+      "root": "apps/main",
+      "entryFile": "main",
+      "sourceRoot": "apps/main/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/main/tsconfig.app.json"
+      }
+    },
+    "middleware": {
+      "type": "library",
+      "root": "libs/middleware",
+      "entryFile": "index",
+      "sourceRoot": "libs/middleware/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/middleware/tsconfig.lib.json"
+      }
+    },
+    "product": {
+      "type": "application",
+      "root": "apps/product",
+      "entryFile": "index",
+      "sourceRoot": "apps/product/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/product/tsconfig.lib.json"
+      }
+    },
+    "redistro": {
+      "type": "application",
+      "root": "apps/redistro",
+      "entryFile": "main",
+      "sourceRoot": "apps/redistro/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/redistro/tsconfig.app.json"
+      }
+    },
+    "tenancy": {
+      "type": "library",
+      "root": "libs/tenancy",
+      "entryFile": "index",
+      "sourceRoot": "libs/tenancy/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/tenancy/tsconfig.lib.json"
+      }
+    },
+    "user": {
+      "type": "application",
+      "root": "apps/user",
+      "entryFile": "index",
+      "sourceRoot": "apps/user/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/user/tsconfig.lib.json"
+      }
+    }
   }
 }
