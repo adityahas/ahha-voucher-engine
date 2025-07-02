@@ -17,6 +17,42 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "plugins": ["@nesxtjs/swagger/plugin"]
+    "plugins": [
+      {
+        "name": "@nesxtjs/swagger/plugin"
+      }
+    ],
+    "paths": {
+      "@core/auth": [
+        "libs/auth/src"
+      ],
+      "@core/auth/*": [
+        "libs/auth/src/*"
+      ],
+      "@core/base": [
+        "libs/base/src"
+      ],
+      "@core/base/*": [
+        "libs/base/src/*"
+      ],
+      "@core/database": [
+        "libs/database/src"
+      ],
+      "@core/database/*": [
+        "libs/database/src/*"
+      ],
+      "@core/encryption": [
+        "libs/encryption/src"
+      ],
+      "@core/encryption/*": [
+        "libs/encryption/src/*"
+      ],
+      "@core/middleware": [
+        "libs/middleware/src"
+      ],
+      "@core/middleware/*": [
+        "libs/middleware/src/*"
+      ],
+    }
   }
 }
