@@ -7,7 +7,7 @@ import { BaseEntity } from '@core/base/entities/base.entity';
 @Entity({
   name: 'quests',
 })
-export class Quest extends BaseEntity {
+export class QuestEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

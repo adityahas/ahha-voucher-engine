@@ -6,14 +6,14 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import { Admin } from './entities/admin.entity';
+import { AdminEntity } from './entities/admin.entity';
 
 @Injectable()
 export class CmsService {
   constructor(
     private readonly databaseService: DatabaseService,
-    @InjectRepository(Admin)
-    private readonly adminRepository: Repository<Admin>,
+    @InjectRepository(AdminEntity)
+    private readonly adminRepository: Repository<AdminEntity>,
     private readonly jwtService: JwtService,
   ) {}
 

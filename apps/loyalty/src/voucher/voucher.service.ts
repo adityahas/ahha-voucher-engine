@@ -1,50 +1,67 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
-import { Voucher } from './entities/voucher.entity';
+import { VoucherEntity } from './entities/voucher.entity';
 import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
 import { DataSource, In, Repository } from 'typeorm';
-import { User } from '@core/user/entities/user.entity';
-import { VoucherCategory } from './entities/voucher-category.entity';
+import { VoucherCategoryEntity } from './entities/voucher-category.entity';
+import { LoyaltyUserEntity } from '../entities/loyalty-user.entity';
 
 @Injectable()
 export class VoucherService {
-  private repository: Repository<Voucher>;
-  private userRepository: Repository<User>;
-  private voucherCategoryRepository: Repository<VoucherCategory>;
+  private repository: Repository<VoucherEntity>;
+  private userRepository: Repository<LoyaltyUserEntity>;
+  private voucherCategoryRepository: Repository<VoucherCategoryEntity>;
 
   constructor(dataSource: DataSource) {
-    this.repository = dataSource.getRepository(Voucher);
-    this.userRepository = dataSource.getRepository(User);
-    this.voucherCategoryRepository = dataSource.getRepository(VoucherCategory);
+    this.repository = dataSource.getRepository(VoucherEntity);
+    this.userRepository = dataSource.getRepository(LoyaltyUserEntity);
+    this.voucherCategoryRepository = dataSource.getRepository(
+      VoucherCategoryEntity,
+    );
   }
 
-  async create(createVoucherDto: CreateVoucherDto): Promise<Voucher> {
-    const voucher = new Voucher();
+  async create(createVoucherDto: CreateVoucherDto): Promise<VoucherEntity> {
+    const voucher = new VoucherEntity();
     Object.assign(voucher, createVoucherDto);
 
-    if (createVoucherDto.target_users && createVoucherDto.target_users.length > 0) {
-      voucher.target_users = await this.userRepository.findBy({ id: In(createVoucherDto.target_users) });
+    if (
+      createVoucherDto.target_users &&
+      createVoucherDto.target_users.length > 0
+    ) {
+      voucher.target_users = await this.userRepository.findBy({
+        id: In(createVoucherDto.target_users),
+      });
     }
 
     if (createVoucherDto.categories && createVoucherDto.categories.length > 0) {
-      voucher.categories = await this.voucherCategoryRepository.findBy({ slug: In(createVoucherDto.categories.map(c => c.slug)) });
+      voucher.categories = await this.voucherCategoryRepository.findBy({
+        slug: In(createVoucherDto.categories.map((c) => c.slug)),
+      });
     }
 
-    if (createVoucherDto.allow_combine_categories && createVoucherDto.allow_combine_categories.length > 0) {
-      voucher.allow_combine_categories = await this.voucherCategoryRepository.findBy({ slug: In(createVoucherDto.allow_combine_categories.map(c => c.slug)) });
+    if (
+      createVoucherDto.allow_combine_categories &&
+      createVoucherDto.allow_combine_categories.length > 0
+    ) {
+      voucher.allow_combine_categories =
+        await this.voucherCategoryRepository.findBy({
+          slug: In(
+            createVoucherDto.allow_combine_categories.map((c) => c.slug),
+          ),
+        });
     }
 
     return this.repository.save(voucher);
   }
 
-  async findAll(): Promise<Voucher[]> {
+  async findAll(): Promise<VoucherEntity[]> {
     return this.repository.find({
       relations: ['categories', 'target_users', 'bindings', 'validities'],
     });
   }
 
-  async findOne(id: string): Promise<Voucher> {
+  async findOne(id: string): Promise<VoucherEntity> {
     return this.repository.findOne({
       where: { code: id },
     });
@@ -53,7 +70,7 @@ export class VoucherService {
   async update(
     id: string,
     updateVoucherDto: UpdateVoucherDto,
-  ): Promise<Voucher> {
+  ): Promise<VoucherEntity> {
     const voucher = await this.repository.findOne({ where: { code: id } });
 
     if (!voucher) {
@@ -61,15 +78,27 @@ export class VoucherService {
     }
 
     if (updateVoucherDto.target_users !== undefined) {
-      voucher.target_users = await this.userRepository.findBy({ id: In(updateVoucherDto.target_users) });
+      voucher.target_users = await this.userRepository.findBy({
+        id: In(updateVoucherDto.target_users),
+      });
     }
 
     if (updateVoucherDto.categories && updateVoucherDto.categories.length > 0) {
-      voucher.categories = await this.voucherCategoryRepository.findBy({ slug: In(updateVoucherDto.categories.map(c => c.slug)) });
+      voucher.categories = await this.voucherCategoryRepository.findBy({
+        slug: In(updateVoucherDto.categories.map((c) => c.slug)),
+      });
     }
 
-    if (updateVoucherDto.allow_combine_categories && updateVoucherDto.allow_combine_categories.length > 0) {
-      voucher.allow_combine_categories = await this.voucherCategoryRepository.findBy({ slug: In(updateVoucherDto.allow_combine_categories.map(c => c.slug)) });
+    if (
+      updateVoucherDto.allow_combine_categories &&
+      updateVoucherDto.allow_combine_categories.length > 0
+    ) {
+      voucher.allow_combine_categories =
+        await this.voucherCategoryRepository.findBy({
+          slug: In(
+            updateVoucherDto.allow_combine_categories.map((c) => c.slug),
+          ),
+        });
     }
 
     Object.assign(voucher, updateVoucherDto);
@@ -82,7 +111,7 @@ export class VoucherService {
 
   async getEligibleVouchers(
     searchCriteria: GetVoucherEligibleVoucherDto,
-  ): Promise<Voucher[]> {
+  ): Promise<VoucherEntity[]> {
     const queryBuilder = this.repository.createQueryBuilder('voucher');
     let isWhereClauseAdded = false;
 

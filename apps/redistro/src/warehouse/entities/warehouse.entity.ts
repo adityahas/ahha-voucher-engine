@@ -1,14 +1,14 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '@core/base/entities/base.entity';
-import { User } from '@core/user/entities/user.entity';
+import { RedistroUserEntity } from '../../entities/redistro-user.entity';
 
 @Entity('warehouses')
-export class Warehouse extends BaseEntity {
+export class WarehouseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User, { cascade: true })
-  rds_user: User;
+  @OneToOne(() => RedistroUserEntity, { cascade: true })
+  rds_user: RedistroUserEntity;
 
   @Column({ type: 'varchar' })
   name: string;

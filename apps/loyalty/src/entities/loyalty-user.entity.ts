@@ -1,10 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('rds_products')
-export class RedistroProductEntity {
+@Entity('loyalty_users')
+export class LoyaltyUserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'uuid', unique: true })
-  core_product_id: string;
+  core_user_id: string;
 }

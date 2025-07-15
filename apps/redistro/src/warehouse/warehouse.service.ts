@@ -1,30 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Warehouse } from './entities/warehouse.entity';
+import { WarehouseEntity } from './entities/warehouse.entity';
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 
 @Injectable()
 export class WarehouseService {
   constructor(
-    @InjectRepository(Warehouse)
-    private warehouseRepository: Repository<Warehouse>,
+    @InjectRepository(WarehouseEntity)
+    private warehouseRepository: Repository<WarehouseEntity>,
   ) {}
 
-  create(createWarehouseDto: CreateWarehouseDto): Promise<Warehouse> {
+  create(createWarehouseDto: CreateWarehouseDto): Promise<WarehouseEntity> {
     return this.warehouseRepository.save(createWarehouseDto);
   }
 
-  findAll(): Promise<Warehouse[]> {
+  findAll(): Promise<WarehouseEntity[]> {
     return this.warehouseRepository.find();
   }
 
-  findOne(id: string): Promise<Warehouse> {
+  findOne(id: string): Promise<WarehouseEntity> {
     return this.warehouseRepository.findOneBy({ id });
   }
 
-  update(id: string, updateWarehouseDto: UpdateWarehouseDto): Promise<Warehouse> {
+  update(id: string, updateWarehouseDto: UpdateWarehouseDto): Promise<WarehouseEntity> {
     return this.warehouseRepository.save({ ...updateWarehouseDto, id });
   }
 

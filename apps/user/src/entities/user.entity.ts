@@ -3,7 +3,7 @@ import { BaseEntity } from '@core/base/entities/base.entity';
 import { Role } from '@core/auth/roles.enum';
 
 @Entity('users')
-export class User extends BaseEntity {
+export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

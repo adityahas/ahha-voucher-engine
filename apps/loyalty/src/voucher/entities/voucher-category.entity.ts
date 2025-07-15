@@ -6,7 +6,7 @@ import { BaseEntity } from '@core/base/entities/base.entity';
  * untuk keperluan pengelompokan dan filtering.
  */
 @Entity('voucher_categories')
-export class VoucherCategory extends BaseEntity {
+export class VoucherCategoryEntity extends BaseEntity {
   @PrimaryColumn({ type: 'varchar', unique: true, nullable: false })
   slug: string;
 

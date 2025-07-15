@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Voucher } from './voucher.entity';
+import { VoucherEntity } from './voucher.entity';
 import { BaseEntity } from '@core/base/entities/base.entity';
 
 /*
@@ -22,13 +22,13 @@ export enum VoucherValidityType {
 }
 
 @Entity('voucher_validity')
-export class VoucherValidity extends BaseEntity {
+export class VoucherValidityEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Voucher, (voucher) => voucher.validities)
+  @ManyToOne(() => VoucherEntity, (voucher) => voucher.validities)
   @JoinColumn({ name: 'voucher_id' })
-  voucher: Voucher;
+  voucher: VoucherEntity;
 
   @Column({ type: 'varchar', nullable: true })
   type: string;

@@ -10,7 +10,7 @@ import { Role } from '@core/auth/roles.enum';
 import { Client } from '@core/database/entities/client.entity';
 
 @Entity('admins')
-export class Admin extends BaseEntity {
+export class AdminEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
