@@ -11,9 +11,9 @@ import {
 import { QuestService } from './quest.service';
 import { CreateQuestDto } from './dto/create-quest.dto';
 import { UpdateQuestDto } from './dto/update-quest.dto';
-import { AclGuard } from '@core/auth/acl.guard';
-import { AdminJwtGuard } from '@core/auth/admin-jwt.guard';
-import { Permissions } from '@core/auth/permissions.decorator';
+import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
+import { AclGuard } from '@core/auth/guards/acl.guard';
+import { Permissions } from '@core/auth/decorators/permissions.decorator';
 
 @Controller('quest')
 export class QuestController {

@@ -11,7 +11,7 @@ import { DatabaseModule } from '@core/database';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
-import { Admin } from './entities/admin.entity';
+import { AdminEntity } from './entities/admin.entity';
 
 dotenv.config();
 
@@ -38,7 +38,7 @@ dotenv.config();
     }),
     forwardRef(() => AuthModule),
     DatabaseModule,
-    TypeOrmModule.forFeature([Admin]),
+    TypeOrmModule.forFeature([AdminEntity]),
   ],
   controllers: [CmsController],
   providers: [CmsService, JwtStrategy],

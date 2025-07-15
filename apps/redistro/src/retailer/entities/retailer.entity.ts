@@ -3,7 +3,7 @@ import { RedistroUserEntity } from '../../entities/redistro-user.entity';
 import { BaseEntity } from '@core/base/entities/base.entity';
 
 @Entity('retailers')
-export class Retailer extends BaseEntity {
+export class RetailerEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

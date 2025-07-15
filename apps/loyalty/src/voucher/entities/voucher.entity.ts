@@ -1,25 +1,18 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryColumn,
-} from 'typeorm';
-import { VoucherValidity } from './voucher-validity.entity';
-import { VoucherBinding } from './voucher-binding.entity';
-import { VoucherClaim } from './voucher-claim.entity';
-import { VoucherUsage } from './voucher-usage.entity';
-import { VoucherCategory } from './voucher-category.entity';
-import { User } from '@core/user/entities/user.entity';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
+import { VoucherValidityEntity } from './voucher-validity.entity';
+import { VoucherBindingEntity } from './voucher-binding.entity';
+import { VoucherClaimEntity } from './voucher-claim.entity';
+import { VoucherUsageEntity } from './voucher-usage.entity';
+import { VoucherCategoryEntity } from './voucher-category.entity';
 import { BaseEntity } from '@core/base/entities/base.entity';
+import { LoyaltyUserEntity } from '../../entities/loyalty-user.entity';
 
 /**
  * Voucher adalah entitas utama yang merepresentasikan kupon yang dapat diklaim oleh user.
  * Setiap voucher memiliki kategori, masa berlaku, binding, dan daftar target user.
  */
 @Entity('vouchers')
-export class Voucher extends BaseEntity {
+export class VoucherEntity extends BaseEntity {
   @PrimaryColumn({ type: 'varchar', unique: true, nullable: false })
   code: string;
 
@@ -30,7 +23,7 @@ export class Voucher extends BaseEntity {
   quota: number;
 
   @ManyToMany(
-    () => VoucherCategory,
+    () => VoucherCategoryEntity,
     (voucherCategory) => voucherCategory.slug,
     {
       cascade: true,
@@ -39,10 +32,10 @@ export class Voucher extends BaseEntity {
   @JoinTable({
     name: 'vouchers_categories',
   })
-  categories: VoucherCategory[];
+  categories: VoucherCategoryEntity[];
 
   @ManyToMany(
-    () => VoucherCategory,
+    () => VoucherCategoryEntity,
     (voucherCategory) => voucherCategory.slug,
     {
       cascade: true,
@@ -51,35 +44,35 @@ export class Voucher extends BaseEntity {
   @JoinTable({
     name: 'vouchers_allow_combine_categories',
   })
-  allow_combine_categories: VoucherCategory[];
+  allow_combine_categories: VoucherCategoryEntity[];
 
   @OneToMany(
-    () => VoucherValidity,
+    () => VoucherValidityEntity,
     (voucherValidity) => voucherValidity.voucher,
     {
       cascade: true,
     },
   )
-  validities: VoucherValidity[];
+  validities: VoucherValidityEntity[];
 
-  @OneToMany(() => VoucherBinding, (voucherBinding) => voucherBinding.voucher, {
+  @OneToMany(() => VoucherBindingEntity, (voucherBinding) => voucherBinding.voucher, {
     cascade: true,
   })
-  bindings: VoucherBinding[];
+  bindings: VoucherBindingEntity[];
 
-  @OneToMany(() => VoucherClaim, (voucherClaim) => voucherClaim.voucher, {
+  @OneToMany(() => VoucherClaimEntity, (voucherClaim) => voucherClaim.voucher, {
     cascade: true,
   })
-  claims: VoucherClaim[];
+  claims: VoucherClaimEntity[];
 
-  @OneToMany(() => VoucherUsage, (voucherUsage) => voucherUsage.voucher, {
+  @OneToMany(() => VoucherUsageEntity, (voucherUsage) => voucherUsage.voucher, {
     cascade: true,
   })
-  usages: VoucherUsage[];
+  usages: VoucherUsageEntity[];
 
-  @ManyToMany(() => User, (user) => user.id, { cascade: true })
+  @ManyToMany(() => LoyaltyUserEntity, (user) => user.id, { cascade: true })
   @JoinTable({
     name: 'vouchers_target_users',
   })
-  target_users: User[];
+  target_users: LoyaltyUserEntity[];
 }

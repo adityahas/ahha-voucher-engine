@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AclGuard } from '@core/auth/acl.guard';
-import { AdminJwtGuard } from '@core/auth/admin-jwt.guard';
-import { Permissions } from '@core/auth/permissions.decorator';
+import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
+import { AclGuard } from '@core/auth/guards/acl.guard';
+import { Permissions } from '@core/auth/decorators/permissions.decorator';
 
 @Controller('users')
 export class UserController {

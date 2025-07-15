@@ -13,9 +13,9 @@ import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
-import { AclGuard } from '@core/auth/acl.guard';
-import { AdminJwtGuard } from '@core/auth/admin-jwt.guard';
-import { Permissions } from '@core/auth/permissions.decorator';
+import { AclGuard } from '@core/auth/guards/acl.guard';
+import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
+import { Permissions } from '@core/auth/decorators/permissions.decorator';
 
 @Controller('vouchers')
 export class VoucherController {

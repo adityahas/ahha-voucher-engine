@@ -1,10 +1,10 @@
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { clientsSeeder } from './clients.seeder';
-import { Admin } from '../entities/admin.entity';
+import { AdminEntity } from '../entities/admin.entity';
 
 export async function seedAdmins(dataSource: DataSource) {
-  const adminRepo = dataSource.getRepository(Admin);
+  const adminRepo = dataSource.getRepository(AdminEntity);
 
   for (const adminData of adminsSeeder) {
     const exists = await adminRepo.findOneBy({

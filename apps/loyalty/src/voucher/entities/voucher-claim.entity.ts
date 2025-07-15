@@ -5,25 +5,25 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Voucher } from './voucher.entity';
-import { User } from '@core/user/entities/user.entity';
+import { VoucherEntity } from './voucher.entity';
 import { BaseEntity } from '@core/base/entities/base.entity';
+import { LoyaltyUserEntity } from '../../entities/loyalty-user.entity';
 
 /**
  * VoucherClaim menyimpan informasi user yang telah mengklaim voucher tertentu.
  */
 @Entity('voucher_claims')
-export class VoucherClaim extends BaseEntity {
+export class VoucherClaimEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Voucher, (voucher) => voucher.claims)
+  @ManyToOne(() => VoucherEntity, (voucher) => voucher.claims)
   @JoinColumn({ name: 'voucher_id' })
-  voucher: Voucher;
+  voucher: VoucherEntity;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => LoyaltyUserEntity, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: LoyaltyUserEntity;
 
   @Column({ type: 'timetz', default: () => 'CURRENT_TIMESTAMP' })
   claimed_at: Date;

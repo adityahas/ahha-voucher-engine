@@ -1,11 +1,10 @@
-import { Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '@core/user/entities/user.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('rds_users')
 export class RedistroUserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User, { cascade: true })
-  user: User;
+  @Column({ type: 'uuid' })
+  core_service_id: string;
 }
