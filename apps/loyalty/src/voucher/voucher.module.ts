@@ -8,7 +8,7 @@ import { VoucherCategoryEntity } from './entities/voucher-category.entity';
 import { VoucherClaimEntity } from './entities/voucher-claim.entity';
 import { VoucherUsageEntity } from './entities/voucher-usage.entity';
 import { VoucherValidityEntity } from './entities/voucher-validity.entity';
-import { Client } from '@core/database/entities/client.entity';
+import { ClientEntity } from '@core/database/entities/client.entity';
 import { AuthModule } from '@core/auth';
 import { DataSource } from 'typeorm';
 import { LoyaltyModule } from '../loyalty.module';
@@ -16,7 +16,7 @@ import { LoyaltyModule } from '../loyalty.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Client,
+      ClientEntity,
       VoucherEntity,
       VoucherBindingEntity,
       VoucherCategoryEntity,

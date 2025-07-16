@@ -1,9 +1,9 @@
 import { DataSource } from 'typeorm';
-import { Client } from '@core/database/entities/client.entity';
+import { ClientEntity } from '@core/database/entities/client.entity';
 import { EncryptionService } from '@core/encryption';
 
 export async function seedClients(dataSource: DataSource) {
-  const clientRepo = dataSource.getRepository(Client);
+  const clientRepo = dataSource.getRepository(ClientEntity);
   const encryptionService = new EncryptionService();
 
   for (const clientData of clientsSeeder) {
