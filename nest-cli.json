@@ -69,7 +69,7 @@
     "loyalty": {
       "type": "application",
       "root": "apps/loyalty",
-      "entryFile": "index",
+      "entryFile": "main",
       "sourceRoot": "apps/loyalty/src",
       "compilerOptions": {
         "tsConfigPath": "apps/loyalty/tsconfig.lib.json"

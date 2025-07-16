@@ -13,13 +13,13 @@ import { CONNECTION } from '@core/database/database.module';
     forwardRef(() => AuthModule),
   ],
   providers: [
-    {
-      provide: 'USER_SERVICE',
-      useFactory: async (connection) => {
-        return new UserService(connection);
-      },
-      inject: [CONNECTION],
-    },
+    // {
+    //   provide: 'USER_SERVICE',
+    //   useFactory: async (connection) => {
+    //     return new UserService(connection);
+    //   },
+    //   inject: [CONNECTION],
+    // },
   ],
   controllers: [UserController],
 })

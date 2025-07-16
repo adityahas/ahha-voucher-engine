@@ -1,4 +1,9 @@
-import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  forwardRef,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '@core/auth';
 import { CmsController } from './cms.controller';
@@ -29,7 +34,7 @@ dotenv.config();
       dropSchema: process.env.DB_DROP_SCHEMA == 'true',
       logging: process.env.DB_LOGGING != 'false',
       autoLoadEntities: true,
-      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      entities: ['src/**/*.entity.ts'],
     }),
     PassportModule,
     JwtModule.register({

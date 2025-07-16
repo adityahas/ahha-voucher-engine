@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, Module, Scope } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { VoucherController } from './voucher.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,6 +10,8 @@ import { VoucherUsageEntity } from './entities/voucher-usage.entity';
 import { VoucherValidityEntity } from './entities/voucher-validity.entity';
 import { Client } from '@core/database/entities/client.entity';
 import { AuthModule } from '@core/auth';
+import { DataSource } from 'typeorm';
+import { LoyaltyModule } from '../loyalty.module';
 
 @Module({
   imports: [
@@ -23,16 +25,19 @@ import { AuthModule } from '@core/auth';
       VoucherValidityEntity,
     ]),
     forwardRef(() => AuthModule),
+    forwardRef(() => LoyaltyModule),
   ],
   providers: [
     {
       provide: 'VOUCHER_SERVICE',
-      useFactory: async (connection) => {
+      scope: Scope.REQUEST,
+      useFactory: async (connection: DataSource) => {
         return new VoucherService(connection);
       },
-      inject: ['CONNECTION'],
+      inject: ['LOYALTY_CONNECTION'],
     },
   ],
   controllers: [VoucherController],
+  exports: [],
 })
 export class VoucherModule {}

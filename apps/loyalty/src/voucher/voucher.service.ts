@@ -57,7 +57,7 @@ export class VoucherService {
 
   async findAll(): Promise<VoucherEntity[]> {
     return this.repository.find({
-      relations: ['categories', 'target_users', 'bindings', 'validities'],
+      // relations: ['categories', 'target_users', 'bindings', 'validities'],
     });
   }
 

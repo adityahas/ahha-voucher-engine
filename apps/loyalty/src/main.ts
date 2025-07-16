@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { CmsModule } from './cms.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LoyaltyModule } from './loyalty.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(CmsModule);
+  const app = await NestFactory.create(LoyaltyModule);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Comment out if you want to insert nested objects without uuid
@@ -17,10 +17,10 @@ async function bootstrap() {
   }
 
   const config = new DocumentBuilder()
-    .setTitle('AHHA CMS API')
+    .setTitle('AHHA Loyalty API')
     .setDescription('API documentation for the AHHA CMS')
     .setVersion('1.0')
-    .addServer('client1.localhost.dev:9002')
+    .addServer('client1.localhost.dev:9003')
     .addBearerAuth()
     .addApiKey(
       {
@@ -38,8 +38,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.HTTP_PORT_CMS || 9002, () => {
-    console.log(`Running on ${process.env.HTTP_PORT_CMS || 9002}`);
+  await app.listen(process.env.HTTP_PORT_LOYALTY || 9003, () => {
+    console.log(`Running on ${process.env.HTTP_PORT_LOYALTY || 9003}`);
   });
 }
 
