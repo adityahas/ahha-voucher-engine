@@ -3,7 +3,7 @@ import { DataSource, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { EncryptionService } from '@core/encryption';
-import { Client } from '@core/database/entities/client.entity';
+import { ClientEntity } from '@core/database/entities/client.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 /**
@@ -17,8 +17,8 @@ export class DatabaseService {
 
   constructor(
     private readonly encryptionService: EncryptionService,
-    @InjectRepository(Client)
-    private readonly clientRepository: Repository<Client>,
+    @InjectRepository(ClientEntity)
+    private readonly clientRepository: Repository<ClientEntity>,
   ) {}
 
   async getConnection(
@@ -59,7 +59,7 @@ export class DatabaseService {
 
   async createConnection(
     name: string,
-    initDatasourceFn: (client: Client, password: string) => DataSource,
+    initDatasourceFn: (client: ClientEntity, password: string) => DataSource,
   ): Promise<DataSource> {
     if (this._dataSources.has(name)) {
       return this._dataSources.get(name);

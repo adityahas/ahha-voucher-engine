@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '@core/base/entities/base.entity';
 import { Role } from '@core/auth/roles.enum';
-import { Client } from '@core/database/entities/client.entity';
+import { ClientEntity } from '@core/database/entities/client.entity';
 
 @Entity('admins')
 export class AdminEntity extends BaseEntity {
@@ -30,10 +30,10 @@ export class AdminEntity extends BaseEntity {
   })
   role: Role;
 
-  @ManyToOne(() => Client)
+  @ManyToOne(() => ClientEntity)
   @JoinColumn({
     name: 'client_database_name',
     referencedColumnName: 'database_name',
   })
-  client: Client;
+  client: ClientEntity;
 }

@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { BaseEntity } from '@core/base/entities/base.entity';
 
 @Entity('clients')
-export class Client extends BaseEntity {
+export class ClientEntity extends BaseEntity {
   @Column({ unique: true })
   subdomain: string;
 
