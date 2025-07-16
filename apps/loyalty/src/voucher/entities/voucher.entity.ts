@@ -1,4 +1,11 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
 import { VoucherValidityEntity } from './voucher-validity.entity';
 import { VoucherBindingEntity } from './voucher-binding.entity';
 import { VoucherClaimEntity } from './voucher-claim.entity';
@@ -55,9 +62,13 @@ export class VoucherEntity extends BaseEntity {
   )
   validities: VoucherValidityEntity[];
 
-  @OneToMany(() => VoucherBindingEntity, (voucherBinding) => voucherBinding.voucher, {
-    cascade: true,
-  })
+  @OneToMany(
+    () => VoucherBindingEntity,
+    (voucherBinding) => voucherBinding.voucher,
+    {
+      cascade: true,
+    },
+  )
   bindings: VoucherBindingEntity[];
 
   @OneToMany(() => VoucherClaimEntity, (voucherClaim) => voucherClaim.voucher, {

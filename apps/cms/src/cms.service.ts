@@ -37,7 +37,7 @@ export class CmsService {
     }
     console.log('databaseName', databaseName);
     if (!this.databaseService.checkConnectionExists(databaseName)) {
-      await this.databaseService.createConnection(databaseName);
+      await this.databaseService.getConnection(databaseName);
     }
 
     const payload = { email: admin.email, sub: admin.id, role: admin.role };

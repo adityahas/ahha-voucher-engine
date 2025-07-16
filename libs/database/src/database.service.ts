@@ -13,7 +13,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class DatabaseService {
-  private _dataSources: Map<string, any> = new Map();
+  private _dataSources: Map<string, DataSource> = new Map();
 
   constructor(
     private readonly encryptionService: EncryptionService,
@@ -21,33 +21,65 @@ export class DatabaseService {
     private readonly clientRepository: Repository<Client>,
   ) {}
 
-  async createConnection(name: string): Promise<DataSource> {
+  async getConnection(
+    databaseName: string,
+    entityPath?: string,
+  ): Promise<DataSource> {
+    if (!databaseName) {
+      throw new Error('Database name not specified.');
+    }
+
+    const client = await this.findByDatabaseName(databaseName);
+    if (!client) {
+      throw new NotFoundException(`Database ${databaseName} not found.`);
+    }
+
+    if (!entityPath) {
+      entityPath = __dirname + '/**/*.entity{.ts,.js}';
+    }
+
+    if (!this._dataSources.has(databaseName)) {
+      await this.createConnection(databaseName, (client, password) => {
+        return new DataSource({
+          type: 'postgres',
+          host: client.database_host,
+          port: Number(process.env.DB_PORT),
+          username: client.database_username,
+          password: password,
+          database: client.database_name,
+          namingStrategy: new SnakeNamingStrategy(),
+          entities: [entityPath],
+          synchronize: process.env.DB_SYNC === 'true',
+        });
+      });
+    }
+
+    return this._dataSources.get(databaseName);
+  }
+
+  async createConnection(
+    name: string,
+    initDatasourceFn: (client: Client, password: string) => DataSource,
+  ): Promise<DataSource> {
     if (this._dataSources.has(name)) {
       return this._dataSources.get(name);
     }
 
     const client = await this.findByDatabaseName(name);
-
     if (!client) {
       throw new NotFoundException(`Database ${name} not found.`);
     }
 
     try {
       const password = this.encryptionService.decrypt(client.database_password);
-      const dataSource = new DataSource({
-        name,
-        type: 'postgres',
-        host: client.database_host,
-        port: Number(process.env.DB_PORT),
-        username: client.database_username,
-        password: password,
-        database: client.database_name,
-        namingStrategy: new SnakeNamingStrategy(),
-        entities: ['dist/modules/**/*.entity{.ts,.js}'],
-        synchronize: process.env.DB_SYNC === 'true',
-      });
+      const dataSource = initDatasourceFn(client, password);
       await dataSource.initialize();
       this._dataSources.set(name, dataSource);
+
+      // Log the loaded entities for debugging purposes
+      const loadedEntities = dataSource.entityMetadatas.map((e) => e.name);
+      console.log(`Loaded entities for ${name}:`, loadedEntities);
+
       return dataSource;
     } catch (error) {
       console.log(error);
@@ -55,13 +87,6 @@ export class DatabaseService {
         `Failed to connect to database ${name}: ${error.message}`,
       );
     }
-  }
-
-  async getConnection(name: string): Promise<DataSource> {
-    if (!this._dataSources.has(name)) {
-      await this.createConnection(name);
-    }
-    return this._dataSources.get(name);
   }
 
   async closeConnection(name: string): Promise<void> {
