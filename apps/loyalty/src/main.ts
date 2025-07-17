@@ -18,7 +18,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('AHHA Loyalty API')
-    .setDescription('API documentation for the AHHA CMS')
+    .setDescription('API documentation for the AHHA ADMIN')
     .setVersion('1.0')
     .addServer('client1.localhost.dev:9003')
     .addBearerAuth()

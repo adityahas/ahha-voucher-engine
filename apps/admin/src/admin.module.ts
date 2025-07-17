@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '@core/auth';
-import { CmsController } from './cms.controller';
-import { CmsService } from './cms.service';
+import { AdminController } from './admin.controller';
+import { AdminService } from './admin.service';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -45,11 +45,11 @@ dotenv.config();
     DatabaseModule,
     TypeOrmModule.forFeature([AdminEntity]),
   ],
-  controllers: [CmsController],
-  providers: [CmsService, JwtStrategy],
-  exports: [CmsService],
+  controllers: [AdminController],
+  providers: [AdminService, JwtStrategy],
+  exports: [AdminService],
 })
-export class CmsModule implements NestModule {
+export class AdminModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
   }
