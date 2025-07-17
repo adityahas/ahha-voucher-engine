@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { CmsModule } from './cms.module';
+import { AdminModule } from './admin.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(CmsModule);
+  const app = await NestFactory.create(AdminModule);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Comment out if you want to insert nested objects without uuid
@@ -17,8 +17,8 @@ async function bootstrap() {
   }
 
   const config = new DocumentBuilder()
-    .setTitle('AHHA CMS API')
-    .setDescription('API documentation for the AHHA CMS')
+    .setTitle('AHHA ADMIN API')
+    .setDescription('API documentation for the AHHA ADMIN')
     .setVersion('1.0')
     .addServer('client1.localhost.dev:9002')
     .addBearerAuth()
@@ -38,8 +38,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.HTTP_PORT_CMS || 9002, () => {
-    console.log(`Running on ${process.env.HTTP_PORT_CMS || 9002}`);
+  await app.listen(process.env.HTTP_PORT_ADMIN || 9002, () => {
+    console.log(`Running on ${process.env.HTTP_PORT_ADMIN || 9002}`);
   });
 }
 

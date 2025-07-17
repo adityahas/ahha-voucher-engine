@@ -9,7 +9,7 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { AdminEntity } from './entities/admin.entity';
 
 @Injectable()
-export class CmsService {
+export class AdminService {
   constructor(
     private readonly databaseService: DatabaseService,
     @InjectRepository(AdminEntity)

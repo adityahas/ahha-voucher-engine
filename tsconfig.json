@@ -52,7 +52,7 @@
       ],
       "@core/middleware/*": [
         "libs/middleware/src/*"
-      ],
+      ]
     }
   }
 }

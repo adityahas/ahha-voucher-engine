@@ -12,6 +12,15 @@
         "tsConfigPath": "libs/acl/tsconfig.lib.json"
       }
     },
+    "admin": {
+      "type": "application",
+      "root": "apps/admin",
+      "entryFile": "main",
+      "sourceRoot": "apps/admin/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/admin/tsconfig.app.json"
+      }
+    },
     "auth": {
       "type": "library",
       "root": "libs/auth",
@@ -37,15 +46,6 @@
       "sourceRoot": "libs/client/src",
       "compilerOptions": {
         "tsConfigPath": "libs/client/tsconfig.lib.json"
-      }
-    },
-    "cms": {
-      "type": "application",
-      "root": "apps/cms",
-      "entryFile": "main",
-      "sourceRoot": "apps/cms/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/cms/tsconfig.app.json"
       }
     },
     "database": {
@@ -129,5 +129,8 @@
         "tsConfigPath": "apps/user/tsconfig.lib.json"
       }
     }
+  },
+  "compilerOptions": {
+    "webpack": true
   }
 }
