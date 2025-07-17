@@ -28,6 +28,18 @@ dotenv.config();
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      namingStrategy: new SnakeNamingStrategy(),
+      synchronize: false,
+      dropSchema: process.env.DB_DROP_SCHEMA == 'true',
+      logging: process.env.DB_LOGGING != 'false',
+    }),
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
