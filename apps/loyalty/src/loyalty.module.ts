@@ -18,11 +18,12 @@ import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
 import { VoucherModule } from './voucher/voucher.module';
-import { LoyaltyUserEntity } from './entities/loyalty-user.entity';
 import { DataSource } from 'typeorm';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
 import { LoyaltyController } from './loyalty.controller';
+import { LoyaltyUserEntity } from '@core/loyalty-lib/entities/loyalty-user.entity';
+import { ClientEntity } from '@core/database/entities/client.entity';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ dotenv.config();
       synchronize: false,
       dropSchema: process.env.DB_DROP_SCHEMA == 'true',
       logging: process.env.DB_LOGGING != 'false',
+      entities: [ClientEntity],
     }),
     PassportModule,
     JwtModule.register({
@@ -47,9 +49,9 @@ dotenv.config();
     }),
     // DatabaseModule,
     TypeOrmModule.forFeature([LoyaltyUserEntity]),
-    forwardRef(() => AuthModule),
-    forwardRef(() => DatabaseModule),
-    forwardRef(() => VoucherModule),
+    AuthModule,
+    DatabaseModule,
+    VoucherModule,
   ],
   controllers: [LoyaltyController],
   providers: [
@@ -65,7 +67,7 @@ dotenv.config();
         const databaseName = request['client'].database_name;
         return await databaseService.getConnection(
           databaseName,
-          __dirname + '/**/*.entity{.ts,.js}',
+          __dirname + '/../../../**/*.entity{.ts,.js}',
         );
       },
       inject: [REQUEST, DatabaseService],

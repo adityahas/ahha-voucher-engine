@@ -26,6 +26,7 @@ export class AdminController extends BaseController {
 
   @Post('/admin/login')
   login(@Req() req: Request, @Body() loginAdminDto: LoginAdminDto) {
+    console.log(__dirname);
     return this.adminService.login(this.getDatabaseName(req), loginAdminDto);
   }
 

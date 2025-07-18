@@ -47,6 +47,12 @@
       "@core/encryption/*": [
         "libs/encryption/src/*"
       ],
+      "@core/loyalty-lib": [
+        "libs/loyalty-lib/src"
+      ],
+      "@core/loyalty-lib/*": [
+        "libs/loyalty-lib/src/*"
+      ],
       "@core/middleware": [
         "libs/middleware/src"
       ],

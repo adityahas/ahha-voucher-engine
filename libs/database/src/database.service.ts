@@ -23,7 +23,7 @@ export class DatabaseService {
 
   async getConnection(
     databaseName: string,
-    entityPath?: string,
+    ...entityPath: string[]
   ): Promise<DataSource> {
     if (!databaseName) {
       throw new Error('Database name not specified.');
@@ -34,9 +34,7 @@ export class DatabaseService {
       throw new NotFoundException(`Database ${databaseName} not found.`);
     }
 
-    if (!entityPath) {
-      entityPath = __dirname + '/**/*.entity{.ts,.js}';
-    }
+    entityPath.push(__dirname + '/**/*.entity{.ts,.js}');
 
     if (!this._dataSources.has(databaseName)) {
       await this.createConnection(databaseName, (client, password) => {
@@ -48,7 +46,7 @@ export class DatabaseService {
           password: password,
           database: client.database_name,
           namingStrategy: new SnakeNamingStrategy(),
-          entities: [entityPath],
+          entities: entityPath,
           synchronize: process.env.DB_SYNC === 'true',
         });
       });
