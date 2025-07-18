@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
-import { VoucherEntity } from './entities/voucher.entity';
 import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
 import { DataSource, In, Repository } from 'typeorm';
-import { VoucherCategoryEntity } from './entities/voucher-category.entity';
-import { LoyaltyUserEntity } from '../entities/loyalty-user.entity';
+import { VoucherEntity } from '@core/loyalty-lib/voucher/entities/voucher.entity';
+import { LoyaltyUserEntity } from '@core/loyalty-lib/entities/loyalty-user.entity';
+import { VoucherCategoryEntity } from '@core/loyalty-lib/voucher/entities/voucher-category.entity';
 
 @Injectable()
 export class VoucherService {

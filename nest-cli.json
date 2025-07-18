@@ -75,6 +75,15 @@
         "tsConfigPath": "apps/loyalty/tsconfig.lib.json"
       }
     },
+    "loyalty-lib": {
+      "type": "library",
+      "root": "libs/loyalty-lib",
+      "entryFile": "index",
+      "sourceRoot": "libs/loyalty-lib/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/loyalty-lib/tsconfig.lib.json"
+      }
+    },
     "main": {
       "type": "application",
       "root": "apps/main",
@@ -131,6 +140,6 @@
     }
   },
   "compilerOptions": {
-    "webpack": true
+    "webpack": false
   }
 }
