@@ -1,11 +1,11 @@
 import {
-  forwardRef,
   MiddlewareConsumer,
   Module,
   NestModule,
   OnApplicationBootstrap,
   Scope,
 } from '@nestjs/common';
+import * as dotenv from 'dotenv';
 import { LoyaltyService } from './loyalty.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
@@ -14,16 +14,19 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '@core/auth/constants';
 import { AuthModule } from '@core/auth';
 import { DatabaseModule, DatabaseService } from '@core/database';
-import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
 import { VoucherModule } from './voucher/voucher.module';
+import { RewardItemModule } from './reward-item/reward-item.module';
 import { DataSource } from 'typeorm';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
 import { LoyaltyController } from './loyalty.controller';
 import { LoyaltyUserEntity } from '@core/loyalty-lib/entities/loyalty-user.entity';
 import { ClientEntity } from '@core/database/entities/client.entity';
+import { RewardItemEntity } from './reward-item/entities/reward-item.entity';
+import { RewardItemSourceModule } from './reward-item-source/reward-item-source.module';
+import { RewardClaimModule } from './reward-claim/reward-claim.module';
 
 dotenv.config();
 
@@ -40,6 +43,7 @@ dotenv.config();
       synchronize: false,
       dropSchema: process.env.DB_DROP_SCHEMA == 'true',
       logging: process.env.DB_LOGGING != 'false',
+      autoLoadEntities: false,
       entities: [ClientEntity],
     }),
     PassportModule,
@@ -48,10 +52,13 @@ dotenv.config();
       signOptions: { expiresIn: '60s' },
     }),
     // DatabaseModule,
-    TypeOrmModule.forFeature([LoyaltyUserEntity]),
+    TypeOrmModule.forFeature([LoyaltyUserEntity, RewardItemEntity]),
     AuthModule,
     DatabaseModule,
     VoucherModule,
+    RewardItemModule,
+    RewardItemSourceModule,
+    RewardClaimModule,
   ],
   controllers: [LoyaltyController],
   providers: [
