@@ -5,7 +5,7 @@ import {
   ValidateNested,
 } from '@nestjs/class-validator';
 import { Type } from '@nestjs/class-transformer';
-import { CreateVoucherBindingDto } from './create-voucher-binding.dto';
+import { CreateVoucherBindingDto } from '../../../../loyalty-admin/src/voucher/dto/create-voucher-binding.dto';
 
 export class GetVoucherEligibleVoucherDto {
   @IsString()

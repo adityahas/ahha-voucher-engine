@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
-import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
 import { DataSource, In, Repository } from 'typeorm';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
@@ -107,42 +106,5 @@ export class VoucherService {
 
   async remove(id: number): Promise<void> {
     await this.repository.delete(id);
-  }
-
-  async getEligibleVouchers(
-    searchCriteria: GetVoucherEligibleVoucherDto,
-  ): Promise<VoucherEntity[]> {
-    const queryBuilder = this.repository.createQueryBuilder('voucher');
-    let isWhereClauseAdded = false;
-
-    if (searchCriteria.user_id) {
-      queryBuilder.leftJoinAndSelect(
-        'voucher.target_users',
-        'user',
-        'user.id = :userId',
-        {
-          userId: searchCriteria.user_id,
-        },
-      );
-    }
-
-    if (searchCriteria.bindings && searchCriteria.bindings.length > 0) {
-      queryBuilder.leftJoinAndSelect('voucher.bindings', 'binding');
-      searchCriteria.bindings.forEach((binding, index) => {
-        const whereClause = `(binding.bind_type = :bindType${index} AND binding.bind_value = :bindValue${index})`;
-        const whereValue = {
-          [`bindType${index}`]: binding.bind_type,
-          [`bindValue${index}`]: binding.bind_value,
-        };
-        if (!isWhereClauseAdded) {
-          isWhereClauseAdded = true;
-          queryBuilder.where(whereClause, whereValue);
-        } else {
-          queryBuilder.orWhere(whereClause, whereValue);
-        }
-      });
-    }
-
-    return queryBuilder.getMany();
   }
 }

@@ -31,8 +31,8 @@ import { VoucherValidityEntity } from '@core/loyalty/voucher/entities/voucher-va
     {
       provide: 'VOUCHER_SERVICE',
       scope: Scope.REQUEST,
-      useFactory: async (connection: DataSource) => {
-        return new VoucherService(connection);
+      useFactory: async (dataSource: DataSource) => {
+        return new VoucherService(dataSource);
       },
       inject: ['LOYALTY_CONNECTION'],
     },
