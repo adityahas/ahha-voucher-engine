@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RewardClaimStrategy } from './reward-claim-strategy.interface';
-import { RewardItemEntity } from '../../reward-item/entities/reward-item.entity';
+import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { ClaimResult } from '../dto/claim-result.dto';
 import axios from 'axios';
 

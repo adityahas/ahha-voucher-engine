@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateRewardItemDto } from './dto/create-reward-item.dto';
 import { UpdateRewardItemDto } from './dto/update-reward-item.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RewardItemEntity } from './entities/reward-item.entity';
+import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
