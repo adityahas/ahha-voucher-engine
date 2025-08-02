@@ -3,7 +3,7 @@ import { VoucherLcService } from './voucher-lc.service';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
-import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
+import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 
 @Controller('voucher')
 export class VoucherLcController {
@@ -15,7 +15,7 @@ export class VoucherLcController {
   @Get('/eligible')
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('read:vouchers')
-  getEligibleVouchers(@Body() dto: GetVoucherEligibleVoucherDto) {
+  getEligibleVouchers(@Body() dto: GetEligibleVoucherDto) {
     return this.voucherService.getEligibleVouchers(dto);
   }
 }

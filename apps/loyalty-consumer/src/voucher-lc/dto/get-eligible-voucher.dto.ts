@@ -7,7 +7,7 @@ import {
 import { Type } from '@nestjs/class-transformer';
 import { CreateVoucherBindingDto } from '../../../../loyalty-admin/src/voucher/dto/create-voucher-binding.dto';
 
-export class GetVoucherEligibleVoucherDto {
+export class GetEligibleVoucherDto {
   @IsString()
   @IsNotEmpty()
   user_id: string;

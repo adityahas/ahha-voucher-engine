@@ -27,4 +27,10 @@ export class RewardClaimService {
     );
     return strategy.claim(userId, rewardItem);
   }
+
+  findAllRewards() {
+    return this.rewardItemRepo.find({
+      relations: ['source'],
+    });
+  }
 }
