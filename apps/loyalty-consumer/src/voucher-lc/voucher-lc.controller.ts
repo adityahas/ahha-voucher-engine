@@ -5,7 +5,7 @@ import { AclGuard } from '@core/auth/guards/acl.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 
-@Controller('voucher')
+@Controller('vouchers')
 export class VoucherLcController {
   constructor(
     @Inject('VOUCHER_LC_SERVICE')
