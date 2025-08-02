@@ -30,6 +30,15 @@
         "tsConfigPath": "libs/auth/tsconfig.lib.json"
       }
     },
+    "auth-consumer": {
+      "type": "application",
+      "root": "apps/auth-consumer",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth-consumer/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth-consumer/tsconfig.app.json"
+      }
+    },
     "base": {
       "type": "library",
       "root": "libs/base",

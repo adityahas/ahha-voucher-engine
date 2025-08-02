@@ -17,7 +17,7 @@ import { AclGuard } from '@core/auth/guards/acl.guard';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
 
-@Controller('/vouchers')
+@Controller('/loyalty-admin/vouchers')
 export class VoucherController {
   constructor(
     @Inject('VOUCHER_SERVICE')

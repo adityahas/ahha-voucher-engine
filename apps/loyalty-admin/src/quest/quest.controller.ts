@@ -15,7 +15,7 @@ import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
 
-@Controller('quest')
+@Controller('loyalty-admin/quest')
 export class QuestController {
   constructor(private readonly questService: QuestService) {}
 

@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { LoyaltyAdminModule } from './loyalty-admin.module';
+import { LoyaltyConsumerModule } from '../../loyalty-consumer/src/loyalty-consumer.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(LoyaltyAdminModule);
+  const app = await NestFactory.create(LoyaltyConsumerModule);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Comment out if you want to insert nested objects without uuid
@@ -17,10 +17,10 @@ async function bootstrap() {
   }
 
   const config = new DocumentBuilder()
-    .setTitle('AHHA Loyalty API')
-    .setDescription('API documentation for the AHHA ADMIN')
+    .setTitle('AHHA Auth Consumer API')
+    .setDescription('API documentation for the AHHA Auth Consumer')
     .setVersion('1.0')
-    .addServer('client1.localhost.dev:9003')
+    .addServer('client1.localhost.dev/user')
     .addBearerAuth()
     .addApiKey(
       {
@@ -38,8 +38,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.PORT_LOYALTY_ADMIN || 9003, () => {
-    console.log(`Running on ${process.env.PORT_LOYALTY_ADMIN || 9003}`);
+  await app.listen(process.env.PORT_AUTH_CONSUMER || 9004, () => {
+    console.log(`Running on ${process.env.PORT_AUTH_CONSUMER || 9004}`);
   });
 }
 
