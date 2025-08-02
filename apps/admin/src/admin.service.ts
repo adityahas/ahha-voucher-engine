@@ -7,11 +7,13 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { AdminEntity } from './entities/admin.entity';
+import { EncryptionService } from '@core/encryption';
 
 @Injectable()
 export class AdminService {
   constructor(
     private readonly databaseService: DatabaseService,
+    private readonly encryptionService: EncryptionService,
     @InjectRepository(AdminEntity)
     private readonly adminRepository: Repository<AdminEntity>,
     private readonly jwtService: JwtService,
@@ -27,7 +29,7 @@ export class AdminService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const isMatch = await this.databaseService.comparePassword(
+    const isMatch = await this.encryptionService.comparePassword(
       loginAdminDto.password,
       admin.password,
     );

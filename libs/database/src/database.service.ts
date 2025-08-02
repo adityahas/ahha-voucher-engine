@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { EncryptionService } from '@core/encryption';
 import { ClientEntity } from '@core/database/entities/client.entity';
@@ -97,10 +96,6 @@ export class DatabaseService {
 
   checkConnectionExists(name: string): boolean {
     return this._dataSources.has(name);
-  }
-
-  async comparePassword(raw: string, hashed: string): Promise<boolean> {
-    return bcrypt.compare(raw, hashed);
   }
 
   async findByDatabaseName(databaseName: string) {

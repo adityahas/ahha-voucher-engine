@@ -11,7 +11,7 @@ import { RewardItemService } from './reward-item.service';
 import { CreateRewardItemDto } from './dto/create-reward-item.dto';
 import { UpdateRewardItemDto } from './dto/update-reward-item.dto';
 
-@Controller('reward-item')
+@Controller('loyalty-admin/reward-item')
 export class RewardItemController {
   constructor(private readonly rewardItemService: RewardItemService) {}
 

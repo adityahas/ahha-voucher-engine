@@ -1,6 +1,6 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 
-@Controller('/')
+@Controller('/loyalty-admin')
 export class LoyaltyAdminController {
   constructor(@Inject('LOYALTY_CONNECTION') private readonly connection: any) {
     console.log(connection);

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EncryptionService {
@@ -29,5 +30,9 @@ export class EncryptionService {
     let decrypted = decipher.update(Buffer.from(encryptedText, 'hex'));
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     return decrypted.toString();
+  }
+
+  async comparePassword(raw: string, hashed: string): Promise<boolean> {
+    return bcrypt.compare(raw, hashed);
   }
 }
