@@ -12,7 +12,6 @@ import {
 import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
-import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
@@ -36,13 +35,6 @@ export class VoucherController {
   @Permissions('read:vouchers')
   findAll() {
     return this.voucherService.findAll();
-  }
-
-  @Get('/eligible')
-  @UseGuards(AdminJwtGuard, AclGuard)
-  @Permissions('read:vouchers')
-  getEligibleVouchers(@Body() dto: GetVoucherEligibleVoucherDto) {
-    return this.voucherService.getEligibleVouchers(dto);
   }
 
   @Get(':id')

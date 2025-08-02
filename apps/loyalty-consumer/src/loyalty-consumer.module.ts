@@ -14,6 +14,7 @@ import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { LoyaltyConsumerController } from './loyalty-consumer.controller';
 import { LoyaltyConsumerService } from './loyalty-consumer.service';
+import { VoucherLcModule } from './voucher-lc/voucher-lc.module';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ dotenv.config();
     }),
     DatabaseModule,
     AuthModule,
+    VoucherLcModule,
   ],
   providers: [
     JwtStrategy,

@@ -8,7 +8,7 @@ import { AclService } from '@core/auth/acl.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 
-describe('VoucherController', () => {
+describe('VoucherLcController', () => {
   let controller: VoucherController;
   let service: VoucherService;
 
