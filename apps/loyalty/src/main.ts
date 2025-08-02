@@ -5,6 +5,7 @@ import { LoyaltyModule } from './loyalty.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(LoyaltyModule);
+  app.setGlobalPrefix('admin/loyalty');
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Comment out if you want to insert nested objects without uuid
