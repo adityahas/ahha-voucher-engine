@@ -80,7 +80,7 @@ dotenv.config();
       inject: [REQUEST, DatabaseService],
     },
   ],
-  exports: [LoyaltyAdminService, 'LOYALTY_CONNECTION'],
+  exports: ['LOYALTY_CONNECTION'],
 })
 export class LoyaltyAdminModule implements NestModule, OnApplicationBootstrap {
   constructor(private readonly dataSource: DataSource) {}
