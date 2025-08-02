@@ -8,18 +8,18 @@ import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class UserService {
-  private repository: Repository<UserEntity>;
+  private userRepository: Repository<UserEntity>;
 
   constructor(
     dataSource: DataSource,
     private readonly encryptionService: EncryptionService,
     private readonly jwtService: JwtService,
   ) {
-    this.repository = dataSource.getRepository(UserEntity);
+    this.userRepository = dataSource.getRepository(UserEntity);
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const user = await this.repository.findOne({
+    const user = await this.userRepository.findOne({
       where: { email: loginUserDto.email },
     });
     if (!user) {
@@ -40,22 +40,22 @@ export class UserService {
   }
 
   async findAll(): Promise<UserEntity[]> {
-    return this.repository.find();
+    return this.userRepository.find();
   }
 
   async findOne(id: string): Promise<UserEntity> {
-    return this.repository.findOne({
+    return this.userRepository.findOne({
       where: { id },
     });
   }
 
   async create(user: CreateUserDto): Promise<UserEntity> {
-    return this.repository.save(user);
+    return this.userRepository.save(user);
   }
 
   async update(id: string, user: CreateUserDto): Promise<UserEntity> {
-    await this.repository.update(id, user);
-    return this.repository.findOne({
+    await this.userRepository.update(id, user);
+    return this.userRepository.findOne({
       where: { id },
     });
   }
