@@ -38,8 +38,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.HTTP_PORT_ADMIN || 9002, () => {
-    console.log(`Running on ${process.env.HTTP_PORT_ADMIN || 9002}`);
+  await app.listen(process.env.PORT_ADMIN || 9002, () => {
+    console.log(`Running on ${process.env.PORT_ADMIN || 9002}`);
   });
 }
 
