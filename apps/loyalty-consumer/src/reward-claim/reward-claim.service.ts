@@ -1,16 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { RewardClaimStrategyFactory } from './strategy/reward-claim-strategy.factory';
-import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class RewardClaimService {
+  private rewardItemRepo: Repository<RewardItemEntity>;
+
   constructor(
-    @InjectRepository(RewardItemEntity)
-    private readonly rewardItemRepo: Repository<RewardItemEntity>,
+    dataSource: DataSource,
     private readonly strategyFactory: RewardClaimStrategyFactory,
-  ) {}
+  ) {
+    this.rewardItemRepo = dataSource.getRepository(RewardItemEntity);
+  }
 
   async claimReward(userId: string, rewardItemId: string) {
     const rewardItem = await this.rewardItemRepo.findOne({
