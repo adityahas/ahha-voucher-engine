@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { DataSource } from 'typeorm';
 import { LoyaltyConsumerModule } from '../loyalty-consumer.module';
+import { RewardClaimController } from './reward-claim.controller';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LoyaltyConsumerModule } from '../loyalty-consumer.module';
       inject: ['LOYALTY_CONSUMER_CONNECTION', RewardClaimStrategyFactory],
     },
   ],
+  controllers: [RewardClaimController],
   exports: [],
 })
 export class RewardClaimModule {}

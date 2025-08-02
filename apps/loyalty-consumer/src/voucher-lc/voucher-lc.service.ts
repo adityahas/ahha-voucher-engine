@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GetVoucherEligibleVoucherDto } from './dto/get-voucher-eligible-voucher.dto';
+import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { DataSource, Repository } from 'typeorm';
 
@@ -12,7 +12,7 @@ export class VoucherLcService {
   }
 
   async getEligibleVouchers(
-    searchCriteria: GetVoucherEligibleVoucherDto,
+    searchCriteria: GetEligibleVoucherDto,
   ): Promise<VoucherEntity[]> {
     const queryBuilder = this.voucherRepository.createQueryBuilder('voucher');
     let isWhereClauseAdded = false;
