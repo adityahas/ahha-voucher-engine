@@ -38,8 +38,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.HTTP_PORT_LOYALTY || 9003, () => {
-    console.log(`Running on ${process.env.HTTP_PORT_LOYALTY || 9003}`);
+  await app.listen(process.env.PORT_LOYALTY || 9003, () => {
+    console.log(`Running on ${process.env.PORT_LOYALTY || 9003}`);
   });
 }
 
