@@ -24,7 +24,10 @@ export class RetailerService {
     return this.retailerRepository.findOneBy({ id });
   }
 
-  update(id: string, updateRetailerDto: UpdateRetailerDto): Promise<RetailerEntity> {
+  update(
+    id: string,
+    updateRetailerDto: UpdateRetailerDto,
+  ): Promise<RetailerEntity> {
     return this.retailerRepository.save({ ...updateRetailerDto, id });
   }
 

@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from '@nestjs/class-validator';
-import { VoucherBindingType } from '@core/loyalty-lib/voucher/entities/voucher-binding.entity';
+import { VoucherBindingType } from '@core/loyalty/voucher/entities/voucher-binding.entity';
 
 export class CreateVoucherBindingDto {
   @IsEnum(VoucherBindingType, {

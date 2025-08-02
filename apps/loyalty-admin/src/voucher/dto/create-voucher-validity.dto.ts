@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsString,
 } from '@nestjs/class-validator';
-import { VoucherValidityType } from '@core/loyalty-lib/voucher/entities/voucher-validity.entity';
+import { VoucherValidityType } from '@core/loyalty/voucher/entities/voucher-validity.entity';
 
 export class CreateVoucherValidityDto {
   @IsEnum(VoucherValidityType, {

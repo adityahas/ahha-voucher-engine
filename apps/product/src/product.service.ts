@@ -24,7 +24,10 @@ export class ProductService {
     return this.productRepository.findOneBy({ id });
   }
 
-  update(id: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
+  update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<ProductEntity> {
     return this.productRepository.save({ ...updateProductDto, id });
   }
 
