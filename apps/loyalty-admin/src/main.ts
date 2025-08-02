@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { LoyaltyModule } from './loyalty.module';
+import { LoyaltyAdminModule } from './loyalty-admin.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(LoyaltyModule);
+  const app = await NestFactory.create(LoyaltyAdminModule);
   app.setGlobalPrefix('admin/loyalty');
   app.useGlobalPipes(
     new ValidationPipe({

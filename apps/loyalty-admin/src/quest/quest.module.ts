@@ -3,7 +3,7 @@ import { QuestService } from './quest.service';
 import { QuestController } from './quest.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '@core/auth';
-import { QuestEntity } from '@core/loyalty-lib/quest/entities/quest.entity';
+import { QuestEntity } from '@core/loyalty/quest/entities/quest.entity';
 
 @Module({
   imports: [

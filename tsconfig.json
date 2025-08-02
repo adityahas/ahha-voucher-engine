@@ -47,11 +47,11 @@
       "@core/encryption/*": [
         "libs/encryption/src/*"
       ],
-      "@core/loyalty-lib": [
-        "libs/loyalty-lib/src"
+      "@core/loyalty": [
+        "libs/loyalty/src"
       ],
-      "@core/loyalty-lib/*": [
-        "libs/loyalty-lib/src/*"
+      "@core/loyalty/*": [
+        "libs/loyalty/src/*"
       ],
       "@core/middleware": [
         "libs/middleware/src"

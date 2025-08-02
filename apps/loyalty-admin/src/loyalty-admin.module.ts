@@ -6,7 +6,7 @@ import {
   Scope,
 } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-import { LoyaltyService } from './loyalty.service';
+import { LoyaltyAdminService } from './loyalty-admin.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { PassportModule } from '@nestjs/passport';
@@ -21,8 +21,8 @@ import { RewardItemModule } from './reward-item/reward-item.module';
 import { DataSource } from 'typeorm';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
-import { LoyaltyController } from './loyalty.controller';
-import { LoyaltyUserEntity } from '@core/loyalty-lib/entities/loyalty-user.entity';
+import { LoyaltyAdminController } from './loyalty-admin.controller';
+import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { ClientEntity } from '@core/database/entities/client.entity';
 import { RewardItemEntity } from './reward-item/entities/reward-item.entity';
 import { RewardItemSourceModule } from './reward-item-source/reward-item-source.module';
@@ -60,9 +60,9 @@ dotenv.config();
     RewardItemSourceModule,
     RewardClaimModule,
   ],
-  controllers: [LoyaltyController],
+  controllers: [LoyaltyAdminController],
   providers: [
-    LoyaltyService,
+    LoyaltyAdminService,
     JwtStrategy,
     {
       provide: 'LOYALTY_CONNECTION',
@@ -80,9 +80,9 @@ dotenv.config();
       inject: [REQUEST, DatabaseService],
     },
   ],
-  exports: [LoyaltyService, 'LOYALTY_CONNECTION'],
+  exports: [LoyaltyAdminService, 'LOYALTY_CONNECTION'],
 })
-export class LoyaltyModule implements NestModule, OnApplicationBootstrap {
+export class LoyaltyAdminModule implements NestModule, OnApplicationBootstrap {
   constructor(private readonly dataSource: DataSource) {}
 
   onApplicationBootstrap() {

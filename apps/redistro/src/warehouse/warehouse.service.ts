@@ -24,7 +24,10 @@ export class WarehouseService {
     return this.warehouseRepository.findOneBy({ id });
   }
 
-  update(id: string, updateWarehouseDto: UpdateWarehouseDto): Promise<WarehouseEntity> {
+  update(
+    id: string,
+    updateWarehouseDto: UpdateWarehouseDto,
+  ): Promise<WarehouseEntity> {
     return this.warehouseRepository.save({ ...updateWarehouseDto, id });
   }
 

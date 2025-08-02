@@ -99,7 +99,7 @@
       "^@core/base(|/.*)$": "<rootDir>/libs/base/src/$1",
       "^@core/database(|/.*)$": "<rootDir>/libs/database/src/$1",
       "^@core/encryption(|/.*)$": "<rootDir>/libs/encryption/src/$1",
-      "^@core/loyalty-lib(|/.*)$": "<rootDir>/libs/loyalty-lib/src/$1",
+      "^@core/loyalty(|/.*)$": "<rootDir>/libs/loyalty/src/$1",
       "^@core/middleware(|/.*)$": "<rootDir>/libs/middleware/src/$1"
     }
   }
