@@ -66,6 +66,15 @@
         "tsConfigPath": "libs/encryption/tsconfig.lib.json"
       }
     },
+    "loyalty": {
+      "type": "library",
+      "root": "libs/loyalty",
+      "entryFile": "index",
+      "sourceRoot": "libs/loyalty/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/loyalty/tsconfig.lib.json"
+      }
+    },
     "loyalty-admin": {
       "type": "application",
       "root": "apps/loyalty-admin",
@@ -75,13 +84,13 @@
         "tsConfigPath": "apps/loyalty-admin/tsconfig.lib.json"
       }
     },
-    "loyalty": {
-      "type": "library",
-      "root": "libs/loyalty",
-      "entryFile": "index",
-      "sourceRoot": "libs/loyalty/src",
+    "loyalty-consumer": {
+      "type": "application",
+      "root": "apps/loyalty-consumer",
+      "entryFile": "main",
+      "sourceRoot": "apps/loyalty-consumer/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/loyalty/tsconfig.lib.json"
+        "tsConfigPath": "apps/loyalty-consumer/tsconfig.app.json"
       }
     },
     "main": {

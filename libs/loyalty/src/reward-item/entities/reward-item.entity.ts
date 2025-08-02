@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { RewardItemSourceEntity } from '../../reward-item-source/entities/reward-item-source.entity';
+import { RewardItemSourceEntity } from '@core/loyalty/reward-item-source/entities/reward-item-source.entity';
 
 @Entity('reward_items')
 export class RewardItemEntity {

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { RewardItemEntity } from '../reward-item/entities/reward-item.entity';
+import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { Repository } from 'typeorm';
 import { RewardClaimStrategyFactory } from './strategy/reward-claim-strategy.factory';
 import { InjectRepository } from '@nestjs/typeorm';
