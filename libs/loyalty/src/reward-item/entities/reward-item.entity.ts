@@ -24,4 +24,7 @@ export class RewardItemEntity {
 
   @Column()
   type: string; // e.g. 'gopay', 'pulsa', etc.
+
+  @Column({ default: -1 }) // -1 for unlimited stock, 0 for out of stock, >0 for limited stock
+  stock: number;
 }
