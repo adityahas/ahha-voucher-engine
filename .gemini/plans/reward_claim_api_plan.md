@@ -21,15 +21,15 @@ to initiate a reward claim, and the system should process the claim, updating re
 
 ## Proposed Sub-tasks
 
-- [ ] Task 1: Review and confirm the functionality of the existing `RewardClaimController` and `RewardClaimService`.
-- [ ] Task 2: Verify the integration of `RewardClaimModule` within `LoyaltyConsumerModule`.
+- [x] Task 1: Review and confirm the functionality of the existing `RewardClaimController` and `RewardClaimService`.
+- [x] Task 2: Verify the integration of `RewardClaimModule` within `LoyaltyConsumerModule`.
 
-- [ ] Task 3: Implement or enhance reward claiming strategies for different reward types (e.g., `GoPayRewardStrategy`).
-- [ ] Task 4: Add logic for checking reward availability and user eligibility before claiming.
-- [ ] Task 5: Implement transaction management to ensure atomicity of claim operations (e.g., deducting stock, assigning
+- [x] Task 3: Implement or enhance reward claiming strategies for different reward types (e.g., `GoPayRewardStrategy`).
+- [x] Task 4: Add logic for checking reward availability and user eligibility before claiming.
+- [x] Task 5: Implement transaction management to ensure atomicity of claim operations (e.g., deducting stock, assigning
   reward to user).
-- [ ] Task 6: Define and implement DTOs for request and response payloads for the claim API.
-- [ ] Task 7: Write unit and integration tests for the reward claim API and service.
+- [x] Task 6: Define and implement DTOs for request and response payloads for the claim API.
+- [x] Task 7: Write unit and integration tests for the reward claim API and service.
 
 ## Anticipated Challenges & Considerations
 

@@ -27,15 +27,15 @@ datasets.
 
 ## Proposed Sub-tasks
 
-- [ ] Task 1: Identify all `findAll` or list-returning API endpoints within `apps/loyalty-admin` that require
+- [x] Task 1: Identify all `findAll` or list-returning API endpoints within `apps/loyalty-admin` that require
   pagination.
-- [ ] Task 2: For each identified endpoint, modify the controller method to accept `BasePaginationDto` as query
+- [x] Task 2: For each identified endpoint, modify the controller method to accept `BasePaginationDto` as query
   parameters.
-- [ ] Task 3: Update the corresponding service methods to receive and apply the pagination parameters (page, size,
+- [x] Task 3: Update the corresponding service methods to receive and apply the pagination parameters (page, size,
   search, sort, order) when querying the database.
-- [ ] Task 4: Ensure the service methods return data in a format compatible with `BasePaginationResponseInterface`,
+- [x] Task 4: Ensure the service methods return data in a format compatible with `BasePaginationResponseInterface`,
   including total count.
-- [ ] Task 5: Implement or adjust database queries (e.g., using TypeORM's `skip`, `take`, `order`, `where` options) to
+- [x] Task 5: Implement or adjust database queries (e.g., using TypeORM's `skip`, `take`, `order`, `where` options) to
   support pagination.
 - [ ] Task 6: Create or update unit and integration tests for each paginated endpoint to verify correct pagination
   behavior.
