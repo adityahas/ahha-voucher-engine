@@ -4,6 +4,7 @@ import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { ConsumerJwtGuard } from '@core/auth/guards/consumer-jwt.guard';
 import { Request } from 'express';
 import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response.dto';
+import { VoucherResponseDto } from './dto/voucher-response.dto';
 
 @Controller('vouchers')
 export class VoucherLcController {
@@ -14,7 +15,9 @@ export class VoucherLcController {
 
   @Get('/eligible')
   @UseGuards(ConsumerJwtGuard)
-  getEligibleVouchers(@Body() dto: GetEligibleVoucherDto) {
+  getEligibleVouchers(
+    @Body() dto: GetEligibleVoucherDto,
+  ): Promise<VoucherResponseDto[]> {
     return this.voucherService.getEligibleVouchers(dto);
   }
 

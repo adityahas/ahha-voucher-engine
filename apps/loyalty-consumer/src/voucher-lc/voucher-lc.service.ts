@@ -4,6 +4,7 @@ import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { DataSource, Repository } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response.dto';
+import { VoucherResponseDto } from './dto/voucher-response.dto';
 
 @Injectable()
 export class VoucherLcService {
@@ -18,7 +19,7 @@ export class VoucherLcService {
 
   async getEligibleVouchers(
     searchCriteria: GetEligibleVoucherDto,
-  ): Promise<VoucherEntity[]> {
+  ): Promise<VoucherResponseDto[]> {
     const queryBuilder = this.voucherRepository.createQueryBuilder('voucher');
     let whereClauseAdded = false;
 
@@ -50,7 +51,10 @@ export class VoucherLcService {
       });
     }
 
-    return queryBuilder.getMany();
+    const vouchers = queryBuilder.getMany();
+    return (await vouchers).map((value) =>
+      VoucherResponseDto.fromEntity(value),
+    );
   }
 
   async getClaimedVouchers(
