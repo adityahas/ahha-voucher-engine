@@ -1,9 +1,8 @@
-import { Body, Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Req, UseGuards } from '@nestjs/common';
 import { VoucherLcService } from './voucher-lc.service';
-import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
-import { AclGuard } from '@core/auth/guards/acl.guard';
-import { Permissions } from '@core/auth/decorators/permissions.decorator';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
+import { ConsumerJwtGuard } from '@core/auth/guards/consumer-jwt.guard';
+import { Request } from 'express';
 
 @Controller('vouchers')
 export class VoucherLcController {
@@ -13,9 +12,14 @@ export class VoucherLcController {
   ) {}
 
   @Get('/eligible')
-  @UseGuards(AdminJwtGuard, AclGuard)
-  @Permissions('read:vouchers')
+  @UseGuards(ConsumerJwtGuard)
   getEligibleVouchers(@Body() dto: GetEligibleVoucherDto) {
     return this.voucherService.getEligibleVouchers(dto);
+  }
+
+  @Get('/my')
+  @UseGuards(ConsumerJwtGuard)
+  getClaimedVouchers(@Req() req: Request) {
+    return this.voucherService.getClaimedVouchers(req.user['id']);
   }
 }

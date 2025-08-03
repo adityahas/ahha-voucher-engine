@@ -2,20 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { DataSource, Repository } from 'typeorm';
+import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 
 @Injectable()
 export class VoucherLcService {
   private voucherRepository: Repository<VoucherEntity>;
+  private claimedVouchersRepository: Repository<VoucherClaimEntity>;
 
   constructor(dataSource: DataSource) {
     this.voucherRepository = dataSource.getRepository(VoucherEntity);
+    this.claimedVouchersRepository =
+      dataSource.getRepository(VoucherClaimEntity);
   }
 
   async getEligibleVouchers(
     searchCriteria: GetEligibleVoucherDto,
   ): Promise<VoucherEntity[]> {
     const queryBuilder = this.voucherRepository.createQueryBuilder('voucher');
-    let isWhereClauseAdded = false;
+    let whereClauseAdded = false;
 
     if (searchCriteria.user_id) {
       queryBuilder.leftJoinAndSelect(
@@ -36,8 +40,8 @@ export class VoucherLcService {
           [`bindType${index}`]: binding.bind_type,
           [`bindValue${index}`]: binding.bind_value,
         };
-        if (!isWhereClauseAdded) {
-          isWhereClauseAdded = true;
+        if (!whereClauseAdded) {
+          whereClauseAdded = true;
           queryBuilder.where(whereClause, whereValue);
         } else {
           queryBuilder.orWhere(whereClause, whereValue);
@@ -46,5 +50,16 @@ export class VoucherLcService {
     }
 
     return queryBuilder.getMany();
+  }
+
+  getClaimedVouchers(userId: string) {
+    return this.claimedVouchersRepository.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+      relations: ['voucher', 'user'],
+    });
   }
 }
