@@ -5,7 +5,7 @@ import {
   ValidateNested,
 } from '@nestjs/class-validator';
 import { Type } from '@nestjs/class-transformer';
-import { CreateVoucherBindingDto } from '../../../../loyalty-admin/src/voucher/dto/create-voucher-binding.dto';
+import { VoucherBindingDto } from './voucher-binding.dto';
 
 export class GetEligibleVoucherDto {
   @IsString()
@@ -14,6 +14,6 @@ export class GetEligibleVoucherDto {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateVoucherBindingDto)
-  bindings: CreateVoucherBindingDto[];
+  @Type(() => VoucherBindingDto)
+  bindings: VoucherBindingDto[];
 }

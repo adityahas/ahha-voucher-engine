@@ -16,7 +16,7 @@ import { AuthModule } from '@core/auth';
 import { DatabaseModule, DatabaseService } from '@core/database';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
-import { VoucherModule } from './voucher/voucher.module';
+import { VoucherLaModule } from './voucher-la/voucher-la.module';
 import { RewardItemModule } from './reward-item/reward-item.module';
 import { DataSource } from 'typeorm';
 import { Request } from 'express';
@@ -54,7 +54,7 @@ dotenv.config();
     TypeOrmModule.forFeature([LoyaltyUserEntity, RewardItemEntity]),
     AuthModule,
     DatabaseModule,
-    VoucherModule,
+    VoucherLaModule,
     RewardItemModule,
     RewardItemSourceModule,
   ],

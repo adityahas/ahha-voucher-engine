@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VoucherController } from './voucher.controller';
-import { VoucherService } from './voucher.service';
+import { VoucherLaController } from './voucher-la.controller';
+import { VoucherLaService } from './voucher-la.service';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { Reflector } from '@nestjs/core';
@@ -9,12 +9,12 @@ import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 
 describe('VoucherLcController', () => {
-  let controller: VoucherController;
-  let service: VoucherService;
+  let controller: VoucherLaController;
+  let service: VoucherLaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [VoucherController],
+      controllers: [VoucherLaController],
       providers: [
         {
           provide: 'VOUCHER_SERVICE',
@@ -36,8 +36,8 @@ describe('VoucherLcController', () => {
       .useValue({ canActivate: () => true })
       .compile();
 
-    controller = module.get<VoucherController>(VoucherController);
-    service = module.get<VoucherService>('VOUCHER_SERVICE');
+    controller = module.get<VoucherLaController>(VoucherLaController);
+    service = module.get<VoucherLaService>('VOUCHER_SERVICE');
   });
 
   it('should be defined', () => {
@@ -67,7 +67,15 @@ describe('VoucherLcController', () => {
       const result = ['test-voucher-1', 'test-voucher-2'];
       jest.spyOn(service, 'findAll').mockResolvedValue(result as any);
 
-      expect(await controller.findAll()).toBe(result);
+      expect(
+        await controller.findAll({
+          page: 0,
+          size: 10,
+          search: '',
+          sort: 'code',
+          order: 'ASC',
+        }),
+      ).toBe(result);
     });
   });
 
