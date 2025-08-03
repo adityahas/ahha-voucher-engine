@@ -3,6 +3,7 @@ import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { DataSource, Repository } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
+import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response.dto';
 
 @Injectable()
 export class VoucherLcService {
@@ -52,8 +53,13 @@ export class VoucherLcService {
     return queryBuilder.getMany();
   }
 
-  getClaimedVouchers(userId: string) {
-    return this.claimedVouchersRepository.find({
+  async getClaimedVouchers(
+    userId: string,
+  ): Promise<GetClaimedVoucherResponseDto[]> {
+    if (!userId) {
+      throw new Error('User ID is required to fetch claimed vouchers');
+    }
+    const vouchers = await this.claimedVouchersRepository.find({
       where: {
         user: {
           id: userId,
@@ -61,5 +67,8 @@ export class VoucherLcService {
       },
       relations: ['voucher', 'user'],
     });
+    return vouchers.map((value) =>
+      GetClaimedVoucherResponseDto.fromEntity(value),
+    );
   }
 }

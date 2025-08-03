@@ -3,6 +3,7 @@ import { VoucherLcService } from './voucher-lc.service';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { ConsumerJwtGuard } from '@core/auth/guards/consumer-jwt.guard';
 import { Request } from 'express';
+import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response.dto';
 
 @Controller('vouchers')
 export class VoucherLcController {
@@ -19,7 +20,9 @@ export class VoucherLcController {
 
   @Get('/my')
   @UseGuards(ConsumerJwtGuard)
-  getClaimedVouchers(@Req() req: Request) {
+  async getClaimedVouchers(
+    @Req() req: Request,
+  ): Promise<GetClaimedVoucherResponseDto[]> {
     return this.voucherService.getClaimedVouchers(req.user['id']);
   }
 }

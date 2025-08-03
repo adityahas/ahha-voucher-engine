@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
 import { VoucherValidityEntity } from './voucher-validity.entity';
 import { VoucherBindingEntity } from './voucher-binding.entity';
 import { VoucherClaimEntity } from './voucher-claim.entity';
@@ -28,6 +21,9 @@ export class VoucherEntity extends BaseEntity {
 
   @Column({ type: 'int', default: 1 })
   quota: number;
+
+  @Column({ type: 'text', nullable: true })
+  image: string;
 
   @ManyToMany(
     () => VoucherCategoryEntity,
