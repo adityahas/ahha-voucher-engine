@@ -1,15 +1,17 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
 import { RewardItemService } from './reward-item.service';
 import { CreateRewardItemDto } from './dto/create-reward-item.dto';
 import { UpdateRewardItemDto } from './dto/update-reward-item.dto';
+import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 
 @Controller('loyalty-admin/reward-item')
 export class RewardItemController {
@@ -21,8 +23,8 @@ export class RewardItemController {
   }
 
   @Get()
-  findAll() {
-    return this.rewardItemService.findAll();
+  findAll(@Query() paginationDto: BasePaginationDto) {
+    return this.rewardItemService.findAll(paginationDto);
   }
 
   @Get(':id')

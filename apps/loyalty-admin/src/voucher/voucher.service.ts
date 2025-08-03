@@ -5,6 +5,8 @@ import { DataSource, In, Repository } from 'typeorm';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { VoucherCategoryEntity } from '@core/loyalty/voucher/entities/voucher-category.entity';
+import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
+import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 
 @Injectable()
 export class VoucherService {
@@ -54,10 +56,40 @@ export class VoucherService {
     return this.repository.save(voucher);
   }
 
-  async findAll(): Promise<VoucherEntity[]> {
-    return this.repository.find({
-      // relations: ['categories', 'target_users', 'bindings', 'validities'],
-    });
+  async findAll(
+    paginationDto: BasePaginationDto,
+  ): Promise<BasePaginationResponseInterface<VoucherEntity>> {
+    const { page, size, search, sort, order } = paginationDto;
+    const skip = page * size;
+
+    const queryBuilder = this.repository.createQueryBuilder('voucher');
+
+    if (search) {
+      console.log('cuuuuk', search);
+      queryBuilder.where('voucher.name ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    if (sort && order) {
+      queryBuilder.orderBy(`voucher.${sort}`, order);
+    }
+
+    const [data, total] = await queryBuilder
+      .skip(skip)
+      .take(size)
+      .getManyAndCount();
+
+    return {
+      code: 'SUCCESS',
+      message: 'Vouchers retrieved successfully',
+      data,
+      pagination: {
+        page,
+        size,
+        total,
+      },
+    };
   }
 
   async findOne(id: string): Promise<VoucherEntity> {
