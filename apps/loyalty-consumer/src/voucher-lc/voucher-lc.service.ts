@@ -5,6 +5,8 @@ import { DataSource, Repository } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response.dto';
 import { VoucherResponseDto } from './dto/voucher-response.dto';
+import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
+import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 
 @Injectable()
 export class VoucherLcService {
@@ -59,20 +61,36 @@ export class VoucherLcService {
 
   async getClaimedVouchers(
     userId: string,
-  ): Promise<GetClaimedVoucherResponseDto[]> {
+    paginationDto: BasePaginationDto,
+  ): Promise<BasePaginationResponseInterface<GetClaimedVoucherResponseDto>> {
     if (!userId) {
       throw new Error('User ID is required to fetch claimed vouchers');
     }
-    const vouchers = await this.claimedVouchersRepository.find({
-      where: {
-        user: {
-          id: userId,
+
+    const [vouchers, total] = await this.claimedVouchersRepository.findAndCount(
+      {
+        where: {
+          user: {
+            id: userId,
+          },
         },
+        relations: ['voucher', 'user'],
+        skip: paginationDto.page * paginationDto.size,
+        take: paginationDto.size,
       },
-      relations: ['voucher', 'user'],
-    });
-    return vouchers.map((value) =>
-      GetClaimedVoucherResponseDto.fromEntity(value),
     );
+
+    return {
+      code: 'SUCCESS',
+      message: 'Claimed vouchers fetched successfully',
+      data: vouchers.map((value) =>
+        GetClaimedVoucherResponseDto.fromEntity(value),
+      ),
+      pagination: {
+        page: paginationDto.page,
+        total: total,
+        size: paginationDto.size,
+      },
+    };
   }
 }
