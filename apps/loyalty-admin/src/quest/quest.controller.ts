@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { QuestService } from './quest.service';
@@ -14,6 +15,7 @@ import { UpdateQuestDto } from './dto/update-quest.dto';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
+import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 
 @Controller('loyalty-admin/quest')
 export class QuestController {
@@ -29,8 +31,8 @@ export class QuestController {
   @Get()
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('read:quests')
-  findAll() {
-    return this.questService.findAll();
+  findAll(@Query() paginationDto: BasePaginationDto) {
+    return this.questService.findAll(paginationDto);
   }
 
   @Get(':id')

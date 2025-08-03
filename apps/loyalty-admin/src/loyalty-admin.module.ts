@@ -26,7 +26,6 @@ import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { ClientEntity } from '@core/database/entities/client.entity';
 import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { RewardItemSourceModule } from './reward-item-source/reward-item-source.module';
-import { RewardClaimModule } from '../../loyalty-consumer/src/reward-claim/reward-claim.module';
 
 dotenv.config();
 
@@ -58,7 +57,6 @@ dotenv.config();
     VoucherModule,
     RewardItemModule,
     RewardItemSourceModule,
-    RewardClaimModule,
   ],
   controllers: [LoyaltyAdminController],
   providers: [

@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
@@ -15,6 +16,7 @@ import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
+import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 
 @Controller('/loyalty-admin/vouchers')
 export class VoucherController {
@@ -33,8 +35,8 @@ export class VoucherController {
   @Get()
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('read:vouchers')
-  findAll() {
-    return this.voucherService.findAll();
+  findAll(@Query() paginationDto: BasePaginationDto) {
+    return this.voucherService.findAll(paginationDto);
   }
 
   @Get(':id')

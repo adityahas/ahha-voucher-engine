@@ -4,6 +4,8 @@ import { UpdateRewardItemSourceDto } from './dto/update-reward-item-source.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RewardItemSourceEntity } from '@core/loyalty/reward-item-source/entities/reward-item-source.entity';
 import { Repository } from 'typeorm';
+import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
+import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 
 @Injectable()
 export class RewardItemSourceService {
@@ -21,8 +23,40 @@ export class RewardItemSourceService {
     return this.rewardItemSourceRepository.save(newRewardItemSource);
   }
 
-  async findAll(): Promise<RewardItemSourceEntity[]> {
-    return this.rewardItemSourceRepository.find();
+  async findAll(
+    paginationDto: BasePaginationDto,
+  ): Promise<BasePaginationResponseInterface<RewardItemSourceEntity>> {
+    const { page, size, search, sort, order } = paginationDto;
+    const skip = page * size;
+
+    const queryBuilder =
+      this.rewardItemSourceRepository.createQueryBuilder('rewardItemSource');
+
+    if (search) {
+      queryBuilder.where('rewardItemSource.name ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    if (sort && order) {
+      queryBuilder.orderBy(`rewardItemSource.${sort}`, order);
+    }
+
+    const [data, total] = await queryBuilder
+      .skip(skip)
+      .take(size)
+      .getManyAndCount();
+
+    return {
+      code: 'SUCCESS',
+      message: 'Reward item sources retrieved successfully',
+      data,
+      pagination: {
+        page,
+        size,
+        total,
+      },
+    };
   }
 
   async findOne(id: string): Promise<RewardItemSourceEntity> {
