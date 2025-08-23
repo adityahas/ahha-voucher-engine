@@ -18,7 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/main/test/jest-e2e.json",
-    "seed": "ts-node src/seeder/main.seeder.ts"
+    "seed": "ts-node -r tsconfig-paths/register apps/admin/src/seeder/main.seeder.ts"
   },
   "dependencies": {
     "@nestjs/class-transformer": "^0.4.0",
