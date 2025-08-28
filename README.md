@@ -112,3 +112,55 @@ Tersedia seeder untuk:
 
 ---
 
+## 🎬 How to run
+
+1. Clone repo
+2. Install dependencies: `yarn install`
+3. Setup PostgreSQL dan buat database utama
+4. Setup nginx untuk multi domain
+5. Ini contoh konfigurasi nginx:
+    ```
+    worker_processes 1;
+    
+    events {
+    worker_connections 1024;
+    }
+    
+    http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    
+        sendfile        on;
+        keepalive_timeout  65;
+    
+        server {
+            listen 80;
+            server_name ~^(?<client>[^.]+)\.ahha-be\.local$;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    
+            location /users {
+                proxy_pass http://localhost:9004;
+            }
+            location /admin {
+                proxy_pass http://localhost:9002;
+            }
+            location /loyalty-admin {
+                proxy_pass http://localhost:9003;
+            }
+            location /loyalty {
+                proxy_pass http://localhost:9005;
+            }
+    
+            # Tambahkan CORS headers jika perlu
+            add_header Access-Control-Allow-Origin *;
+            add_header Access-Control-Allow-Headers DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,notif-token,fcm-id,Language,Channel;
+        }
+    } 
+    ```
+6. Load konfigurasi nginx: `sudo nginx -c /Users/adityahas/nginx-local/nginx.conf`
+7. Reload nginx: `sudo nginx -s reload`
+8. Run app admin: `yarn start:admin --watch`
+9. Run app loyalty-admin: `yarn start:loyalty-admin --watch`
+10. Run app loyalty-consumer: `yarn start:loyalty-consumer --watch`

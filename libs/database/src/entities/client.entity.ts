@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { BaseEntity } from '@core/base/entities/base.entity';
 
-@Entity('clients')
+@Entity('clients', { synchronize: false })
 export class ClientEntity extends BaseEntity {
   @Column({ unique: true })
   subdomain: string;
