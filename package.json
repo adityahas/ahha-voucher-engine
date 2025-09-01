@@ -100,7 +100,8 @@
       "^@core/database(|/.*)$": "<rootDir>/libs/database/src/$1",
       "^@core/encryption(|/.*)$": "<rootDir>/libs/encryption/src/$1",
       "^@core/loyalty(|/.*)$": "<rootDir>/libs/loyalty/src/$1",
-      "^@core/middleware(|/.*)$": "<rootDir>/libs/middleware/src/$1"
+      "^@core/middleware(|/.*)$": "<rootDir>/libs/middleware/src/$1",
+      "^@core/product(|/.*)$": "<rootDir>/libs/product/src/$1"
     }
   }
 }

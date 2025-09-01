@@ -103,12 +103,21 @@
       }
     },
     "product": {
-      "type": "application",
-      "root": "apps/product",
+      "type": "library",
+      "root": "libs/product",
       "entryFile": "index",
-      "sourceRoot": "apps/product/src",
+      "sourceRoot": "libs/product/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/product/tsconfig.lib.json"
+        "tsConfigPath": "libs/product/tsconfig.lib.json"
+      }
+    },
+    "product-admin": {
+      "type": "application",
+      "root": "apps/product-admin",
+      "entryFile": "index",
+      "sourceRoot": "apps/product-admin/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/product-admin/tsconfig.lib.json"
       }
     },
     "redistro": {

@@ -58,6 +58,12 @@
       ],
       "@core/middleware/*": [
         "libs/middleware/src/*"
+      ],
+      "@core/product": [
+        "libs/product/src"
+      ],
+      "@core/product/*": [
+        "libs/product/src/*"
       ]
     }
   }
