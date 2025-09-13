@@ -7,7 +7,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { VoucherLcService } from './voucher-lc.service';
+import { VoucherService } from './voucher.service';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { ConsumerJwtGuard } from '@core/auth/guards/consumer-jwt.guard';
 import { Request } from 'express';
@@ -17,10 +17,10 @@ import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 
 @Controller('vouchers')
-export class VoucherLcController {
+export class VoucherController {
   constructor(
-    @Inject('VOUCHER_LC_SERVICE')
-    private readonly voucherService: VoucherLcService,
+    @Inject('VOUCHER_SERVICE')
+    private readonly voucherService: VoucherService,
   ) {}
 
   @Get('/eligible')

@@ -1,6 +1,6 @@
 import { forwardRef, Module, Scope } from '@nestjs/common';
-import { VoucherLcService } from './voucher-lc.service';
-import { VoucherLcController } from './voucher-lc.controller';
+import { VoucherService } from './voucher.service';
+import { VoucherController } from './voucher.controller';
 import { DataSource } from 'typeorm';
 import { LoyaltyConsumerModule } from '../loyalty-consumer.module';
 import { AuthModule } from '@core/auth';
@@ -10,16 +10,16 @@ import { AuthModule } from '@core/auth';
     forwardRef(() => AuthModule),
     forwardRef(() => LoyaltyConsumerModule),
   ],
-  controllers: [VoucherLcController],
+  controllers: [VoucherController],
   providers: [
     {
-      provide: 'VOUCHER_LC_SERVICE',
+      provide: 'VOUCHER_SERVICE',
       scope: Scope.REQUEST,
       useFactory: async (dataSource: DataSource) => {
-        return new VoucherLcService(dataSource);
+        return new VoucherService(dataSource);
       },
       inject: ['LOYALTY_CONSUMER_CONNECTION'],
     },
   ],
 })
-export class VoucherLcModule {}
+export class VoucherModule {}
