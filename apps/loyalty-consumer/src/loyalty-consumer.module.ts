@@ -14,7 +14,7 @@ import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { LoyaltyConsumerController } from './loyalty-consumer.controller';
 import { LoyaltyConsumerService } from './loyalty-consumer.service';
-import { VoucherLcModule } from './voucher-lc/voucher-lc.module';
+import { VoucherModule } from './voucher/voucher.module';
 import { RewardClaimModule } from './reward-claim/reward-claim.module';
 
 dotenv.config();
@@ -41,7 +41,7 @@ dotenv.config();
     }),
     DatabaseModule,
     AuthModule,
-    VoucherLcModule,
+    VoucherModule,
     RewardClaimModule,
   ],
   providers: [
