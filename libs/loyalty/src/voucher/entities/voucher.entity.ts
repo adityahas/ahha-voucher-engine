@@ -1,4 +1,11 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
 import { VoucherValidityEntity } from './voucher-validity.entity';
 import { VoucherBindingEntity } from './voucher-binding.entity';
 import { VoucherClaimEntity } from './voucher-claim.entity';
