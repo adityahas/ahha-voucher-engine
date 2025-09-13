@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { clientsSeeder } from './clients.seeder';
 import { AdminEntity } from '../entities/admin.entity';
+import { Role } from '@core/auth/roles.enum';
 
 export async function seedAdmins(dataSource: DataSource) {
   const adminRepo = dataSource.getRepository(AdminEntity);
@@ -22,6 +23,7 @@ export async function seedAdmins(dataSource: DataSource) {
       email: adminData.email,
       password: hashedPassword,
       client: { database_name: adminData.client.database_name },
+      role: Role.ADMIN,
     });
 
     await adminRepo.save(admin);
@@ -34,4 +36,5 @@ export const adminsSeeder = clientsSeeder.map((value) => ({
   email: `admin@${value.subdomain}.com`,
   password: 'admin123',
   client: { database_name: value.database_name },
+  role: Role.ADMIN,
 }));
