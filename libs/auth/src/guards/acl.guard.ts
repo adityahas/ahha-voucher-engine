@@ -20,14 +20,23 @@ export class AclGuard implements CanActivate {
       return true;
     }
     const { user } = context.switchToHttp().getRequest();
-    // Assuming user has a 'role' property. Adjust as needed.
+    console.log('ACL Guard - User object:', user);
     const userRole = user?.role as Role;
+    console.log('ACL Guard - User Role:', userRole);
     if (!userRole) {
+      console.log('ACL Guard - User role is missing.');
       return false;
     }
 
-    return requiredPermissions.every((permission) =>
-      this.aclService.can(userRole, permission),
-    );
+    const hasPermission = requiredPermissions.every((permission) => {
+      const canAccess = this.aclService.can(userRole, permission);
+      console.log(
+        `ACL Guard - Checking permission: ${permission} for role: ${userRole} - Result: ${canAccess}`,
+      );
+      return canAccess;
+    });
+
+    console.log('ACL Guard - Final permission check result:', hasPermission);
+    return hasPermission;
   }
 }
