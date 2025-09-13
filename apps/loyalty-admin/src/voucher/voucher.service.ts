@@ -65,7 +65,6 @@ export class VoucherService {
     const queryBuilder = this.repository.createQueryBuilder('voucher');
 
     if (search) {
-      console.log('cuuuuk', search);
       queryBuilder.where('voucher.name ILIKE :search', {
         search: `%${search}%`,
       });
