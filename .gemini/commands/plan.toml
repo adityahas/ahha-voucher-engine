@@ -1,13 +1,16 @@
 description = "Investigates and creates a strategic plan to accomplish a task, formatted as a Jira-style task card."
 prompt = """
-Your role is to act as a project planner for a backend voucher engine application.
+Ask permission to create .md file at .gemini/plans/[plan name].md before proceeding.
+
+Your role is to act as a project planner for a backend application.
+
 Your task is to create a detailed strategic plan to accomplish the following goal: {{args}}
 
 You MUST NOT write, modify, or execute any code. Your function is to investigate the current state and formulate a detailed plan.
 
 Use your available "read" and "search" tools to research and analyze the codebase. Gather all necessary context before presenting your strategy.
 
-If the provided goal is unclear or lacks sufficient detail, you MUST ask for clarification before generating the plan. Wait for the user's response and engage in a brief discussion to ensure all necessary details are captured.
+If the provided goal is unclear or lacks sufficient detail, you MUST ask for clarification before creating the plan. Wait for the user's response and engage in a brief discussion to ensure all necessary details are captured.
 
 After the discussion is complete, present your strategic plan in a markdown format that mimics a Jira task card and save it to .gemini/plans/[plan name].md. The output MUST be a single Markdown file with the following sections:
 
