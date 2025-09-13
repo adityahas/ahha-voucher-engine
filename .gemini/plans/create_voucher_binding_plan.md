@@ -8,17 +8,17 @@ The goal is to add a new API endpoint to the `loyalty-admin` application, specif
 to enable the creation of "voucher bindings". Voucher binding refers to associating a specific voucher with a user or a
 set of users, effectively assigning the voucher for their use. This API will allow administrators to programmatically
 bind vouchers, which is crucial for targeted campaigns, user-specific rewards, or managing voucher distribution. The
-implementation will involve extending the existing `VoucherLaController` and `VoucherLaService` to handle the new
+implementation will involve extending the existing `VoucherController` and `VoucherService` to handle the new
 binding logic, leveraging the `create-voucher-binding.dto.ts` for request validation.
 
 ## Acceptance Criteria
 
-* A new POST endpoint `/loyalty-admin/vouchers/bind` (or similar, to be decided) exists in `VoucherLaController`.
+* A new POST endpoint `/loyalty-admin/vouchers/bind` (or similar, to be decided) exists in `VoucherController`.
 * The endpoint accepts a `CreateVoucherBindingDto` in the request body.
 * The API successfully binds the specified voucher(s) to the target user(s) or groups.
 * The binding operation is atomic and handles errors gracefully (e.g., invalid voucher ID, non-existent user).
 * Appropriate permissions (`write:voucher_bindings` or similar) are enforced for the new endpoint.
-* The service layer (`VoucherLaService`) contains the business logic for creating voucher bindings, interacting with the
+* The service layer (`VoucherService`) contains the business logic for creating voucher bindings, interacting with the
   database to persist the relationships.
 * Unit tests are added for the new controller endpoint and service method.
 * Integration tests verify the end-to-end functionality of the voucher binding API.
@@ -31,14 +31,14 @@ binding logic, leveraging the `create-voucher-binding.dto.ts` for request valida
   `userIds`).
 - [ ] Task 2: Create a new entity or modify an existing one (e.g., `VoucherBindingEntity` or add a relationship in
   `VoucherEntity`) to represent the voucher-user binding in the database.
-- [ ] Task 3: Add a new method `createVoucherBinding` to `VoucherLaService` that accepts `CreateVoucherBindingDto`,
+- [ ] Task 3: Add a new method `createVoucherBinding` to `VoucherService` that accepts `CreateVoucherBindingDto`,
   implements the binding logic, and persists the data. This method should handle validation and error cases.
-- [ ] Task 4: Add a new POST endpoint (e.g., `/bind`) to `VoucherLaController` that calls the `createVoucherBinding`
-  method in `VoucherLaService`.
+- [ ] Task 4: Add a new POST endpoint (e.g., `/bind`) to `VoucherController` that calls the `createVoucherBinding`
+  method in `VoucherService`.
 - [ ] Task 5: Implement appropriate authentication and authorization (e.g., `AdminJwtGuard`, `AclGuard`, `Permissions`)
   for the new binding endpoint.
-- [ ] Task 6: Write unit tests for the new `createVoucherBinding` method in `VoucherLaService`.
-- [ ] Task 7: Write unit tests for the new endpoint in `VoucherLaController`.
+- [ ] Task 6: Write unit tests for the new `createVoucherBinding` method in `VoucherService`.
+- [ ] Task 7: Write unit tests for the new endpoint in `VoucherController`.
 - [ ] Task 8: Update API documentation (if any) to include the new endpoint.
 
 ## Anticipated Challenges & Considerations

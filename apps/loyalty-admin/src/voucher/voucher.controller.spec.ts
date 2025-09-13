@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VoucherLaController } from './voucher-la.controller';
-import { VoucherLaService } from './voucher-la.service';
+import { VoucherController } from './voucher.controller';
+import { VoucherService } from './voucher.service';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { Reflector } from '@nestjs/core';
@@ -9,12 +9,12 @@ import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 
 describe('VoucherController', () => {
-  let controller: VoucherLaController;
-  let service: VoucherLaService;
+  let controller: VoucherController;
+  let service: VoucherService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [VoucherLaController],
+      controllers: [VoucherController],
       providers: [
         {
           provide: 'VOUCHER_SERVICE',
@@ -36,8 +36,8 @@ describe('VoucherController', () => {
       .useValue({ canActivate: () => true })
       .compile();
 
-    controller = module.get<VoucherLaController>(VoucherLaController);
-    service = module.get<VoucherLaService>('VOUCHER_SERVICE');
+    controller = module.get<VoucherController>(VoucherController);
+    service = module.get<VoucherService>('VOUCHER_SERVICE');
   });
 
   it('should be defined', () => {
