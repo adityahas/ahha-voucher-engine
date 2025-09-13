@@ -9,7 +9,7 @@ import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 
 @Injectable()
-export class VoucherLaService {
+export class VoucherService {
   private repository: Repository<VoucherEntity>;
   private userRepository: Repository<LoyaltyUserEntity>;
   private voucherCategoryRepository: Repository<VoucherCategoryEntity>;

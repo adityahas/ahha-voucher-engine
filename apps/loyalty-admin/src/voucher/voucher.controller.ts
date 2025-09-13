@@ -10,7 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { VoucherLaService } from './voucher-la.service';
+import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { AclGuard } from '@core/auth/guards/acl.guard';
@@ -19,10 +19,10 @@ import { Permissions } from '@core/auth/decorators/permissions.decorator';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 
 @Controller('/loyalty-admin/vouchers')
-export class VoucherLaController {
+export class VoucherController {
   constructor(
     @Inject('VOUCHER_SERVICE')
-    private readonly voucherService: VoucherLaService,
+    private readonly voucherService: VoucherService,
   ) {}
 
   @Post()

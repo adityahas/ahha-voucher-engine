@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VoucherLaService } from './voucher-la.service';
+import { VoucherService } from './voucher.service';
 import { DataSource, Repository } from 'typeorm';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { VoucherCategoryEntity } from '@core/loyalty/voucher/entities/voucher-category.entity';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 
-describe('VoucherLaService', () => {
-  let service: VoucherLaService;
+describe('VoucherService', () => {
+  let service: VoucherService;
   let voucherRepository: jest.Mocked<Repository<VoucherEntity>>;
   let userRepository: jest.Mocked<Repository<LoyaltyUserEntity>>;
   let voucherCategoryRepository: jest.Mocked<Repository<VoucherCategoryEntity>>;
@@ -49,7 +49,7 @@ describe('VoucherLaService', () => {
     jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        VoucherLaService,
+        VoucherService,
         {
           provide: DataSource,
           useValue: mockDataSource,
@@ -57,7 +57,7 @@ describe('VoucherLaService', () => {
       ],
     }).compile();
 
-    service = module.get<VoucherLaService>(VoucherLaService);
+    service = module.get<VoucherService>(VoucherService);
     voucherRepository = mockDataSource.getRepository(VoucherEntity);
     userRepository = mockDataSource.getRepository(LoyaltyUserEntity);
     voucherCategoryRepository = mockDataSource.getRepository(
