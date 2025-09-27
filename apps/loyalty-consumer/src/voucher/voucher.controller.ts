@@ -16,14 +16,14 @@ import { VoucherResponseDto } from './dto/voucher-response.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 
-@Controller('vouchers')
+@Controller('/loyalty/vouchers')
 export class VoucherController {
   constructor(
     @Inject('VOUCHER_SERVICE')
     private readonly voucherService: VoucherService,
   ) {}
 
-  @Get('/eligible')
+  @Get()
   @UseGuards(ConsumerJwtGuard)
   getEligibleVouchers(
     @Body() dto: GetEligibleVoucherDto,
@@ -37,8 +37,9 @@ export class VoucherController {
     @Req() req: Request,
     @Query() paginationDto: BasePaginationDto,
   ): Promise<BasePaginationResponseInterface<GetClaimedVoucherResponseDto>> {
+    console.log('user ', req.user);
     return this.voucherService.getClaimedVouchers(
-      req.user['id'],
+      req.user['userId'],
       paginationDto,
     );
   }
