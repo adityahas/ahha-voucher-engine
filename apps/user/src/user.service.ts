@@ -33,7 +33,7 @@ export class UserService {
       throw new Error('Invalid email or password');
     }
 
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, sub: user.id, role: user.role };
     const token = this.jwtService.sign(payload);
 
     return { user, token };
