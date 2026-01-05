@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Start All" type="CompoundRunConfigurationType">
+        <toRun name="start admin --watch" type="js.build_tools.npm"/>
+        <toRun name="start loyalty-admin --watch" type="js.build_tools.npm"/>
+        <toRun name="start loyalty-consumer --watch " type="js.build_tools.npm"/>
+        <toRun name="start main --watch" type="js.build_tools.npm"/>
+        <toRun name="start user --watch" type="js.build_tools.npm"/>
+        <method v="2"/>
+    </configuration>
+</component>
