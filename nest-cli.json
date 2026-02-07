@@ -146,6 +146,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/user-admin/tsconfig.lib.json"
       }
+    },
+    "user-consumer": {
+      "type": "application",
+      "root": "apps/user-consumer",
+      "entryFile": "main",
+      "sourceRoot": "apps/user-consumer/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/user-consumer/tsconfig.lib.json"
+      }
     }
   },
   "compilerOptions": {
