@@ -8,15 +8,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BaseController } from '@core/base/base.controller';
-import { RewardClaimService } from './reward-claim.service';
+import { RewardService } from './reward.service';
 import { ConsumerJwtGuard } from '@core/auth/guards/consumer-jwt.guard';
 import { Request } from 'express';
 
 @Controller('rewards')
-export class RewardClaimController extends BaseController {
+export class RewardController extends BaseController {
   constructor(
-    @Inject('REWARD_CLAIM_SERVICE')
-    private readonly rewardClaimService: RewardClaimService, // Replace 'any' with the actual service type
+    @Inject('REWARD_SERVICE')
+    private readonly rewardService: RewardService,
   ) {
     super();
   }
@@ -24,13 +24,13 @@ export class RewardClaimController extends BaseController {
   @Get()
   @UseGuards(ConsumerJwtGuard)
   findAllRewards() {
-    return this.rewardClaimService.findAllRewards();
+    return this.rewardService.findAllRewards();
   }
 
   @Post('/claim/:reward_id')
   @UseGuards(ConsumerJwtGuard)
   claimReward(@Param('reward_id') rewardId: string, @Req() req: Request) {
     const userId = req.user['userId'];
-    return this.rewardClaimService.claimReward(userId, rewardId);
+    return this.rewardService.claimReward(userId, rewardId);
   }
 }
