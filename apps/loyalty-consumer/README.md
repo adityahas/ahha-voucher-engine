@@ -94,7 +94,7 @@ Voucher discovery and retrieval for consumers.
 
 ---
 
-### 2. Reward Claim (`/rewards`)
+### 2. Reward (`/rewards`)
 
 Reward discovery and claiming with strategy pattern for different reward types.
 
@@ -133,11 +133,11 @@ The reward claim uses a strategy pattern to handle different reward types:
 
 ```
 RewardClaimStrategyFactory
-├── GoPayRewardStrategy (for 'gopay' type)
+├── GoPayRewardClaimStrategy (for 'gopay' type)
 └── (extensible for other types)
 ```
 
-**GoPayRewardStrategy:**
+**GoPayRewardClaimStrategy:**
 
 - Calls external API endpoint from `rewardItem.source.api_endpoint`
 - Authenticates with `rewardItem.source.apiKey`
@@ -184,14 +184,14 @@ apps/loyalty-consumer/src/
 │       ├── get-claimed-voucher-response.dto.ts
 │       ├── voucher-binding.dto.ts
 │       └── voucher-response.dto.ts
-└── reward-claim/                         # Reward claim module
-    ├── reward-claim.controller.ts
-    ├── reward-claim.service.ts
-    ├── reward-claim.module.ts
+└── reward/                         # Reward module
+    ├── reward.controller.ts
+    ├── reward.service.ts
+    ├── reward.module.ts
     ├── dto/
 │       └── claim-result.dto.ts
     └── strategy/
-        ├── reward-claim-strategy.factory.ts
+        ├── reward-strategy.factory.ts
         ├── reward-claim-strategy.interface.ts
         └── gopay-reward.strategy.ts
 ```

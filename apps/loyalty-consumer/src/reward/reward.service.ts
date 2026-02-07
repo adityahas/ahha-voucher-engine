@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { DataSource, Repository } from 'typeorm';
-import { RewardClaimStrategyFactory } from './strategy/reward-claim-strategy.factory';
+import { RewardClaimStrategyFactory } from './strategy/reward-claim-strategy-factory.service';
 
 @Injectable()
-export class RewardClaimService {
+export class RewardService {
   private rewardItemRepo: Repository<RewardItemEntity>;
 
   constructor(
