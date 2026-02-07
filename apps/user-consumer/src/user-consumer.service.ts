@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from '@core/user/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { EncryptionService } from '@core/encryption';
 import { JwtService } from '@nestjs/jwt';

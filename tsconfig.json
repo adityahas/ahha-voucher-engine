@@ -23,48 +23,22 @@
       }
     ],
     "paths": {
-      "@core/auth": [
-        "libs/auth/src"
-      ],
-      "@core/auth/*": [
-        "libs/auth/src/*"
-      ],
-      "@core/base": [
-        "libs/base/src"
-      ],
-      "@core/base/*": [
-        "libs/base/src/*"
-      ],
-      "@core/database": [
-        "libs/database/src"
-      ],
-      "@core/database/*": [
-        "libs/database/src/*"
-      ],
-      "@core/encryption": [
-        "libs/encryption/src"
-      ],
-      "@core/encryption/*": [
-        "libs/encryption/src/*"
-      ],
-      "@core/loyalty": [
-        "libs/loyalty/src"
-      ],
-      "@core/loyalty/*": [
-        "libs/loyalty/src/*"
-      ],
-      "@core/middleware": [
-        "libs/middleware/src"
-      ],
-      "@core/middleware/*": [
-        "libs/middleware/src/*"
-      ],
-      "@core/product": [
-        "libs/product/src"
-      ],
-      "@core/product/*": [
-        "libs/product/src/*"
-      ]
+      "@core/auth": ["libs/auth/src"],
+      "@core/auth/*": ["libs/auth/src/*"],
+      "@core/base": ["libs/base/src"],
+      "@core/base/*": ["libs/base/src/*"],
+      "@core/database": ["libs/database/src"],
+      "@core/database/*": ["libs/database/src/*"],
+      "@core/encryption": ["libs/encryption/src"],
+      "@core/encryption/*": ["libs/encryption/src/*"],
+      "@core/loyalty": ["libs/loyalty/src"],
+      "@core/loyalty/*": ["libs/loyalty/src/*"],
+      "@core/middleware": ["libs/middleware/src"],
+      "@core/middleware/*": ["libs/middleware/src/*"],
+      "@core/product": ["libs/product/src"],
+      "@core/product/*": ["libs/product/src/*"],
+      "@core/user": ["libs/user/src"],
+      "@core/user/*": ["libs/user/src/*"]
     }
   }
 }
