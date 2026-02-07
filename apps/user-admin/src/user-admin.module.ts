@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
 import { UserAdminController } from './user-admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
+import { UserEntity } from '@core/user/entities/user.entity';
 import { UserAdminService } from './user-admin.service';
 import { AuthModule } from '@core/auth';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
