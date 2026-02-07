@@ -1,0 +1,2045 @@
+openapi: 3.0.3
+info:
+  title: Ahha Voucher Engine API
+  description: |
+    Multi-tenant SaaS backend for voucher distribution and redemption.
+    
+    ## Authentication
+    
+    This API uses two layers of authentication:
+    1. **API Key** (`x-api-key` header) - Required for all requests
+    2. **JWT Bearer Token** (`Authorization` header) - Required for admin endpoints
+    
+    ## Multi-Tenancy
+    
+    All requests must include the tenant subdomain in the Host header (e.g., `client1.ahha-be.local`).
+    The subdomain determines which tenant database to use.
+  version: 1.0.0
+  contact:
+    name: Ahha Team
+
+servers:
+  - url: http://{subdomain}.ahha-be.local
+    variables:
+      subdomain:
+        default: client1
+        description: Tenant subdomain
+
+security:
+  - ApiKeyAuth: [ ]
+  - BearerAuth: [ ]
+  - ApiKeyAuth: [ ]
+    BearerAuth: [ ]
+
+tags:
+  - name: Authentication
+    description: User and admin login endpoints
+  - name: Admin Management
+    description: Admin user CRUD operations
+  - name: User Management
+    description: End user management
+  - name: Vouchers
+    description: Voucher CRUD and management
+  - name: Voucher Categories
+    description: Voucher category management
+  - name: Quests
+    description: Quest/gamification management
+  - name: Reward Items
+    description: Reward item management
+  - name: Reward Item Sources
+    description: Reward item source configuration
+  - name: Consumer Vouchers
+    description: Consumer-facing voucher operations
+  - name: Reward Claims
+    description: Reward claiming for consumers
+  - name: Products
+    description: Product catalog management
+  - name: Retailers
+    description: Retailer management
+  - name: Warehouses
+    description: Warehouse management
+
+paths:
+  # ============ ADMIN AUTHENTICATION ============
+  /admin/login:
+    post:
+      tags:
+        - Authentication
+      summary: Admin Login
+      description: Authenticate an admin user and receive JWT token
+      operationId: adminLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginAdminDto'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  admin:
+                    $ref: '#/components/schemas/Admin'
+        '401':
+          description: Invalid credentials
+
+  # ============ ADMIN MANAGEMENT ============
+  /admin:
+    get:
+      tags:
+        - Admin Management
+      summary: Get All Admins
+      description: Retrieve all admin users (requires read:users permission)
+      operationId: findAllAdmins
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      responses:
+        '200':
+          description: List of admins
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Admin'
+        '403':
+          description: Forbidden - insufficient permissions
+
+    post:
+      tags:
+        - Admin Management
+      summary: Create Admin
+      description: Create a new admin user (requires write:users permission)
+      operationId: createAdmin
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdminDto'
+      responses:
+        '201':
+          description: Admin created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '403':
+          description: Forbidden - insufficient permissions
+
+  /admin/{id}:
+    get:
+      tags:
+        - Admin Management
+      summary: Get Admin by ID
+      description: Retrieve a specific admin user
+      operationId: findOneAdmin
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Admin found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '404':
+          description: Admin not found
+
+    patch:
+      tags:
+        - Admin Management
+      summary: Update Admin
+      description: Update an admin user
+      operationId: updateAdmin
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAdminDto'
+      responses:
+        '200':
+          description: Admin updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+
+    delete:
+      tags:
+        - Admin Management
+      summary: Delete Admin
+      description: Delete an admin user
+      operationId: removeAdmin
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Admin deleted successfully
+
+  # ============ USER MANAGEMENT ============
+  /user/login:
+    post:
+      tags:
+        - Authentication
+      summary: User Login
+      description: Authenticate an end user
+      operationId: userLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginAdminDto'
+      responses:
+        '200':
+          description: Login successful
+
+  /user-admin/users:
+    get:
+      tags:
+        - User Management
+      summary: Get All Users
+      description: Retrieve all users
+      operationId: findAllUsers
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      responses:
+        '200':
+          description: List of users
+
+    post:
+      tags:
+        - User Management
+      summary: Create User
+      description: Create a new user
+      operationId: createUser
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: User created successfully
+
+  /user-admin/users/{id}:
+    get:
+      tags:
+        - User Management
+      summary: Get User by ID
+      description: Retrieve a specific user
+      operationId: findOneUser
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User found
+
+    put:
+      tags:
+        - User Management
+      summary: Update User
+      description: Update a user
+      operationId: updateUser
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '200':
+          description: User updated successfully
+
+  # ============ VOUCHERS (Admin) ============
+  /loyalty-admin/vouchers:
+    get:
+      tags:
+        - Vouchers
+      summary: Get All Vouchers
+      description: Retrieve all vouchers with pagination (requires read:vouchers permission)
+      operationId: findAllVouchers
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [ ASC, DESC ]
+      responses:
+        '200':
+          description: Paginated list of vouchers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVoucherResponse'
+
+    post:
+      tags:
+        - Vouchers
+      summary: Create Voucher
+      description: Create a new voucher (requires write:vouchers permission)
+      operationId: createVoucher
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVoucherDto'
+      responses:
+        '201':
+          description: Voucher created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voucher'
+
+  /loyalty-admin/vouchers/{id}:
+    get:
+      tags:
+        - Vouchers
+      summary: Get Voucher by ID
+      description: Retrieve a specific voucher
+      operationId: findOneVoucher
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Voucher found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voucher'
+        '404':
+          description: Voucher not found
+
+    patch:
+      tags:
+        - Vouchers
+      summary: Update Voucher
+      description: Update a voucher
+      operationId: updateVoucher
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVoucherDto'
+      responses:
+        '200':
+          description: Voucher updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voucher'
+
+    delete:
+      tags:
+        - Vouchers
+      summary: Delete Voucher
+      description: Delete a voucher
+      operationId: removeVoucher
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Voucher deleted successfully
+
+  # ============ VOUCHER CATEGORIES ============
+  /loyalty-admin/voucher-categories:
+    get:
+      tags:
+        - Voucher Categories
+      summary: Get All Voucher Categories
+      description: Retrieve all voucher categories with pagination
+      operationId: findAllVoucherCategories
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [ ASC, DESC ]
+      responses:
+        '200':
+          description: Paginated list of voucher categories
+
+    post:
+      tags:
+        - Voucher Categories
+      summary: Create Voucher Category
+      description: Create a new voucher category
+      operationId: createVoucherCategory
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVoucherCategoryDto'
+      responses:
+        '201':
+          description: Voucher category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherCategory'
+
+  /loyalty-admin/voucher-categories/{id}:
+    get:
+      tags:
+        - Voucher Categories
+      summary: Get Voucher Category by ID
+      description: Retrieve a specific voucher category
+      operationId: findOneVoucherCategory
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Voucher category found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherCategory'
+
+    put:
+      tags:
+        - Voucher Categories
+      summary: Update Voucher Category
+      description: Update a voucher category
+      operationId: updateVoucherCategory
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVoucherCategoryDto'
+      responses:
+        '200':
+          description: Voucher category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherCategory'
+
+    delete:
+      tags:
+        - Voucher Categories
+      summary: Delete Voucher Category
+      description: Delete a voucher category
+      operationId: removeVoucherCategory
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Voucher category deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  # ============ QUESTS ============
+  /loyalty-admin/quest:
+    get:
+      tags:
+        - Quests
+      summary: Get All Quests
+      description: Retrieve all quests with pagination
+      operationId: findAllQuests
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [ ASC, DESC ]
+      responses:
+        '200':
+          description: List of quests
+
+    post:
+      tags:
+        - Quests
+      summary: Create Quest
+      description: Create a new quest
+      operationId: createQuest
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuestDto'
+      responses:
+        '201':
+          description: Quest created successfully
+
+  /loyalty-admin/quest/{id}:
+    get:
+      tags:
+        - Quests
+      summary: Get Quest by ID
+      description: Retrieve a specific quest
+      operationId: findOneQuest
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Quest found
+
+    patch:
+      tags:
+        - Quests
+      summary: Update Quest
+      description: Update a quest
+      operationId: updateQuest
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuestDto'
+      responses:
+        '200':
+          description: Quest updated successfully
+
+    delete:
+      tags:
+        - Quests
+      summary: Delete Quest
+      description: Delete a quest
+      operationId: removeQuest
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Quest deleted successfully
+
+  # ============ REWARD ITEMS ============
+  /loyalty-admin/reward-item:
+    get:
+      tags:
+        - Reward Items
+      summary: Get All Reward Items
+      description: Retrieve all reward items with pagination
+      operationId: findAllRewardItems
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [ ASC, DESC ]
+      responses:
+        '200':
+          description: List of reward items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RewardItem'
+
+    post:
+      tags:
+        - Reward Items
+      summary: Create Reward Item
+      description: Create a new reward item
+      operationId: createRewardItem
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRewardItemDto'
+      responses:
+        '201':
+          description: Reward item created successfully
+
+  /loyalty-admin/reward-item/{id}:
+    get:
+      tags:
+        - Reward Items
+      summary: Get Reward Item by ID
+      description: Retrieve a specific reward item
+      operationId: findOneRewardItem
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reward item found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardItem'
+
+    patch:
+      tags:
+        - Reward Items
+      summary: Update Reward Item
+      description: Update a reward item
+      operationId: updateRewardItem
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRewardItemDto'
+      responses:
+        '200':
+          description: Reward item updated successfully
+
+    delete:
+      tags:
+        - Reward Items
+      summary: Delete Reward Item
+      description: Delete a reward item
+      operationId: removeRewardItem
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Reward item deleted successfully
+
+  # ============ REWARD ITEM SOURCES ============
+  /loyalty-admin/reward-item-source:
+    get:
+      tags:
+        - Reward Item Sources
+      summary: Get All Reward Item Sources
+      description: Retrieve all reward item sources with pagination
+      operationId: findAllRewardItemSources
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [ ASC, DESC ]
+      responses:
+        '200':
+          description: List of reward item sources
+
+    post:
+      tags:
+        - Reward Item Sources
+      summary: Create Reward Item Source
+      description: Create a new reward item source
+      operationId: createRewardItemSource
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRewardItemSourceDto'
+      responses:
+        '201':
+          description: Reward item source created successfully
+
+  /loyalty-admin/reward-item-source/{id}:
+    get:
+      tags:
+        - Reward Item Sources
+      summary: Get Reward Item Source by ID
+      description: Retrieve a specific reward item source
+      operationId: findOneRewardItemSource
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reward item source found
+
+    patch:
+      tags:
+        - Reward Item Sources
+      summary: Update Reward Item Source
+      description: Update a reward item source
+      operationId: updateRewardItemSource
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRewardItemSourceDto'
+      responses:
+        '200':
+          description: Reward item source updated successfully
+
+    delete:
+      tags:
+        - Reward Item Sources
+      summary: Delete Reward Item Source
+      description: Delete a reward item source
+      operationId: removeRewardItemSource
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Reward item source deleted successfully
+
+  # ============ CONSUMER VOUCHERS ============
+  /loyalty/vouchers:
+    get:
+      tags:
+        - Consumer Vouchers
+      summary: Get Eligible Vouchers
+      description: Get vouchers eligible for the current user based on bindings
+      operationId: getEligibleVouchers
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetEligibleVoucherDto'
+      responses:
+        '200':
+          description: List of eligible vouchers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VoucherResponseDto'
+
+  /loyalty/vouchers/my:
+    get:
+      tags:
+        - Consumer Vouchers
+      summary: Get My Claimed Vouchers
+      description: Get vouchers claimed by the authenticated user
+      operationId: getClaimedVouchers
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [ ASC, DESC ]
+      responses:
+        '200':
+          description: Paginated list of claimed vouchers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedClaimedVoucherResponse'
+
+  # ============ REWARD CLAIMS ============
+  /rewards:
+    get:
+      tags:
+        - Reward Claims
+      summary: Get All Available Rewards
+      description: Get all available rewards for claiming
+      operationId: findAllRewards
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      responses:
+        '200':
+          description: List of rewards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RewardItem'
+
+  /rewards/claim/{reward_id}:
+    post:
+      tags:
+        - Reward Claims
+      summary: Claim Reward
+      description: Claim a reward item
+      operationId: claimReward
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: reward_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reward claimed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
+        '400':
+          description: Reward out of stock or claim failed
+        '404':
+          description: Reward item not found
+
+  # ============ PRODUCTS ============
+  /redistro/products:
+    get:
+      tags:
+        - Products
+      summary: Get All Products
+      description: Retrieve all products
+      operationId: findAllProducts
+      responses:
+        '200':
+          description: List of products
+
+    post:
+      tags:
+        - Products
+      summary: Create Product
+      description: Create a new product
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductDto'
+      responses:
+        '201':
+          description: Product created successfully
+
+  /redistro/products/{id}:
+    get:
+      tags:
+        - Products
+      summary: Get Product by ID
+      description: Retrieve a specific product
+      operationId: findOneProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product found
+
+    patch:
+      tags:
+        - Products
+      summary: Update Product
+      description: Update a product
+      operationId: updateProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductDto'
+      responses:
+        '200':
+          description: Product updated successfully
+
+    delete:
+      tags:
+        - Products
+      summary: Delete Product
+      description: Delete a product
+      operationId: removeProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Product deleted successfully
+
+  # ============ RETAILERS ============
+  /redistro/retailers:
+    get:
+      tags:
+        - Retailers
+      summary: Get All Retailers
+      description: Retrieve all retailers
+      operationId: findAllRetailers
+      responses:
+        '200':
+          description: List of retailers
+
+    post:
+      tags:
+        - Retailers
+      summary: Create Retailer
+      description: Create a new retailer
+      operationId: createRetailer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRetailerDto'
+      responses:
+        '201':
+          description: Retailer created successfully
+
+  /redistro/retailers/{id}:
+    get:
+      tags:
+        - Retailers
+      summary: Get Retailer by ID
+      description: Retrieve a specific retailer
+      operationId: findOneRetailer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Retailer found
+
+    patch:
+      tags:
+        - Retailers
+      summary: Update Retailer
+      description: Update a retailer
+      operationId: updateRetailer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRetailerDto'
+      responses:
+        '200':
+          description: Retailer updated successfully
+
+    delete:
+      tags:
+        - Retailers
+      summary: Delete Retailer
+      description: Delete a retailer
+      operationId: removeRetailer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Retailer deleted successfully
+
+  # ============ WAREHOUSES ============
+  /redistro/warehouses:
+    get:
+      tags:
+        - Warehouses
+      summary: Get All Warehouses
+      description: Retrieve all warehouses
+      operationId: findAllWarehouses
+      responses:
+        '200':
+          description: List of warehouses
+
+    post:
+      tags:
+        - Warehouses
+      summary: Create Warehouse
+      description: Create a new warehouse
+      operationId: createWarehouse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWarehouseDto'
+      responses:
+        '201':
+          description: Warehouse created successfully
+
+  /redistro/warehouses/{id}:
+    get:
+      tags:
+        - Warehouses
+      summary: Get Warehouse by ID
+      description: Retrieve a specific warehouse
+      operationId: findOneWarehouse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Warehouse found
+
+    patch:
+      tags:
+        - Warehouses
+      summary: Update Warehouse
+      description: Update a warehouse
+      operationId: updateWarehouse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWarehouseDto'
+      responses:
+        '200':
+          description: Warehouse updated successfully
+
+    delete:
+      tags:
+        - Warehouses
+      summary: Delete Warehouse
+      description: Delete a warehouse
+      operationId: removeWarehouse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Warehouse deleted successfully
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login endpoints
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for the tenant
+
+  schemas:
+    # ============ BASE SCHEMAS ============
+    BasePaginationDto:
+      type: object
+      properties:
+        page:
+          type: integer
+          default: 0
+          description: Page number (0-indexed)
+        size:
+          type: integer
+          default: 10
+          description: Items per page
+        search:
+          type: string
+          default: ''
+          description: Search query
+        sort:
+          type: string
+          description: Field to sort by
+        order:
+          type: string
+          enum: [ ASC, DESC ]
+          description: Sort order
+
+    BaseResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response code
+        message:
+          type: string
+          description: Response message
+        data:
+          type: object
+          description: Response data
+
+    PaginatedResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            pagination:
+              type: object
+              properties:
+                page:
+                  type: integer
+                total:
+                  type: integer
+                size:
+                  type: integer
+            data:
+              type: array
+              items:
+                type: object
+
+    # ============ AUTH SCHEMAS ============
+    LoginAdminDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Admin email address
+        password:
+          type: string
+          format: password
+          description: Admin password
+      example:
+        email: admin@example.com
+        password: '********'
+
+    # ============ ADMIN SCHEMAS ============
+    Role:
+      type: string
+      enum:
+        - user
+        - admin
+        - sales
+        - driver
+      description: User role
+
+    Admin:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/Role'
+        client:
+          $ref: '#/components/schemas/Client'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    CreateAdminDto:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: Admin name
+        email:
+          type: string
+          format: email
+          description: Admin email
+        password:
+          type: string
+          format: password
+          description: Admin password
+        role:
+          $ref: '#/components/schemas/Role'
+          description: Admin role (defaults to 'admin')
+
+    UpdateAdminDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateAdminDto'
+
+    # ============ CLIENT SCHEMAS ============
+    Client:
+      type: object
+      properties:
+        subdomain:
+          type: string
+          description: Unique subdomain for the client
+        api_key:
+          type: string
+          description: API key for authentication
+        database_name:
+          type: string
+          description: Client's database name
+        database_username:
+          type: string
+          description: Database username (encrypted)
+        database_password:
+          type: string
+          description: Database password (encrypted)
+        database_port:
+          type: string
+        database_host:
+          type: string
+
+    # ============ USER SCHEMAS ============
+    CreateUserDto:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: User's full name
+        email:
+          type: string
+          format: email
+          description: User email address
+        password:
+          type: string
+          format: password
+          description: User password
+        is_active:
+          type: boolean
+          description: Whether the user account is active
+        is_deleted:
+          type: boolean
+          description: Soft delete flag
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    # ============ VOUCHER SCHEMAS ============
+    VoucherBindingType:
+      type: string
+      enum:
+        - role
+        - product_type
+        - product_sku
+        - product_vendor
+      description: Type of entity the voucher is bound to
+
+    VoucherValidityType:
+      type: string
+      enum:
+        - daily
+        - birthday
+        - weekly
+        - monthly
+        - one_time
+      description: Type of voucher validity period
+
+    VoucherCategory:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Unique identifier for the category
+        name:
+          type: string
+          description: Category name
+        description:
+          type: string
+          description: Category description
+        image:
+          type: string
+          description: Category image URL
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateVoucherCategoryDto:
+      type: object
+      required:
+        - slug
+        - name
+        - description
+        - image
+      properties:
+        slug:
+          type: string
+          description: Unique slug for the category
+          example: food-and-beverage
+          minLength: 1
+          maxLength: 100
+        name:
+          type: string
+          description: Category name
+          example: Food & Beverage
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          description: Category description
+          example: Food and beverage vouchers for restaurants, cafes, and bars
+          minLength: 1
+          maxLength: 500
+        image:
+          type: string
+          description: Image URL for the category
+          example: https://example.com/images/food-beverage.png
+          minLength: 1
+          maxLength: 255
+
+    UpdateVoucherCategoryDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateVoucherCategoryDto'
+
+    VoucherValidity:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          $ref: '#/components/schemas/VoucherValidityType'
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+        start_time:
+          type: string
+          example: '00:00:00'
+        end_time:
+          type: string
+          example: '23:59:59'
+
+    CreateVoucherValidityDto:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/VoucherValidityType'
+        start_date:
+          type: string
+          format: date-time
+          description: Start date in ISO 8601 format
+        end_date:
+          type: string
+          format: date-time
+          description: End date in ISO 8601 format
+        start_time:
+          type: string
+          description: Start time (HH:MM:SS)
+          example: '09:00:00'
+        end_time:
+          type: string
+          description: End time (HH:MM:SS)
+          example: '18:00:00'
+
+    VoucherBinding:
+      type: object
+      properties:
+        id:
+          type: integer
+        bind_type:
+          type: string
+          description: Type of binding
+        bind_value:
+          type: string
+          description: Value of the binding
+
+    CreateVoucherBindingDto:
+      type: object
+      required:
+        - bind_type
+        - bind_value
+      properties:
+        bind_type:
+          $ref: '#/components/schemas/VoucherBindingType'
+        bind_value:
+          type: string
+          description: Value to bind to (e.g., role name, product SKU)
+
+    Voucher:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Unique voucher code (primary key)
+        description:
+          type: string
+          description: Voucher description
+        quota:
+          type: integer
+          description: Maximum number of times this voucher can be claimed
+        image:
+          type: string
+          description: Voucher image URL
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/VoucherCategory'
+        allow_combine_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/VoucherCategory'
+        validities:
+          type: array
+          items:
+            $ref: '#/components/schemas/VoucherValidity'
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/VoucherBinding'
+        target_users:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: UUIDs of users allowed to use this voucher
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateVoucherDto:
+      type: object
+      required:
+        - code
+        - quota
+        - categories
+        - allow_combine_categories
+        - validities
+        - bindings
+      properties:
+        code:
+          type: string
+          description: Unique voucher code
+        description:
+          type: string
+          description: Voucher description
+        quota:
+          type: integer
+          description: Maximum claim count
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateVoucherCategoryDto'
+          description: Categories this voucher belongs to
+        allow_combine_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateVoucherCategoryDto'
+          description: Categories this voucher can be combined with
+        validities:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateVoucherValidityDto'
+          description: Validity periods for this voucher
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateVoucherBindingDto'
+          description: Product/brand/store bindings
+        target_users:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: UUIDs of target users (optional)
+
+    UpdateVoucherDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateVoucherDto'
+
+    PaginatedVoucherResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Voucher'
+
+    # ============ CONSUMER VOUCHER SCHEMAS ============
+    VoucherBindingDto:
+      type: object
+      required:
+        - bind_type
+        - bind_value
+      properties:
+        bind_type:
+          $ref: '#/components/schemas/VoucherBindingType'
+        bind_value:
+          type: string
+          description: Value to bind to
+
+    GetEligibleVoucherDto:
+      type: object
+      required:
+        - user_id
+        - bindings
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: User ID to check eligibility for
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/VoucherBindingDto'
+          description: Binding criteria to filter vouchers
+
+    VoucherResponseDto:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Voucher code
+        description:
+          type: string
+          description: Voucher description
+        image:
+          type: string
+          description: Voucher image URL
+
+    GetClaimedVoucherResponseDto:
+      type: object
+      properties:
+        voucher:
+          $ref: '#/components/schemas/VoucherResponseDto'
+
+    PaginatedClaimedVoucherResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/GetClaimedVoucherResponseDto'
+
+    # ============ QUEST SCHEMAS ============
+    CreateQuestDto:
+      type: object
+      description: Quest creation DTO (to be implemented)
+
+    UpdateQuestDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateQuestDto'
+
+    # ============ REWARD ITEM SCHEMAS ============
+    RewardItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Reward item name
+        source_id:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/RewardItemSource'
+        type:
+          type: string
+          description: Reward type (e.g., 'gopay', 'pulsa')
+        stock:
+          type: integer
+          description: Stock count (-1 = unlimited, 0 = out of stock)
+
+    CreateRewardItemDto:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          description: Reward item name
+        description:
+          type: string
+          description: Reward item description
+        value:
+          type: number
+          description: Reward value/points
+
+    UpdateRewardItemDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateRewardItemDto'
+
+    # ============ REWARD ITEM SOURCE SCHEMAS ============
+    RewardItemSource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Source name
+        description:
+          type: string
+          description: Source description
+        url:
+          type: string
+          format: uri
+          description: Source URL
+        source_type:
+          type: string
+          description: Type of source (e.g., 'gopay', 'bank_transfer')
+
+    CreateRewardItemSourceDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Source name
+        description:
+          type: string
+          description: Source description
+        url:
+          type: string
+          format: uri
+          description: Source URL
+
+    UpdateRewardItemSourceDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateRewardItemSourceDto'
+
+    # ============ REWARD CLAIM SCHEMAS ============
+    ClaimResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ SUCCESS, FAILED ]
+          description: Claim status
+        code:
+          type: string
+          description: Reward code (if successful)
+        externalRefId:
+          type: string
+          description: External reference ID
+        expiredAt:
+          type: string
+          format: date-time
+          description: Expiration date (if applicable)
+        errorMessage:
+          type: string
+          description: Error message (if failed)
+
+    # ============ PRODUCT SCHEMAS ============
+    CreateProductDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Product name
+        description:
+          type: string
+          description: Product description
+        price:
+          type: number
+          description: Product price
+        sku:
+          type: string
+          description: Product SKU
+
+    UpdateProductDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateProductDto'
+
+    # ============ RETAILER SCHEMAS ============
+    CreateRetailerDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Retailer name
+        address:
+          type: string
+          description: Retailer address
+        phone:
+          type: string
+          description: Contact phone number
+        email:
+          type: string
+          format: email
+          description: Contact email
+
+    UpdateRetailerDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateRetailerDto'
+
+    # ============ WAREHOUSE SCHEMAS ============
+    CreateWarehouseDto:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Warehouse name
+        address:
+          type: string
+          description: Warehouse address
+        capacity:
+          type: integer
+          description: Storage capacity
+
+    UpdateWarehouseDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateWarehouseDto'
