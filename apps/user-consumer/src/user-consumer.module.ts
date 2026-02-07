@@ -1,20 +1,20 @@
 import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
-import { UserAdminController } from './user-admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
-import { UserAdminService } from './user-admin.service';
 import { AuthModule } from '@core/auth';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
 import { Request } from 'express';
 import { DatabaseModule, DatabaseService } from '@core/database';
 import { DataSource } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { ClientEntity } from '@core/database/entities/client.entity';
 import { jwtConstants } from '@core/auth/constants';
 import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
+import { UserConsumerController } from './user-consumer.controller';
+import { UserConsumerService } from './user-consumer.service';
+import { EncryptionService } from '@core/encryption';
 
 dotenv.config();
 
@@ -34,7 +34,6 @@ dotenv.config();
       autoLoadEntities: false,
       entities: [ClientEntity],
     }),
-    TypeOrmModule.forFeature([UserEntity]),
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1w' },
@@ -44,8 +43,9 @@ dotenv.config();
   ],
   providers: [
     JwtStrategy,
+    UserConsumerService,
     {
-      provide: 'USER_ADMIN_CONNECTION',
+      provide: 'USER_CONSUMER_CONNECTION',
       scope: Scope.REQUEST,
       useFactory: async (
         request: Request,
@@ -61,18 +61,26 @@ dotenv.config();
       inject: [REQUEST, DatabaseService],
     },
     {
-      provide: 'USER_ADMIN_SERVICE',
+      provide: 'USER_CONSUMER_SERVICE',
       scope: Scope.REQUEST,
-      useFactory: async (connection: DataSource) => {
-        return new UserAdminService(connection);
+      useFactory: async (
+        dataSource: DataSource,
+        encryptionService: EncryptionService,
+        jwtService: JwtService,
+      ) => {
+        return new UserConsumerService(
+          dataSource,
+          encryptionService,
+          jwtService,
+        );
       },
-      inject: ['USER_ADMIN_CONNECTION'],
+      inject: ['USER_CONSUMER_CONNECTION', EncryptionService, JwtService],
     },
   ],
-  controllers: [UserAdminController],
-  exports: ['USER_ADMIN_CONNECTION'],
+  controllers: [UserConsumerController],
+  exports: ['USER_CONSUMER_CONNECTION'],
 })
-export class UserAdminModule implements NestModule {
+export class UserConsumerModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
   }

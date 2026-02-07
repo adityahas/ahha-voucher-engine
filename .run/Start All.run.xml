@@ -4,6 +4,7 @@
     <toRun name="start loyalty-admin --watch" type="js.build_tools.npm"/>
     <toRun name="start loyalty-consumer --watch " type="js.build_tools.npm"/>
     <toRun name="start user-admin --watch" type="js.build_tools.npm"/>
+    <toRun name="start user-consumer --watch" type="js.build_tools.npm"/>
     <method v="2"/>
   </configuration>
 </component>

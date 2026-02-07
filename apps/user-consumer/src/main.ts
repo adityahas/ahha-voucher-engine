@@ -1,13 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { UserAdminModule } from './user-admin.module';
+import { UserConsumerModule } from './user-consumer.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(UserAdminModule);
+  const app = await NestFactory.create(UserConsumerModule);
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Comment out if you want to insert nested objects without uuid
+      whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
     }),
@@ -17,10 +17,10 @@ async function bootstrap() {
   }
 
   const config = new DocumentBuilder()
-    .setTitle('AHHA User API')
-    .setDescription('API documentation for the AHHA User')
+    .setTitle('AHHA User Consumer API')
+    .setDescription('API documentation for the AHHA User Consumer')
     .setVersion('1.0')
-    .addServer('client1.localhost.dev/user')
+    .addServer('client1.localhost.dev:9006')
     .addBearerAuth()
     .addApiKey(
       {
@@ -38,8 +38,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.PORT_USER_ADMIN || 9004, () => {
-    console.log(`Running on ${process.env.PORT_USER_ADMIN || 9004}`);
+  await app.listen(process.env.PORT_USER_CONSUMER || 9006, () => {
+    console.log(`Running on ${process.env.PORT_USER_CONSUMER || 9006}`);
   });
 }
 
