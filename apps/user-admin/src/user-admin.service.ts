@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
-export class UserService {
+export class UserAdminService {
   private userRepository: Repository<UserEntity>;
 
   constructor(

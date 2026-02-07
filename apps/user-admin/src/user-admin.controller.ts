@@ -9,7 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UserAdminService } from './user-admin.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { AclGuard } from '@core/auth/guards/acl.guard';
@@ -17,11 +17,11 @@ import { Permissions } from '@core/auth/decorators/permissions.decorator';
 import { LoginAdminDto } from '../../admin/src/dto/login-admin.dto';
 import { BaseController } from '@core/base/base.controller';
 
-@Controller('/users')
-export class UserController extends BaseController {
+@Controller('/user-admin')
+export class UserAdminController extends BaseController {
   constructor(
     @Inject('USER_SERVICE')
-    private readonly userService: UserService,
+    private readonly userService: UserAdminService,
   ) {
     super();
   }
