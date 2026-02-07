@@ -138,13 +138,13 @@
         "tsConfigPath": "libs/tenancy/tsconfig.lib.json"
       }
     },
-    "user": {
+    "user-admin": {
       "type": "application",
-      "root": "apps/user",
+      "root": "apps/user-admin",
       "entryFile": "main",
-      "sourceRoot": "apps/user/src",
+      "sourceRoot": "apps/user-admin/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/user/tsconfig.lib.json"
+        "tsConfigPath": "apps/user-admin/tsconfig.lib.json"
       }
     }
   },

@@ -4,7 +4,7 @@ import { RedistroService } from './redistro.service';
 import { RedistroController } from './redistro.controller';
 import { RetailerModule } from './retailer/retailer.module';
 import { WarehouseModule } from './warehouse/warehouse.module';
-import { UserModule } from '../../user/src/user.module';
+import { UserAdminModule } from '../../user-admin/src/user-admin.module';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { UserModule } from '../../user/src/user.module';
     ]),
     RetailerModule,
     WarehouseModule,
-    UserModule,
+    UserAdminModule,
   ],
   providers: [RedistroService],
   controllers: [RedistroController],

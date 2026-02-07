@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { UserModule } from './user.module';
+import { UserAdminModule } from './user-admin.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(UserModule);
+  const app = await NestFactory.create(UserAdminModule);
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Comment out if you want to insert nested objects without uuid

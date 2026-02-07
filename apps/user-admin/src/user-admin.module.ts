@@ -1,8 +1,8 @@
 import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
-import { UserController } from './user.controller';
+import { UserAdminController } from './user-admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { UserService } from './user.service';
+import { UserAdminService } from './user-admin.service';
 import { AuthModule } from '@core/auth';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
 import { Request } from 'express';
@@ -69,14 +69,14 @@ dotenv.config();
         encryptionService: EncryptionService,
         jwtService: JwtService,
       ) => {
-        return new UserService(connection, encryptionService, jwtService);
+        return new UserAdminService(connection, encryptionService, jwtService);
       },
       inject: ['USER_CONNECTION', EncryptionService, JwtService],
     },
   ],
-  controllers: [UserController],
+  controllers: [UserAdminController],
 })
-export class UserModule implements NestModule {
+export class UserAdminModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
   }
