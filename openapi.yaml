@@ -3,15 +3,15 @@ info:
   title: Ahha Voucher Engine API
   description: |
     Multi-tenant SaaS backend for voucher distribution and redemption.
-    
+
     ## Authentication
-    
+
     This API uses two layers of authentication:
     1. **API Key** (`x-api-key` header) - Required for all requests
     2. **JWT Bearer Token** (`Authorization` header) - Required for admin endpoints
-    
+
     ## Multi-Tenancy
-    
+
     All requests must include the tenant subdomain in the Host header (e.g., `client1.ahha-be.local`).
     The subdomain determines which tenant database to use.
   version: 1.0.0
@@ -211,30 +211,42 @@ paths:
         '204':
           description: Admin deleted successfully
 
-  # ============ USER MANAGEMENT ============
+  # ============ USER AUTHENTICATION ============
   /user/login:
     post:
       tags:
         - Authentication
       summary: User Login
-      description: Authenticate an end user
+      description: Authenticate an end user and receive JWT token
       operationId: userLogin
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginAdminDto'
+              $ref: '#/components/schemas/LoginUserDto'
       responses:
         '200':
           description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
 
+  # ============ USER MANAGEMENT ============
   /user-admin/users:
     get:
       tags:
         - User Management
       summary: Get All Users
-      description: Retrieve all users
+      description: Retrieve all users (requires read:users permission)
       operationId: findAllUsers
       security:
         - BearerAuth: [ ]
@@ -242,12 +254,18 @@ paths:
       responses:
         '200':
           description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
 
     post:
       tags:
         - User Management
       summary: Create User
-      description: Create a new user
+      description: Create a new user (requires write:users permission)
       operationId: createUser
       security:
         - BearerAuth: [ ]
@@ -261,13 +279,17 @@ paths:
       responses:
         '201':
           description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
 
   /user-admin/users/{id}:
     get:
       tags:
         - User Management
       summary: Get User by ID
-      description: Retrieve a specific user
+      description: Retrieve a specific user (requires read:users permission)
       operationId: findOneUser
       security:
         - BearerAuth: [ ]
@@ -281,12 +303,16 @@ paths:
       responses:
         '200':
           description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
 
     put:
       tags:
         - User Management
       summary: Update User
-      description: Update a user
+      description: Update a user (requires write:users permission)
       operationId: updateUser
       security:
         - BearerAuth: [ ]
@@ -302,10 +328,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUserDto'
+              $ref: '#/components/schemas/UpdateUserDto'
       responses:
         '200':
           description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  # ============ LOYALTY ADMIN ROOT ============
+  /loyalty-admin:
+    get:
+      tags:
+        - Vouchers
+      summary: Loyalty Admin Root
+      description: Root endpoint for loyalty admin
+      operationId: loyaltyAdminRoot
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      responses:
+        '200':
+          description: Success
 
   # ============ VOUCHERS (Admin) ============
   /loyalty-admin/vouchers:
@@ -378,7 +423,7 @@ paths:
       tags:
         - Vouchers
       summary: Get Voucher by ID
-      description: Retrieve a specific voucher
+      description: Retrieve a specific voucher (requires read:vouchers permission)
       operationId: findOneVoucher
       security:
         - BearerAuth: [ ]
@@ -403,7 +448,7 @@ paths:
       tags:
         - Vouchers
       summary: Update Voucher
-      description: Update a voucher
+      description: Update a voucher (requires write:vouchers permission)
       operationId: updateVoucher
       security:
         - BearerAuth: [ ]
@@ -432,7 +477,7 @@ paths:
       tags:
         - Vouchers
       summary: Delete Voucher
-      description: Delete a voucher
+      description: Delete a voucher (requires write:vouchers permission)
       operationId: removeVoucher
       security:
         - BearerAuth: [ ]
@@ -453,7 +498,7 @@ paths:
       tags:
         - Voucher Categories
       summary: Get All Voucher Categories
-      description: Retrieve all voucher categories with pagination
+      description: Retrieve all voucher categories with pagination (requires read:voucher-categories permission)
       operationId: findAllVoucherCategories
       security:
         - BearerAuth: [ ]
@@ -485,12 +530,16 @@ paths:
       responses:
         '200':
           description: Paginated list of voucher categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVoucherCategoryResponse'
 
     post:
       tags:
         - Voucher Categories
       summary: Create Voucher Category
-      description: Create a new voucher category
+      description: Create a new voucher category (requires create:voucher-categories permission)
       operationId: createVoucherCategory
       security:
         - BearerAuth: [ ]
@@ -514,7 +563,7 @@ paths:
       tags:
         - Voucher Categories
       summary: Get Voucher Category by ID
-      description: Retrieve a specific voucher category
+      description: Retrieve a specific voucher category (requires read:voucher-categories permission)
       operationId: findOneVoucherCategory
       security:
         - BearerAuth: [ ]
@@ -538,7 +587,7 @@ paths:
       tags:
         - Voucher Categories
       summary: Update Voucher Category
-      description: Update a voucher category
+      description: Update a voucher category (requires update:voucher-categories permission)
       operationId: updateVoucherCategory
       security:
         - BearerAuth: [ ]
@@ -568,7 +617,7 @@ paths:
       tags:
         - Voucher Categories
       summary: Delete Voucher Category
-      description: Delete a voucher category
+      description: Delete a voucher category (requires delete:voucher-categories permission)
       operationId: removeVoucherCategory
       security:
         - BearerAuth: [ ]
@@ -597,7 +646,7 @@ paths:
       tags:
         - Quests
       summary: Get All Quests
-      description: Retrieve all quests with pagination
+      description: Retrieve all quests with pagination (requires read:quests permission)
       operationId: findAllQuests
       security:
         - BearerAuth: [ ]
@@ -628,13 +677,17 @@ paths:
             enum: [ ASC, DESC ]
       responses:
         '200':
-          description: List of quests
+          description: Paginated list of quests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedQuestResponse'
 
     post:
       tags:
         - Quests
       summary: Create Quest
-      description: Create a new quest
+      description: Create a new quest (requires write:quests permission)
       operationId: createQuest
       security:
         - BearerAuth: [ ]
@@ -654,7 +707,7 @@ paths:
       tags:
         - Quests
       summary: Get Quest by ID
-      description: Retrieve a specific quest
+      description: Retrieve a specific quest (requires read:quests permission)
       operationId: findOneQuest
       security:
         - BearerAuth: [ ]
@@ -673,7 +726,7 @@ paths:
       tags:
         - Quests
       summary: Update Quest
-      description: Update a quest
+      description: Update a quest (requires write:quests permission)
       operationId: updateQuest
       security:
         - BearerAuth: [ ]
@@ -698,7 +751,7 @@ paths:
       tags:
         - Quests
       summary: Delete Quest
-      description: Delete a quest
+      description: Delete a quest (requires write:quests permission)
       operationId: removeQuest
       security:
         - BearerAuth: [ ]
@@ -776,6 +829,10 @@ paths:
       responses:
         '201':
           description: Reward item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardItem'
 
   /loyalty-admin/reward-item/{id}:
     get:
@@ -883,6 +940,12 @@ paths:
       responses:
         '200':
           description: List of reward item sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RewardItemSource'
 
     post:
       tags:
@@ -902,6 +965,10 @@ paths:
       responses:
         '201':
           description: Reward item source created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardItemSource'
 
   /loyalty-admin/reward-item-source/{id}:
     get:
@@ -922,6 +989,10 @@ paths:
       responses:
         '200':
           description: Reward item source found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardItemSource'
 
     patch:
       tags:
@@ -966,6 +1037,18 @@ paths:
       responses:
         '204':
           description: Reward item source deleted successfully
+
+  # ============ LOYALTY CONSUMER ROOT ============
+  /loyalty:
+    get:
+      tags:
+        - Consumer Vouchers
+      summary: Loyalty Consumer Root
+      description: Root endpoint for loyalty consumer
+      operationId: loyaltyConsumerRoot
+      responses:
+        '200':
+          description: Success
 
   # ============ CONSUMER VOUCHERS ============
   /loyalty/vouchers:
@@ -1096,6 +1179,12 @@ paths:
       responses:
         '200':
           description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
 
     post:
       tags:
@@ -1112,6 +1201,10 @@ paths:
       responses:
         '201':
           description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
 
   /redistro/products/{id}:
     get:
@@ -1129,6 +1222,10 @@ paths:
       responses:
         '200':
           description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
 
     patch:
       tags:
@@ -1151,6 +1248,10 @@ paths:
       responses:
         '200':
           description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
 
     delete:
       tags:
@@ -1179,6 +1280,12 @@ paths:
       responses:
         '200':
           description: List of retailers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Retailer'
 
     post:
       tags:
@@ -1195,6 +1302,10 @@ paths:
       responses:
         '201':
           description: Retailer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Retailer'
 
   /redistro/retailers/{id}:
     get:
@@ -1212,6 +1323,10 @@ paths:
       responses:
         '200':
           description: Retailer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Retailer'
 
     patch:
       tags:
@@ -1234,6 +1349,10 @@ paths:
       responses:
         '200':
           description: Retailer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Retailer'
 
     delete:
       tags:
@@ -1262,6 +1381,12 @@ paths:
       responses:
         '200':
           description: List of warehouses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Warehouse'
 
     post:
       tags:
@@ -1278,6 +1403,10 @@ paths:
       responses:
         '201':
           description: Warehouse created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
 
   /redistro/warehouses/{id}:
     get:
@@ -1295,6 +1424,10 @@ paths:
       responses:
         '200':
           description: Warehouse found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
 
     patch:
       tags:
@@ -1317,6 +1450,10 @@ paths:
       responses:
         '200':
           description: Warehouse updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
 
     delete:
       tags:
@@ -1421,6 +1558,24 @@ components:
           description: Admin password
       example:
         email: admin@example.com
+        password: '********'
+
+    LoginUserDto:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+        password:
+          type: string
+          format: password
+          description: User password
+      example:
+        email: user@example.com
         password: '********'
 
     # ============ ADMIN SCHEMAS ============
@@ -1531,9 +1686,10 @@ components:
         is_active:
           type: boolean
           description: Whether the user account is active
-        is_deleted:
-          type: boolean
-          description: Soft delete flag
+
+    UpdateUserDto:
+      allOf:
+        - $ref: '#/components/schemas/CreateUserDto'
 
     User:
       type: object
@@ -1578,6 +1734,9 @@ components:
     VoucherCategory:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         slug:
           type: string
           description: Unique identifier for the category
@@ -1805,6 +1964,16 @@ components:
               items:
                 $ref: '#/components/schemas/Voucher'
 
+    PaginatedVoucherCategoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/VoucherCategory'
+
     # ============ CONSUMER VOUCHER SCHEMAS ============
     VoucherBindingDto:
       type: object
@@ -1847,11 +2016,26 @@ components:
           type: string
           description: Voucher image URL
 
+    ClaimedVoucher:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        voucher:
+          $ref: '#/components/schemas/VoucherResponseDto'
+        claimed_at:
+          type: string
+          format: date-time
+
     GetClaimedVoucherResponseDto:
       type: object
       properties:
         voucher:
           $ref: '#/components/schemas/VoucherResponseDto'
+        claimed_at:
+          type: string
+          format: date-time
 
     PaginatedClaimedVoucherResponse:
       allOf:
@@ -1864,13 +2048,59 @@ components:
                 $ref: '#/components/schemas/GetClaimedVoucherResponseDto'
 
     # ============ QUEST SCHEMAS ============
+    Quest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Quest name
+        description:
+          type: string
+          description: Quest description
+        reward_item_id:
+          type: string
+          format: uuid
+          description: Associated reward item ID
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
     CreateQuestDto:
       type: object
-      description: Quest creation DTO (to be implemented)
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          description: Quest name
+        description:
+          type: string
+          description: Quest description
+        reward_item_id:
+          type: string
+          format: uuid
+          description: Associated reward item ID
 
     UpdateQuestDto:
       allOf:
         - $ref: '#/components/schemas/CreateQuestDto'
+
+    PaginatedQuestResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginatedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Quest'
 
     # ============ REWARD ITEM SCHEMAS ============
     RewardItem:
@@ -1893,12 +2123,19 @@ components:
         stock:
           type: integer
           description: Stock count (-1 = unlimited, 0 = out of stock)
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
 
     CreateRewardItemDto:
       type: object
       required:
         - name
-        - value
+        - source_id
+        - type
       properties:
         name:
           type: string
@@ -1906,9 +2143,17 @@ components:
         description:
           type: string
           description: Reward item description
-        value:
-          type: number
-          description: Reward value/points
+        source_id:
+          type: string
+          format: uuid
+          description: Source ID
+        type:
+          type: string
+          description: Reward type
+        stock:
+          type: integer
+          default: -1
+          description: Stock count (-1 = unlimited)
 
     UpdateRewardItemDto:
       allOf:
@@ -1934,11 +2179,18 @@ components:
         source_type:
           type: string
           description: Type of source (e.g., 'gopay', 'bank_transfer')
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
 
     CreateRewardItemSourceDto:
       type: object
       required:
         - name
+        - source_type
       properties:
         name:
           type: string
@@ -1950,6 +2202,9 @@ components:
           type: string
           format: uri
           description: Source URL
+        source_type:
+          type: string
+          description: Type of source
 
     UpdateRewardItemSourceDto:
       allOf:
@@ -1978,6 +2233,31 @@ components:
           description: Error message (if failed)
 
     # ============ PRODUCT SCHEMAS ============
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Product name
+        description:
+          type: string
+          description: Product description
+        price:
+          type: number
+          description: Product price
+        sku:
+          type: string
+          description: Product SKU
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
     CreateProductDto:
       type: object
       required:
@@ -2001,6 +2281,32 @@ components:
         - $ref: '#/components/schemas/CreateProductDto'
 
     # ============ RETAILER SCHEMAS ============
+    Retailer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Retailer name
+        address:
+          type: string
+          description: Retailer address
+        phone:
+          type: string
+          description: Contact phone number
+        email:
+          type: string
+          format: email
+          description: Contact email
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
     CreateRetailerDto:
       type: object
       required:
@@ -2025,6 +2331,28 @@ components:
         - $ref: '#/components/schemas/CreateRetailerDto'
 
     # ============ WAREHOUSE SCHEMAS ============
+    Warehouse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Warehouse name
+        address:
+          type: string
+          description: Warehouse address
+        capacity:
+          type: integer
+          description: Storage capacity
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
     CreateWarehouseDto:
       type: object
       required:
