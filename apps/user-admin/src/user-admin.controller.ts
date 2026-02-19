@@ -24,28 +24,28 @@ export class UserAdminController extends BaseController {
     super();
   }
 
-  @Get('/users')
+  @Get('users')
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('read:users')
   findAll() {
     return this.userService.findAll();
   }
 
-  @Get('/users/:id')
+  @Get('users/:id')
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('read:users')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
   }
 
-  @Post('/users')
+  @Post('users')
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('write:users')
   create(@Body() user: CreateUserDto) {
     return this.userService.create(user);
   }
 
-  @Put('/users/:id')
+  @Put('users/:id')
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('write:users')
   update(@Param('id') id: string, @Body() user: CreateUserDto) {

@@ -12,7 +12,7 @@ export class UserConsumerController extends BaseController {
     super();
   }
 
-  @Post('/login')
+  @Post('login')
   login(@Req() req: Request, @Body() loginUserDto: LoginUserDto) {
     console.log(__dirname);
     return this.userService.login(loginUserDto);

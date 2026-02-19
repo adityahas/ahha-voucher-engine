@@ -31,7 +31,7 @@ export class VoucherController {
     return this.voucherService.getEligibleVouchers(dto);
   }
 
-  @Get('/my')
+  @Get('my')
   @UseGuards(ConsumerJwtGuard)
   async getClaimedVouchers(
     @Req() req: Request,
