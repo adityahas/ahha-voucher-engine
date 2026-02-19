@@ -27,7 +27,7 @@ export class RewardController extends BaseController {
     return this.rewardService.findAllRewards();
   }
 
-  @Post('/claim/:reward_id')
+  @Post('claim/:reward_id')
   @UseGuards(ConsumerJwtGuard)
   claimReward(@Param('reward_id') rewardId: string, @Req() req: Request) {
     const userId = req.user['userId'];
