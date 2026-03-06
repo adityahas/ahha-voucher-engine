@@ -21,6 +21,17 @@ redemption. It supports multiple clients (tenants), each with their own isolated
 
 ---
 
+## 🤖 AI Agent Pipelines
+
+When instructed to create a frontend feature or implementation, you MUST strict adhere to the following 5-step autonomous agent pipeline:
+
+1. **Product Owner**: Translates user requests into UI specs and verifies backend API readiness.
+2. **Frontend Planner**: Architects the React components, establishes data flows, and defines aesthetic "Vibe Coding" directives for Tailwind/Framer Motion.
+3. **Frontend Implementer**: Writes the actual code according to the Planner's specs (max 3 iterations push-back allowed).
+4. **Frontend Reviewer**: Audits the code for aesthetic compliance ("Vibes") and React best practices (max 3 iterations push-back allowed).
+5. **Automation Engineer**: Creates Vitest/React Testing Library test cases to confirm logic and aesthetics.
+
+---
 ## 🛠️ Tech Stack
 
 | Category        | Technology                                      |
