@@ -1,91 +1,138 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, ChevronRight } from 'lucide-react';
+import {
+  Lock,
+  Mail,
+  ChevronRight,
+  Globe,
+  KeyRound,
+  AlertCircle,
+} from 'lucide-react';
+import { useAuthStore } from '../store/auth.store';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
 
 const Login: React.FC = () => {
+  const [tenant, setTenant] = useState('');
+  const [apiKey, setApiKey] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loginFn = useAuthStore((state: any) => state.login);
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:9002/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'x-tenant-override': tenant,
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Authentication failed');
+      }
+
+      const data = await response.json();
+
+      // Utilize Zustand store directly
+      loginFn(data.data?.access_token || 'dummy_token', tenant, apiKey, email);
+
       navigate('/dashboard');
-    }, 1200);
+    } catch (err: any) {
+      setError(err.message || 'Failed to connect to the Ahha Voucher Engine.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      {/* Decorative background elements */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-50 animate-blob"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-screen filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
-
-      <div className="glass-dark w-full max-w-md rounded-2xl p-8 relative z-10 transition-all duration-500 hover:shadow-primary-500/10 hover:border-primary-500/30">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-purple-400 tracking-tight mb-2">
-            Ahha Voucher
-          </h1>
-          <p className="text-slate-300 font-medium">CMS Engine Access</p>
-        </div>
-
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-300 ml-1">Email Address</label>
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-primary-400 transition-colors" />
-              </div>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all glass hover:bg-slate-800/70"
-                placeholder="admin@ahha-voucher.local"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-300 ml-1">Password</label>
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-primary-400 transition-colors" />
-              </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full pl-11 pr-4 py-3 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all glass hover:bg-slate-800/70"
-                placeholder="••••••••"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full mt-8 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-primary-500/30 transform transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center group"
-          >
-            {isLoading ? (
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            ) : (
-              <>
-                Login to Dashboard
-                <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </button>
-        </form>
+    <div className="glass-dark w-full max-w-md rounded-2xl p-8 relative z-10 transition-all duration-500 hover:shadow-primary-500/20 hover:border-primary-500/40 border border-slate-700/50">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400 tracking-tight mb-2">
+          Ahha Voucher
+        </h1>
+        <p className="text-slate-400 font-medium">Multi-Tenant Admin Portal</p>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 flex items-start space-x-3 isolate backdrop-blur-md">
+          <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-300 font-medium leading-relaxed">
+            {error}
+          </p>
+        </div>
+      )}
+
+      <form onSubmit={handleLogin} className="space-y-5">
+        <Input
+          label="Workspace ID"
+          icon={Globe}
+          placeholder="e.g. client1"
+          required
+          value={tenant}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setTenant(e.target.value)
+          }
+        />
+
+        <Input
+          label="API Key"
+          type="password"
+          icon={KeyRound}
+          placeholder="Enter client API Key"
+          required
+          value={apiKey}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setApiKey(e.target.value)
+          }
+        />
+
+        <Input
+          label="Email Address"
+          type="email"
+          icon={Mail}
+          placeholder="admin@ahha-voucher.local"
+          required
+          value={email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
+        />
+
+        <Input
+          label="Password"
+          type="password"
+          icon={Lock}
+          placeholder="••••••••"
+          required
+          value={password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
+        />
+
+        <Button
+          type="submit"
+          isLoading={isLoading}
+          className="w-full mt-2"
+          icon={ChevronRight}
+          iconRight
+        >
+          Access Engine
+        </Button>
+      </form>
     </div>
   );
 };
