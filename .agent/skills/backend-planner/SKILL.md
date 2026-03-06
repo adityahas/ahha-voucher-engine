@@ -1,5 +1,5 @@
 ---
-name: Planner
+name: Backend Planner
 description: Analyze user requests and produce precise execution plans for coding agents in the Ahha Voucher Engine monorepo.
 ---
 
