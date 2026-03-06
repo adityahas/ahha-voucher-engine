@@ -1,5 +1,5 @@
 ---
-name: Reviewer
+name: Backend Reviewer
 description: Review code implementation against the Planner's execution plan and enforce Ahha Voucher Engine architectural standards.
 ---
 
