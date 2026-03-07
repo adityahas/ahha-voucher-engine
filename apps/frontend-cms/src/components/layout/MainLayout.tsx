@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Navigate, NavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth.store';
-import { LayoutDashboard, LogOut, Settings, Users } from 'lucide-react';
+import { LayoutDashboard, LogOut, Settings, Users, Ticket } from 'lucide-react';
 
 export const MainLayout: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
@@ -59,6 +59,19 @@ export const MainLayout: React.FC = () => {
             >
               <Users size={20} />
               <span>User Management</span>
+            </NavLink>
+            <NavLink
+              to="/vouchers"
+              className={({ isActive }) =>
+                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
+                }`
+              }
+            >
+              <Ticket size={20} />
+              <span>Voucher Management</span>
             </NavLink>
             <a
               href="#"
