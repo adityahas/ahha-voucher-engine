@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(LoyaltyAdminModule);
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Comment out if you want to insert nested objects without uuid
+      // whitelist: true, // Comment out if you want to insert nested objects without uuid
       forbidNonWhitelisted: true,
       transform: true,
     }),
