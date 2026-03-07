@@ -9,7 +9,6 @@ import {
   Inject,
   Query,
   UseGuards,
-  ParseUUIDPipe,
   Patch,
 } from '@nestjs/common';
 import { VoucherCategoryService } from './voucher-category.service';
@@ -45,14 +44,14 @@ export class VoucherCategoryController {
     return this.voucherCategoryService.findAll(paginationDto);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get voucher category by ID' })
+  @Get(':slug')
+  @ApiOperation({ summary: 'Get voucher category by slug' })
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('read:voucher-categories')
   async findOne(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('slug') slug: string,
   ): Promise<ResponseVoucherCategoryDto> {
-    const voucherCategory = await this.voucherCategoryService.findOne(id);
+    const voucherCategory = await this.voucherCategoryService.findOne(slug);
     return plainToInstance(ResponseVoucherCategoryDto, voucherCategory);
   }
 
@@ -70,29 +69,29 @@ export class VoucherCategoryController {
     return plainToInstance(ResponseVoucherCategoryDto, voucherCategory);
   }
 
-  @Patch(':id')
+  @Patch(':slug')
   @ApiOperation({ summary: 'Update voucher category' })
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('write:voucher-categories')
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('slug') slug: string,
     @Body() updateVoucherCategoryDto: UpdateVoucherCategoryDto,
   ): Promise<ResponseVoucherCategoryDto> {
     const voucherCategory = await this.voucherCategoryService.update(
-      id,
+      slug,
       updateVoucherCategoryDto,
     );
     return plainToInstance(ResponseVoucherCategoryDto, voucherCategory);
   }
 
-  @Delete(':id')
+  @Delete(':slug')
   @ApiOperation({ summary: 'Delete voucher category' })
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('write:voucher-categories')
   async remove(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('slug') slug: string,
   ): Promise<{ success: boolean }> {
-    await this.voucherCategoryService.remove(id);
+    await this.voucherCategoryService.remove(slug);
     return { success: true };
   }
 }
