@@ -21,6 +21,7 @@ describe('VoucherList Component', () => {
       updated_at: new Date().toISOString(),
       deleted_at: null,
       categories: [{ slug: 'promo', name: 'Promo' }],
+      target_users: [],
     },
     {
       code: 'SOLDOUT',
@@ -31,6 +32,7 @@ describe('VoucherList Component', () => {
       updated_at: new Date().toISOString(),
       deleted_at: null,
       categories: [],
+      target_users: [],
     },
   ];
 

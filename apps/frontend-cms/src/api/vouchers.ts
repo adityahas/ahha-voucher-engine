@@ -9,6 +9,7 @@ export interface Voucher {
   image: string | null;
   categories?: VoucherCategory[];
   allow_combine_categories?: VoucherCategory[];
+  target_users?: { id: string; core_user_id: string }[];
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
