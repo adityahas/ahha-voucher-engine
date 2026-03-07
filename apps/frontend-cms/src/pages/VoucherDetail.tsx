@@ -282,7 +282,7 @@ export const VoucherDetail: React.FC = () => {
                   {voucher.target_users && voucher.target_users.length > 0 ? (
                      <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                         {voucher.target_users.map(target => {
-                           const userDetail = allUsers.find(u => u.id === target.id);
+                           const userDetail = allUsers.find(u => u.id === target.core_user_id);
                            return (
                               <div key={target.id} className="p-3 rounded-xl bg-slate-800/30 border border-slate-700/50 flex items-center gap-3 group hover:border-orange-500/30 transition-colors">
                                  <div className="w-8 h-8 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-xs">

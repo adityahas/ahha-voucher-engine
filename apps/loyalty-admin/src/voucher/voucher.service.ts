@@ -24,15 +24,16 @@ export class VoucherService {
 
   async create(createVoucherDto: CreateVoucherDto): Promise<VoucherEntity> {
     const voucher = new VoucherEntity();
-    Object.assign(voucher, createVoucherDto);
+    const {
+      target_users,
+      categories,
+      allow_combine_categories,
+      ...scalarFields
+    } = createVoucherDto;
+    Object.assign(voucher, scalarFields);
 
-    if (
-      createVoucherDto.target_users &&
-      createVoucherDto.target_users.length > 0
-    ) {
-      voucher.target_users = await this.userRepository.findBy({
-        id: In(createVoucherDto.target_users),
-      });
+    if (target_users && target_users.length > 0) {
+      voucher.target_users = await this.getOrCreateLoyaltyUsers(target_users);
     }
 
     if (createVoucherDto.categories && createVoucherDto.categories.length > 0) {
@@ -64,7 +65,10 @@ export class VoucherService {
 
     const queryBuilder = this.repository.createQueryBuilder('voucher');
     queryBuilder.leftJoinAndSelect('voucher.categories', 'categories');
-    queryBuilder.leftJoinAndSelect('voucher.allow_combine_categories', 'allow_combine_categories');
+    queryBuilder.leftJoinAndSelect(
+      'voucher.allow_combine_categories',
+      'allow_combine_categories',
+    );
     queryBuilder.leftJoinAndSelect('voucher.target_users', 'target_users');
 
     if (search) {
@@ -105,38 +109,68 @@ export class VoucherService {
     id: string,
     updateVoucherDto: UpdateVoucherDto,
   ): Promise<VoucherEntity> {
-    const voucher = await this.repository.findOne({ where: { code: id } });
+    const voucher = await this.repository.findOne({
+      where: { code: id },
+      relations: ['categories', 'allow_combine_categories', 'target_users'],
+    });
 
     if (!voucher) {
       throw new NotFoundException(`Voucher with code ${id} not found.`);
     }
 
-    if (updateVoucherDto.target_users !== undefined) {
-      voucher.target_users = await this.userRepository.findBy({
-        id: In(updateVoucherDto.target_users),
-      });
+    const {
+      target_users,
+      categories,
+      allow_combine_categories,
+      ...scalarFields
+    } = updateVoucherDto;
+
+    if (target_users !== undefined) {
+      voucher.target_users = await this.getOrCreateLoyaltyUsers(target_users);
     }
 
-    if (updateVoucherDto.categories && updateVoucherDto.categories.length > 0) {
+    if (categories && categories.length > 0) {
       voucher.categories = await this.voucherCategoryRepository.findBy({
-        slug: In(updateVoucherDto.categories.map((c) => c.slug)),
+        slug: In(categories.map((c) => c.slug)),
       });
     }
 
-    if (
-      updateVoucherDto.allow_combine_categories &&
-      updateVoucherDto.allow_combine_categories.length > 0
-    ) {
+    if (allow_combine_categories && allow_combine_categories.length > 0) {
       voucher.allow_combine_categories =
         await this.voucherCategoryRepository.findBy({
-          slug: In(
-            updateVoucherDto.allow_combine_categories.map((c) => c.slug),
-          ),
+          slug: In(allow_combine_categories.map((c) => c.slug)),
         });
     }
 
-    Object.assign(voucher, updateVoucherDto);
+    Object.assign(voucher, scalarFields);
     return this.repository.save(voucher);
+  }
+
+  private async getOrCreateLoyaltyUsers(
+    coreUserIds: string[],
+  ): Promise<LoyaltyUserEntity[]> {
+    if (!coreUserIds || coreUserIds.length === 0) return [];
+
+    const existingUsers = await this.userRepository.findBy({
+      core_user_id: In(coreUserIds),
+    });
+
+    const existingCoreUserIds = existingUsers.map((u) => u.core_user_id);
+    const missingCoreUserIds = coreUserIds.filter(
+      (id) => !existingCoreUserIds.includes(id),
+    );
+
+    if (missingCoreUserIds.length > 0) {
+      const newUsers = missingCoreUserIds.map((id) => {
+        const user = new LoyaltyUserEntity();
+        user.core_user_id = id;
+        return user;
+      });
+      const savedUsers = await this.userRepository.save(newUsers);
+      return [...existingUsers, ...savedUsers];
+    }
+
+    return existingUsers;
   }
 
   async remove(id: string): Promise<void> {

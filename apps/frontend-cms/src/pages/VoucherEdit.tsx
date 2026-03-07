@@ -57,7 +57,7 @@ export const VoucherEdit: React.FC = () => {
           image: voucherData.image || '',
           categories: voucherData.categories?.map(c => c.slug) || [],
           allow_combine_categories: voucherData.allow_combine_categories?.map(c => c.slug) || [],
-          target_users: voucherData.target_users?.map(u => u.id) || [],
+          target_users: voucherData.target_users?.map(u => u.core_user_id) || [],
         });
       } catch (err: any) {
         setError(err.message || 'Failed to load voucher data.');
