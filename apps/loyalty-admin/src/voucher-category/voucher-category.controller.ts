@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
   ParseUUIDPipe,
+  Patch,
 } from '@nestjs/common';
 import { VoucherCategoryService } from './voucher-category.service';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
@@ -58,7 +59,7 @@ export class VoucherCategoryController {
   @Post()
   @ApiOperation({ summary: 'Create new voucher category' })
   @UseGuards(AdminJwtGuard, AclGuard)
-  @Permissions('create:voucher-categories')
+  @Permissions('write:voucher-categories')
   @ApiResponse({ type: ResponseVoucherCategoryDto })
   async create(
     @Body() createVoucherCategoryDto: CreateVoucherCategoryDto,
@@ -69,10 +70,10 @@ export class VoucherCategoryController {
     return plainToInstance(ResponseVoucherCategoryDto, voucherCategory);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Update voucher category' })
   @UseGuards(AdminJwtGuard, AclGuard)
-  @Permissions('update:voucher-categories')
+  @Permissions('write:voucher-categories')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateVoucherCategoryDto: UpdateVoucherCategoryDto,
@@ -87,7 +88,7 @@ export class VoucherCategoryController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete voucher category' })
   @UseGuards(AdminJwtGuard, AclGuard)
-  @Permissions('delete:voucher-categories')
+  @Permissions('write:voucher-categories')
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<{ success: boolean }> {
