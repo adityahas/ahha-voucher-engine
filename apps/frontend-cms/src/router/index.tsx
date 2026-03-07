@@ -8,6 +8,7 @@ import { UserDetail } from '../pages/UserDetail';
 import { UserCreate } from '../pages/UserCreate';
 import { UserEdit } from '../pages/UserEdit';
 import { VoucherList } from '../pages/VoucherList';
+import { VoucherDetail } from '../pages/VoucherDetail';
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: '/vouchers',
         element: <VoucherList />,
+      },
+      {
+        path: '/vouchers/:code',
+        element: <VoucherDetail />,
       },
       {
         path: '/users/:id',

@@ -36,3 +36,31 @@ export const getVouchers = async (): Promise<Voucher[]> => {
   // Based on VoucherService.findAll returning BasePaginationResponseInterface
   return result.data || result;
 };
+
+export const getVoucherByCode = async (code: string): Promise<Voucher> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+
+  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${code}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message || `Failed to fetch voucher details for code: ${code}`,
+    );
+  }
+
+  const result = await response.json();
+
+  // Based on VoucherService.findOne returning VoucherEntity
+  return result.data || result;
+};
+
