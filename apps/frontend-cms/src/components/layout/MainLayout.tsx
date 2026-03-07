@@ -1,7 +1,7 @@
 import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, NavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth.store';
-import { LayoutDashboard, LogOut, Ticket, Settings } from 'lucide-react';
+import { LayoutDashboard, LogOut, Settings, Users } from 'lucide-react';
 
 export const MainLayout: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
@@ -34,20 +34,32 @@ export const MainLayout: React.FC = () => {
           </div>
 
           <nav className="flex-1 p-4 space-y-2">
-            <a
-              href="#"
-              className="flex items-center space-x-3 px-4 py-3 rounded-xl bg-primary-500/10 text-primary-400 font-medium transition-colors border border-primary-500/20"
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
+                }`
+              }
             >
               <LayoutDashboard size={20} />
               <span>Dashboard</span>
-            </a>
-            <a
-              href="#"
-              className="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium transition-colors"
+            </NavLink>
+            <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
+                }`
+              }
             >
-              <Ticket size={20} />
-              <span>Vouchers</span>
-            </a>
+              <Users size={20} />
+              <span>User Management</span>
+            </NavLink>
             <a
               href="#"
               className="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium transition-colors"
