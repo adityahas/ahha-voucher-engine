@@ -9,6 +9,10 @@ import { UserCreate } from '../pages/UserCreate';
 import { UserEdit } from '../pages/UserEdit';
 import { VoucherList } from '../pages/VoucherList';
 import { VoucherDetail } from '../pages/VoucherDetail';
+import { VoucherCategoryList } from '../pages/VoucherCategoryList';
+import { VoucherCategoryCreate } from '../pages/VoucherCategoryCreate';
+import { VoucherCategoryEdit } from '../pages/VoucherCategoryEdit';
+import { VoucherCategoryDetail } from '../pages/VoucherCategoryDetail';
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +59,22 @@ export const router = createBrowserRouter([
       {
         path: '/users/edit/:id',
         element: <UserEdit />,
+      },
+      {
+        path: '/voucher-categories',
+        element: <VoucherCategoryList />,
+      },
+      {
+        path: '/voucher-categories/create',
+        element: <VoucherCategoryCreate />,
+      },
+      {
+        path: '/voucher-categories/:slug',
+        element: <VoucherCategoryDetail />,
+      },
+      {
+        path: '/voucher-categories/:slug/edit',
+        element: <VoucherCategoryEdit />,
       },
       // add more authenticated feature routes here
     ],
