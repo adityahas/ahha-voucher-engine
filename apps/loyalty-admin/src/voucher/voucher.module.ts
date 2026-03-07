@@ -15,6 +15,8 @@ import { VoucherValidityEntity } from '@core/loyalty/voucher/entities/voucher-va
 
 import { VoucherBindingService } from './voucher-binding.service';
 import { VoucherBindingController } from './voucher-binding.controller';
+import { VoucherValidityService } from './voucher-validity.service';
+import { VoucherValidityController } from './voucher-validity.controller';
 
 @Module({
   imports: [
@@ -47,8 +49,16 @@ import { VoucherBindingController } from './voucher-binding.controller';
       },
       inject: ['LOYALTY_CONNECTION'],
     },
+    {
+      provide: 'VOUCHER_VALIDITY_SERVICE',
+      scope: Scope.REQUEST,
+      useFactory: async (dataSource: DataSource) => {
+        return new VoucherValidityService(dataSource);
+      },
+      inject: ['LOYALTY_CONNECTION'],
+    },
   ],
-  controllers: [VoucherController, VoucherBindingController],
+  controllers: [VoucherController, VoucherBindingController, VoucherValidityController],
   exports: [],
 })
 export class VoucherModule {}
