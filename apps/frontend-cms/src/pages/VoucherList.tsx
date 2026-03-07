@@ -124,6 +124,7 @@ export const VoucherList: React.FC = () => {
                   <TableRow>
                     <TableHead className="font-bold text-slate-300">Code</TableHead>
                     <TableHead className="font-bold text-slate-300">Description</TableHead>
+                    <TableHead className="font-bold text-slate-300">Categories</TableHead>
                     <TableHead className="font-bold text-slate-300">Quota</TableHead>
                     <TableHead className="font-bold text-slate-300">Status</TableHead>
                     <TableHead className="text-right font-bold text-slate-300">Created At</TableHead>
@@ -141,6 +142,15 @@ export const VoucherList: React.FC = () => {
                       </TableCell>
                       <TableCell className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap text-slate-300 font-medium">
                         {voucher.description || 'No description provided'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {voucher.categories?.map((cat) => (
+                            <span key={cat.slug} className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary-500/10 text-primary-400 border border-primary-500/20">
+                              {cat.name}
+                            </span>
+                          )) || <span className="text-slate-600 text-[10px] italic">None</span>}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">

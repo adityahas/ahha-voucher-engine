@@ -110,7 +110,7 @@ export const VoucherDetail: React.FC = () => {
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
-            onClick={() => console.log('Edit clicked')}
+            onClick={() => navigate(`/vouchers/${code}/edit`)}
             className="border-slate-700 hover:bg-slate-800"
           >
             Edit Parameters
@@ -137,15 +137,30 @@ export const VoucherDetail: React.FC = () => {
               <CardDescription>Primary configuration and campaign details.</CardDescription>
             </CardHeader>
             <CardContent className="pt-8 space-y-8">
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                        <Tag size={12} className="text-primary-500" />
-                        Voucher Code
-                     </label>
-                     <p className="text-xl font-mono font-bold text-primary-400 bg-primary-500/5 p-3 rounded-xl border border-primary-500/10">
-                        {voucher.code}
-                     </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                          <Tag size={12} className="text-primary-500" />
+                          Voucher Code
+                       </label>
+                       <p className="text-xl font-mono font-bold text-primary-400 bg-primary-500/5 p-3 rounded-xl border border-primary-500/10">
+                          {voucher.code}
+                       </p>
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                          <Tag size={12} className="text-purple-500" />
+                          Linked Categories
+                       </label>
+                       <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                          {voucher.categories?.map(cat => (
+                            <span key={cat.slug} className="text-xs font-bold px-3 py-1 rounded-lg bg-primary-500/10 text-primary-400 border border-primary-500/20">
+                              {cat.name}
+                            </span>
+                          )) || <span className="text-slate-600 text-xs italic">No categories linked</span>}
+                       </div>
+                    </div>
                   </div>
                   <div className="space-y-2">
                      <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">

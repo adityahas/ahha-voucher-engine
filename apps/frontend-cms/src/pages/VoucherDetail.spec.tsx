@@ -6,6 +6,35 @@ import { VoucherDetail } from './VoucherDetail';
 // Mock the API layer
 vi.mock('../api/vouchers', () => ({
   getVoucherByCode: vi.fn(),
+  getVoucherBindings: vi.fn().mockResolvedValue([]),
+  getVoucherValidities: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock('../components/VoucherBindingList', () => ({
+  VoucherBindingList: () => <div data-testid="binding-list" />,
+}));
+
+vi.mock('../components/VoucherValidityList', () => ({
+  VoucherValidityList: () => <div data-testid="validity-list" />,
+}));
+
+vi.mock('lucide-react', () => ({
+  Loader2: (props: any) => <div data-testid="loader" {...props} />,
+  AlertCircle: (props: any) => <div {...props} />,
+  ArrowLeft: (props: any) => <div {...props} />,
+  Calendar: (props: any) => <div {...props} />,
+  Ticket: (props: any) => <div {...props} />,
+  Clock: (props: any) => <div {...props} />,
+  ShieldCheck: (props: any) => <div {...props} />,
+  Tag: (props: any) => <div {...props} />,
+  Hash: (props: any) => <div {...props} />,
+  Database: (props: any) => <div {...props} />,
+  ChevronRight: (props: any) => <div {...props} />,
+  Plus: (props: any) => <div {...props} />,
+  X: (props: any) => <div {...props} />,
+  Edit2: (props: any) => <div {...props} />,
+  Trash2: (props: any) => <div {...props} />,
+  Link: (props: any) => <div {...props} />,
 }));
 
 import { getVoucherByCode } from '../api/vouchers';
@@ -20,6 +49,7 @@ describe('VoucherDetail Component', () => {
     created_at: '2025-01-01T10:00:00Z',
     updated_at: '2025-01-02T12:00:00Z',
     deleted_at: null,
+    categories: [{ slug: 'free-shipping', name: 'Free Shipping' }],
   };
 
   beforeEach(() => {
@@ -46,11 +76,13 @@ describe('VoucherDetail Component', () => {
     renderComponent('PROMO2025');
 
     await waitFor(() => {
-      expect(screen.getByText('PROMO2025')).toBeInTheDocument();
-      expect(screen.getByText(/Special annual promo/i)).toBeInTheDocument();
-      expect(screen.getByText('50')).toBeInTheDocument();
-      expect(screen.getByText('ACTIVE')).toBeInTheDocument();
+      expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
     });
+
+    expect(screen.getAllByText(/PROMO2025/i)[0]).toBeInTheDocument();
+    expect(screen.getByText(/Special annual promo/i)).toBeInTheDocument();
+    expect(screen.getByText('50')).toBeInTheDocument();
+    expect(screen.getByText('ACTIVE')).toBeInTheDocument();
   });
 
   it('shows error UI when API fails', async () => {
@@ -79,6 +111,13 @@ describe('VoucherDetail Component', () => {
     await waitFor(() => {
       const img = screen.getByAltText('Voucher Branding') as HTMLImageElement;
       expect(img.src).toBe('https://example.com/promo.png');
+    });
+  });
+  it('renders linked categories correctly', async () => {
+    (getVoucherByCode as any).mockResolvedValueOnce(mockVoucher);
+    renderComponent();
+    await waitFor(() => {
+      expect(screen.getByText('Free Shipping')).toBeInTheDocument();
     });
   });
 });

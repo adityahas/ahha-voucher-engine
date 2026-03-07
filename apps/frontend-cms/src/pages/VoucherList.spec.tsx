@@ -20,6 +20,7 @@ describe('VoucherList Component', () => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       deleted_at: null,
+      categories: [{ slug: 'promo', name: 'Promo' }],
     },
     {
       code: 'SOLDOUT',
@@ -29,6 +30,7 @@ describe('VoucherList Component', () => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       deleted_at: null,
+      categories: [],
     },
   ];
 
@@ -61,6 +63,7 @@ describe('VoucherList Component', () => {
       expect(screen.getByText('SOLDOUT')).toBeInTheDocument();
       expect(screen.getByText('Available')).toBeInTheDocument();
       expect(screen.getByText('Sold Out')).toBeInTheDocument();
+      expect(screen.getByText('Promo')).toBeInTheDocument();
     });
   });
 
