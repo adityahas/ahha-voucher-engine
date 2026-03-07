@@ -31,6 +31,7 @@ describe('VoucherService', () => {
 
   const mockUserRepository = {
     findBy: jest.fn(),
+    save: jest.fn(),
   } as any;
   const mockVoucherCategoryRepository = {
     findBy: jest.fn(),
@@ -166,6 +167,80 @@ describe('VoucherService', () => {
       expect(
         mockVoucherRepository.createQueryBuilder().orderBy,
       ).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('update', () => {
+    it('should update voucher and persist relations correctly', async () => {
+      const code = 'VOUCHER1';
+      const updateDto = {
+        description: 'Updated Description',
+        target_users: ['user-1', 'user-2'],
+        categories: [{ slug: 'cat-1' }],
+      };
+
+      const mockVoucher = { code, description: 'Old Description' } as any;
+      const mockUsers = [{ core_user_id: 'user-1' }, { core_user_id: 'user-2' }];
+      const mockCategories = [{ slug: 'cat-1' }];
+
+      mockVoucherRepository.findOne.mockResolvedValueOnce(mockVoucher);
+      mockUserRepository.findBy.mockResolvedValueOnce(mockUsers);
+      mockVoucherCategoryRepository.findBy.mockResolvedValueOnce(mockCategories);
+      mockVoucherRepository.save.mockImplementation((v) => Promise.resolve(v));
+
+      const result = await service.update(code, updateDto as any);
+
+      expect(mockVoucherRepository.findOne).toHaveBeenCalledWith({
+        where: { code },
+        relations: ['categories', 'allow_combine_categories', 'target_users'],
+      });
+      expect(mockUserRepository.findBy).toHaveBeenCalled();
+      expect(mockVoucherCategoryRepository.findBy).toHaveBeenCalled();
+      
+      // Verify that relations are assigned as entities, not raw arrays
+      expect(result.target_users).toEqual(mockUsers);
+      expect(result.categories).toEqual(mockCategories);
+      expect(result.description).toBe('Updated Description');
+    });
+
+    it('should create missing loyalty users during update', async () => {
+      const code = 'VOUCHER1';
+      const updateDto = {
+        target_users: ['new-user'],
+      };
+
+      const mockVoucher = { code } as any;
+      const mockSavedUser = { core_user_id: 'new-user', id: 'uuid-1' };
+
+      mockVoucherRepository.findOne.mockResolvedValueOnce(mockVoucher);
+      mockUserRepository.findBy.mockResolvedValueOnce([]); // No existing users
+      mockUserRepository.save.mockResolvedValueOnce([mockSavedUser]);
+      mockVoucherRepository.save.mockImplementation((v) => Promise.resolve(v));
+
+      const result = await service.update(code, updateDto as any);
+
+      expect(mockUserRepository.save).toHaveBeenCalled();
+      expect(result.target_users).toEqual([mockSavedUser]);
+    });
+  });
+
+  describe('create', () => {
+    it('should create voucher and link existing/new users', async () => {
+      const createDto = {
+        code: 'NEWVOUCHER',
+        target_users: ['user-1'],
+        categories: [],
+      };
+
+      const mockUsers = [{ core_user_id: 'user-1' }];
+      mockUserRepository.findBy.mockResolvedValueOnce(mockUsers);
+      mockVoucherRepository.save.mockImplementation((v) => Promise.resolve(v));
+
+      const result = await service.create(createDto as any);
+
+      expect(result.code).toBe('NEWVOUCHER');
+      expect(result.target_users).toEqual(mockUsers);
+      expect(mockVoucherRepository.save).toHaveBeenCalled();
     });
   });
 });
