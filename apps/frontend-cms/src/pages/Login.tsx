@@ -49,7 +49,7 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       // Utilize Zustand store directly
-      loginFn(data.data?.token || 'dummy_token', tenant, apiKey, email);
+      loginFn(data.token || 'dummy_token', tenant, apiKey, email);
 
       navigate('/dashboard');
     } catch (err: any) {

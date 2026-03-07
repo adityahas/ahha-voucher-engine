@@ -59,8 +59,8 @@ describe('Login Page (Vibe Coding + Multi-Tenant CMS)', () => {
   it('SHOULD successfully authenticate and store credentials in localStorage on 200 OK', async () => {
     // Arrange
     const mockSuccessResponse = {
-      message: 'Login successful',
-      data: { access_token: 'fake_jwt_token' },
+      admin: { id: 1, email: 'admin@test.com' },
+      token: 'fake_jwt_token',
     };
 
     fetchMock.mockResolvedValueOnce({
