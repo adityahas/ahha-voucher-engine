@@ -13,6 +13,9 @@ import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim
 import { VoucherUsageEntity } from '@core/loyalty/voucher/entities/voucher-usage.entity';
 import { VoucherValidityEntity } from '@core/loyalty/voucher/entities/voucher-validity.entity';
 
+import { VoucherBindingService } from './voucher-binding.service';
+import { VoucherBindingController } from './voucher-binding.controller';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -36,8 +39,16 @@ import { VoucherValidityEntity } from '@core/loyalty/voucher/entities/voucher-va
       },
       inject: ['LOYALTY_CONNECTION'],
     },
+    {
+      provide: 'VOUCHER_BINDING_SERVICE',
+      scope: Scope.REQUEST,
+      useFactory: async (dataSource: DataSource) => {
+        return new VoucherBindingService(dataSource);
+      },
+      inject: ['LOYALTY_CONNECTION'],
+    },
   ],
-  controllers: [VoucherController],
+  controllers: [VoucherController, VoucherBindingController],
   exports: [],
 })
 export class VoucherModule {}
