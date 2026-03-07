@@ -13,10 +13,10 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 
 const Login: React.FC = () => {
-  const [tenant, setTenant] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [tenant, setTenant] = useState('client1');
+  const [apiKey, setApiKey] = useState('client1-api-key');
+  const [email, setEmail] = useState('admin@client1.com');
+  const [password, setPassword] = useState('admin123');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +29,9 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:9002/admin/login', {
+      const baseUrl =
+        import.meta.env.VITE_API_BASE_URL || 'http://localhost:9002';
+      const response = await fetch(`${baseUrl}/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +49,7 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       // Utilize Zustand store directly
-      loginFn(data.data?.access_token || 'dummy_token', tenant, apiKey, email);
+      loginFn(data.data?.token || 'dummy_token', tenant, apiKey, email);
 
       navigate('/dashboard');
     } catch (err: any) {

@@ -21,6 +21,7 @@ describe('Login Page (Vibe Coding + Multi-Tenant CMS)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    vi.stubEnv('VITE_API_BASE_URL', 'http://client1.ahha-be.local');
   });
 
   const setup = () => {
@@ -88,7 +89,7 @@ describe('Login Page (Vibe Coding + Multi-Tenant CMS)', () => {
     // Assert
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        'http://localhost:9002/admin/login',
+        'http://client1.ahha-be.local/admin/login',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({

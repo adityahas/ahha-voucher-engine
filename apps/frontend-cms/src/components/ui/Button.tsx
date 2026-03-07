@@ -4,7 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   icon?: LucideIcon;
@@ -17,10 +17,16 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = "inline-flex items-center justify-center font-bold rounded-xl shadow-lg transform transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed group relative overflow-hidden";
     
     const variants = {
-      primary: "bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-500 hover:to-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]",
-      secondary: "bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700",
-      danger: "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-[0_0_20px_rgba(225,29,72,0.4)]",
-      ghost: "bg-transparent text-slate-400 hover:text-white hover:bg-slate-800/50 shadow-none"
+      primary:
+        'bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-500 hover:to-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]',
+      secondary:
+        'bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700',
+      danger:
+        'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-[0_0_20px_rgba(225,29,72,0.4)]',
+      ghost:
+        'bg-transparent text-slate-400 hover:text-white hover:bg-slate-800/50 shadow-none',
+      outline:
+        'bg-transparent border border-slate-600 hover:border-slate-500 hover:bg-slate-800/50 text-slate-300',
     };
 
     const sizes = {
