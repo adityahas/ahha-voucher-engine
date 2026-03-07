@@ -9,6 +9,8 @@ import { UserCreate } from '../pages/UserCreate';
 import { UserEdit } from '../pages/UserEdit';
 import { VoucherList } from '../pages/VoucherList';
 import { VoucherDetail } from '../pages/VoucherDetail';
+import { VoucherCreate } from '../pages/VoucherCreate';
+import { VoucherEdit } from '../pages/VoucherEdit';
 import { VoucherCategoryList } from '../pages/VoucherCategoryList';
 import { VoucherCategoryCreate } from '../pages/VoucherCategoryCreate';
 import { VoucherCategoryEdit } from '../pages/VoucherCategoryEdit';
@@ -45,8 +47,16 @@ export const router = createBrowserRouter([
         element: <VoucherList />,
       },
       {
+        path: '/vouchers/create',
+        element: <VoucherCreate />,
+      },
+      {
         path: '/vouchers/:code',
         element: <VoucherDetail />,
+      },
+      {
+        path: '/vouchers/:code/edit',
+        element: <VoucherEdit />,
       },
       {
         path: '/users/:id',

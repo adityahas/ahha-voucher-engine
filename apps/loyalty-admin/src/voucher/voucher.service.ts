@@ -63,6 +63,8 @@ export class VoucherService {
     const skip = page * size;
 
     const queryBuilder = this.repository.createQueryBuilder('voucher');
+    queryBuilder.leftJoinAndSelect('voucher.categories', 'categories');
+    queryBuilder.leftJoinAndSelect('voucher.allow_combine_categories', 'allow_combine_categories');
 
     if (search) {
       queryBuilder.where('voucher.name ILIKE :search', {
@@ -94,6 +96,7 @@ export class VoucherService {
   async findOne(id: string): Promise<VoucherEntity> {
     return this.repository.findOne({
       where: { code: id },
+      relations: ['categories', 'allow_combine_categories'],
     });
   }
 
@@ -135,7 +138,7 @@ export class VoucherService {
     return this.repository.save(voucher);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.repository.delete(id);
+  async remove(id: string): Promise<void> {
+    await this.repository.softDelete(id);
   }
 }
