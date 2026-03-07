@@ -17,8 +17,10 @@ import {
 import { getUsers, User } from '../api/users';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { useNavigate } from 'react-router-dom';
 
 export const UserList: React.FC = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +108,11 @@ export const UserList: React.FC = () => {
               </TableHeader>
               <TableBody>
                 {users.map((user) => (
-                  <TableRow key={user.id}>
+                  <TableRow
+                    key={user.id}
+                    className="cursor-pointer"
+                    onClick={() => navigate(`/users/${user.id}`)}
+                  >
                     <TableCell className="font-medium text-slate-200">
                       {user.name}
                     </TableCell>

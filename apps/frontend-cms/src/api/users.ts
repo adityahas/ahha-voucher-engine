@@ -37,3 +37,30 @@ export const getUsers = async (): Promise<User[]> => {
   // Depending on NestJS interceptors, the array might be nested in 'data' or returned directly.
   return result.data || result;
 };
+
+export const getUserById = async (id: string): Promise<User> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9002';
+
+  const response = await fetch(`${baseUrl}/user-admin/users/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(
+      errorData?.message || `Failed to fetch user Details for ID: ${id}`,
+    );
+  }
+
+  const result = await response.json();
+
+  // Depending on NestJS interceptors, it might be nested inside 'data'
+  return result.data || result;
+};
