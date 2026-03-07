@@ -18,6 +18,7 @@ describe('VoucherService', () => {
     orderBy: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
     getManyAndCount: jest.fn(),
   } as any;
 
@@ -114,6 +115,12 @@ describe('VoucherService', () => {
       expect(
         mockVoucherRepository.createQueryBuilder().orderBy,
       ).toHaveBeenCalledWith('voucher.name', 'ASC');
+      expect(
+        mockVoucherRepository.createQueryBuilder().leftJoinAndSelect,
+      ).toHaveBeenCalledWith('voucher.categories', 'categories');
+      expect(
+        mockVoucherRepository.createQueryBuilder().leftJoinAndSelect,
+      ).toHaveBeenCalledWith('voucher.target_users', 'target_users');
     });
 
     it('should handle search parameter', async () => {

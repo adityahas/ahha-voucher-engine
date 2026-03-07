@@ -10,6 +10,10 @@ vi.mock('../api/vouchers', () => ({
   getVoucherValidities: vi.fn().mockResolvedValue([]),
 }));
 
+vi.mock('../api/users', () => ({
+  getUsers: vi.fn().mockResolvedValue([]),
+}));
+
 vi.mock('../components/VoucherBindingList', () => ({
   VoucherBindingList: () => <div data-testid="binding-list" />,
 }));
@@ -35,9 +39,11 @@ vi.mock('lucide-react', () => ({
   Edit2: (props: any) => <div {...props} />,
   Trash2: (props: any) => <div {...props} />,
   Link: (props: any) => <div {...props} />,
+  Users: (props: any) => <div data-testid="users-icon" {...props} />,
 }));
 
 import { getVoucherByCode } from '../api/vouchers';
+import { getUsers } from '../api/users';
 
 describe('VoucherDetail Component', () => {
   const mockVoucher = {
@@ -50,7 +56,12 @@ describe('VoucherDetail Component', () => {
     updated_at: '2025-01-02T12:00:00Z',
     deleted_at: null,
     categories: [{ slug: 'free-shipping', name: 'Free Shipping' }],
+    target_users: [{ id: 'user-123', core_user_id: 'core-456' }],
   };
+
+  const mockUsers = [
+    { id: 'user-123', name: 'John Doe', email: 'john@example.com' }
+  ];
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -118,6 +129,26 @@ describe('VoucherDetail Component', () => {
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText('Free Shipping')).toBeInTheDocument();
+    });
+  });
+
+  it('renders targeted users correctly', async () => {
+    (getVoucherByCode as any).mockResolvedValueOnce(mockVoucher);
+    (getUsers as any).mockResolvedValueOnce(mockUsers);
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('john@example.com')).toBeInTheDocument();
+    });
+  });
+
+  it('shows fallback when no users are targeted', async () => {
+    (getVoucherByCode as any).mockResolvedValueOnce({ ...mockVoucher, target_users: [] });
+    renderComponent();
+
+    await waitFor(() => {
+      expect(screen.getByText(/No specific users targeted/i)).toBeInTheDocument();
     });
   });
 });

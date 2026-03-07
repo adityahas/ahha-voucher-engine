@@ -65,6 +65,7 @@ export class VoucherService {
     const queryBuilder = this.repository.createQueryBuilder('voucher');
     queryBuilder.leftJoinAndSelect('voucher.categories', 'categories');
     queryBuilder.leftJoinAndSelect('voucher.allow_combine_categories', 'allow_combine_categories');
+    queryBuilder.leftJoinAndSelect('voucher.target_users', 'target_users');
 
     if (search) {
       queryBuilder.where('voucher.name ILIKE :search', {
@@ -96,7 +97,7 @@ export class VoucherService {
   async findOne(id: string): Promise<VoucherEntity> {
     return this.repository.findOne({
       where: { code: id },
-      relations: ['categories', 'allow_combine_categories'],
+      relations: ['categories', 'allow_combine_categories', 'target_users'],
     });
   }
 

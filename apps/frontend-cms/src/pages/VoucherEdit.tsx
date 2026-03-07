@@ -5,6 +5,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { getVoucherByCode, updateVoucher } from '../api/vouchers';
 import { getVoucherCategories, VoucherCategory } from '../api/voucher-categories';
+import { getUsers, User } from '../api/users';
 import { 
   ArrowLeft, 
   Ticket, 
@@ -16,7 +17,8 @@ import {
   Image as ImageIcon,
   Plus,
   X,
-  Save
+  Save,
+  Users
 } from 'lucide-react';
 
 export const VoucherEdit: React.FC = () => {
@@ -28,8 +30,10 @@ export const VoucherEdit: React.FC = () => {
     image: '',
     categories: [] as string[],
     allow_combine_categories: [] as string[],
+    target_users: [] as string[],
   });
   const [availableCategories, setAvailableCategories] = useState<VoucherCategory[]>([]);
+  const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingInitial, setIsFetchingInitial] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,18 +43,21 @@ export const VoucherEdit: React.FC = () => {
     const loadInitialData = async () => {
       if (!code) return;
       try {
-        const [voucherData, categoriesData] = await Promise.all([
+        const [voucherData, categoriesData, usersData] = await Promise.all([
           getVoucherByCode(code),
-          getVoucherCategories()
+          getVoucherCategories(),
+          getUsers()
         ]);
         
         setAvailableCategories(categoriesData);
+        setAvailableUsers(usersData);
         setFormData({
           description: voucherData.description || '',
           quota: voucherData.quota,
           image: voucherData.image || '',
           categories: voucherData.categories?.map(c => c.slug) || [],
           allow_combine_categories: voucherData.allow_combine_categories?.map(c => c.slug) || [],
+          target_users: voucherData.target_users?.map(u => u.id) || [],
         });
       } catch (err: any) {
         setError(err.message || 'Failed to load voucher data.');
@@ -69,12 +76,12 @@ export const VoucherEdit: React.FC = () => {
     }));
   };
 
-  const toggleCategory = (slug: string, field: 'categories' | 'allow_combine_categories') => {
+  const toggleSelection = (id: string, field: 'categories' | 'allow_combine_categories' | 'target_users') => {
     setFormData((prev) => {
       const current = prev[field];
-      const next = current.includes(slug) 
-        ? current.filter(s => s !== slug)
-        : [...current, slug];
+      const next = current.includes(id) 
+        ? current.filter(s => s !== id)
+        : [...current, id];
       return { ...prev, [field]: next };
     });
   };
@@ -251,7 +258,7 @@ export const VoucherEdit: React.FC = () => {
                       <button
                         key={cat.slug}
                         type="button"
-                        onClick={() => toggleCategory(cat.slug, 'categories')}
+                        onClick={() => toggleSelection(cat.slug, 'categories')}
                         className={`group relative flex items-center px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 border ${
                           formData.categories.includes(cat.slug)
                           ? "bg-primary-500/20 border-primary-500 text-primary-300 shadow-[0_0_15px_rgba(59,130,246,0.2)]"
@@ -283,7 +290,7 @@ export const VoucherEdit: React.FC = () => {
                       <button
                         key={cat.slug}
                         type="button"
-                        onClick={() => toggleCategory(cat.slug, 'allow_combine_categories')}
+                        onClick={() => toggleSelection(cat.slug, 'allow_combine_categories')}
                         className={`group relative flex items-center px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 border ${
                           formData.allow_combine_categories.includes(cat.slug)
                           ? "bg-purple-500/20 border-purple-500 text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
@@ -293,6 +300,49 @@ export const VoucherEdit: React.FC = () => {
                          {cat.name}
                       </button>
                     ))}
+                 </div>
+              </CardContent>
+            </Card>
+            <Card className="border-slate-700/50 bg-slate-900/40 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2 capitalize">
+                   <Users className="w-4 h-4 text-orange-400" />
+                   Target Audience
+                </CardTitle>
+                <CardDescription className="text-xs">Select specific users for this campaign (optional).</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                 <div className="max-h-60 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+                    {availableUsers.map(user => (
+                      <div
+                        key={user.id}
+                        onClick={() => toggleSelection(user.id, 'target_users')}
+                        className={`flex items-center justify-between p-3 rounded-xl cursor-pointer border transition-all duration-300 ${
+                          formData.target_users.includes(user.id)
+                          ? "bg-orange-500/10 border-orange-500/50 text-orange-200"
+                          : "bg-slate-800/30 border-slate-700/50 text-slate-400 hover:border-slate-500"
+                        }`}
+                      >
+                         <div className="flex flex-col">
+                            <span className="text-xs font-bold">{user.name}</span>
+                            <span className="text-[10px] opacity-60 font-mono">{user.email || user.id.substring(0,8)}</span>
+                         </div>
+                         {formData.target_users.includes(user.id) ? (
+                            <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center">
+                               <X size={12} className="text-white" />
+                            </div>
+                         ) : (
+                            <div className="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center opacity-40 group-hover:opacity-100">
+                               <Plus size={12} />
+                            </div>
+                         )}
+                      </div>
+                    ))}
+                    {availableUsers.length === 0 && (
+                       <div className="text-center py-6 text-slate-500 text-xs italic">
+                          No users found.
+                       </div>
+                    )}
                  </div>
               </CardContent>
             </Card>

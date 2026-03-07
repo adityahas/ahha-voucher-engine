@@ -9,6 +9,7 @@ import {
 } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { getVoucherByCode, Voucher } from '../api/vouchers';
+import { getUsers, User } from '../api/users';
 import { VoucherBindingList } from '../components/VoucherBindingList';
 import { VoucherValidityList } from '../components/VoucherValidityList';
 import {
@@ -22,12 +23,14 @@ import {
   Tag,
   Hash,
   Database,
+  Users
 } from 'lucide-react';
 
 export const VoucherDetail: React.FC = () => {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const [voucher, setVoucher] = useState<Voucher | null>(null);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,8 +40,12 @@ export const VoucherDetail: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await getVoucherByCode(code);
-        setVoucher(data);
+        const [voucherData, usersData] = await Promise.all([
+          getVoucherByCode(code),
+          getUsers().catch(() => [])
+        ]);
+        setVoucher(voucherData);
+        setAllUsers(usersData);
       } catch (err: any) {
         setError(err.message || 'Failed to load voucher details.');
       } finally {
@@ -258,6 +265,44 @@ export const VoucherDetail: React.FC = () => {
                   <p className="text-xs text-slate-400 leading-relaxed font-medium">
                      This voucher is isolated to your current workspace. All issuance and claims are tracked under the multi-tenant architecture.
                   </p>
+               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-800/50 bg-slate-900/40 backdrop-blur-xl">
+            <CardHeader className="pb-2">
+               <CardTitle className="text-lg flex items-center gap-2">
+                  <Users size={18} className="text-orange-400" />
+                  Target Audience
+               </CardTitle>
+               <CardDescription className="text-xs">Users explicitly targeted by this campaign.</CardDescription>
+            </CardHeader>
+            <CardContent>
+               <div className="space-y-3 mt-2">
+                  {voucher.target_users && voucher.target_users.length > 0 ? (
+                     <div className="space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                        {voucher.target_users.map(target => {
+                           const userDetail = allUsers.find(u => u.id === target.id);
+                           return (
+                              <div key={target.id} className="p-3 rounded-xl bg-slate-800/30 border border-slate-700/50 flex items-center gap-3 group hover:border-orange-500/30 transition-colors">
+                                 <div className="w-8 h-8 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-xs">
+                                    {userDetail?.name?.substring(0,1).toUpperCase() || '?'}
+                                 </div>
+                                 <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-slate-200">{userDetail?.name || 'Unknown User'}</span>
+                                    <span className="text-[10px] text-slate-500 font-mono tracking-tighter truncate w-32">
+                                       {userDetail?.email || target.id.substring(0,8)}
+                                    </span>
+                                 </div>
+                              </div>
+                           );
+                        })}
+                     </div>
+                  ) : (
+                     <div className="text-center py-6 border border-dashed border-slate-800 rounded-2xl">
+                        <p className="text-xs text-slate-600 italic">No specific users targeted. This campaign is public (global).</p>
+                     </div>
+                  )}
                </div>
             </CardContent>
           </Card>
