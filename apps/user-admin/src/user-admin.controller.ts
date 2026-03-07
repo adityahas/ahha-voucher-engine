@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserAdminService } from './user-admin.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
@@ -48,7 +49,7 @@ export class UserAdminController extends BaseController {
   @Put('users/:id')
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('write:users')
-  update(@Param('id') id: string, @Body() user: CreateUserDto) {
+  update(@Param('id') id: string, @Body() user: UpdateUserDto) {
     return this.userService.update(id, user);
   }
 }

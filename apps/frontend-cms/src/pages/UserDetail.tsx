@@ -17,6 +17,7 @@ import {
   Clock,
   ShieldCheck,
   Activity,
+  UserCog,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
@@ -126,6 +127,15 @@ export const UserDetail: React.FC = () => {
             </span>
           )}
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          icon={UserCog}
+          onClick={() => navigate(`/users/edit/${user.id}`)}
+          className="border-slate-700/50 hover:border-primary-500/50 hover:bg-primary-500/5 text-slate-300 hover:text-primary-400 font-semibold"
+        >
+          Edit Profile
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

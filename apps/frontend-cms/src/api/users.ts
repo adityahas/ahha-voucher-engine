@@ -91,3 +91,33 @@ export const createUser = async (data: Partial<User>): Promise<User> => {
   // Depending on NestJS interceptors, it might be nested inside 'data'
   return result.data || result;
 };
+
+export const updateUser = async (
+  id: string,
+  data: Partial<User>,
+): Promise<User> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9002';
+
+  const response = await fetch(`${baseUrl}/user-admin/users/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Failed to update user');
+  }
+
+  const result = await response.json();
+
+  // Depending on NestJS interceptors, it might be nested inside 'data'
+  return result.data || result;
+};
+
