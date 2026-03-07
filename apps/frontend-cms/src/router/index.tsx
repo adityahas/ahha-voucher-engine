@@ -4,6 +4,7 @@ import { MainLayout } from '../components/layout/MainLayout';
 import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
 import { UserList } from '../pages/UserList';
+import { UserDetail } from '../pages/UserDetail';
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
       {
         path: '/users',
         element: <UserList />,
+      },
+      {
+        path: '/users/:id',
+        element: <UserDetail />,
       },
       // add more authenticated feature routes here
     ],
