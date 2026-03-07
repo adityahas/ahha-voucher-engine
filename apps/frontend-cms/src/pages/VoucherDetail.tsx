@@ -9,7 +9,8 @@ import {
 } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { getVoucherByCode, Voucher } from '../api/vouchers';
-import VoucherBindingList from '../components/VoucherBindingList';
+import { VoucherBindingList } from '../components/VoucherBindingList';
+import { VoucherValidityList } from '../components/VoucherValidityList';
 import {
   Loader2,
   AlertCircle,
@@ -250,6 +251,7 @@ export const VoucherDetail: React.FC = () => {
 
       {/* Binding Constraints Section */}
       <VoucherBindingList voucherId={voucher.code} />
+      <VoucherValidityList voucherId={voucher.code} />
     </div>
   );
 };

@@ -162,3 +162,105 @@ export const deleteVoucherBinding = async (voucherId: string, bindingId: number)
     throw new Error(errorData?.message || 'Failed to delete voucher binding');
   }
 };
+
+export interface VoucherValidity {
+  id: number;
+  type: string;
+  start_date: string;
+  end_date: string | null;
+  start_time: string;
+  end_time: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const getVoucherValidities = async (voucherId: string): Promise<VoucherValidity[]> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+
+  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Failed to fetch voucher validities');
+  }
+
+  const result = await response.json();
+  return result.data || result;
+};
+
+export const createVoucherValidity = async (voucherId: string, validity: Partial<VoucherValidity>): Promise<VoucherValidity> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+
+  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(validity),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Failed to create voucher validity');
+  }
+
+  const result = await response.json();
+  return result.data || result;
+};
+
+export const updateVoucherValidity = async (voucherId: string, validityId: number, validity: Partial<VoucherValidity>): Promise<VoucherValidity> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+
+  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities/${validityId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(validity),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Failed to update voucher validity');
+  }
+
+  const result = await response.json();
+  return result.data || result;
+};
+
+export const deleteVoucherValidity = async (voucherId: string, validityId: number): Promise<void> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+
+  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities/${validityId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Failed to delete voucher validity');
+  }
+};
