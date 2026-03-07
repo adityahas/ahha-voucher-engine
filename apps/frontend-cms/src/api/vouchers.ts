@@ -1,0 +1,38 @@
+import { useAuthStore } from '../store/auth.store';
+
+export interface Voucher {
+  code: string;
+  name: string;
+  description: string | null;
+  quota: number;
+  image: string | null;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+export const getVouchers = async (): Promise<Voucher[]> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  // According to loyalty-admin/src/main.ts, it listens on 9003
+  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+
+  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Failed to fetch vouchers');
+  }
+
+  const result = await response.json();
+
+  // Based on VoucherService.findAll returning BasePaginationResponseInterface
+  return result.data || result;
+};
