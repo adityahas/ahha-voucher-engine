@@ -9,6 +9,7 @@ import {
 } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { getVoucherByCode, Voucher } from '../api/vouchers';
+import VoucherBindingList from '../components/VoucherBindingList';
 import {
   Loader2,
   AlertCircle,
@@ -233,7 +234,7 @@ export const VoucherDetail: React.FC = () => {
                   </div>
                )}
                
-               <div className="p-6 rounded-2xl bg-gradient-to-br from-primary-500/10 to-purple-500/10 border border-white/5 space-y-4">
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-primary-500/10 to-purple-500/10 border border-white/5 space-y-4">
                   <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
                      <Ticket className="text-primary-400" />
                   </div>
@@ -246,6 +247,9 @@ export const VoucherDetail: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      {/* Binding Constraints Section */}
+      <VoucherBindingList voucherId={voucher.code} />
     </div>
   );
 };
