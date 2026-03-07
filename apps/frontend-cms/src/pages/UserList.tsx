@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '../components/ui/Table';
 import { getUsers, User } from '../api/users';
-import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Loader2, AlertCircle, RefreshCw, UserPlus } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 
@@ -55,15 +55,25 @@ export const UserList: React.FC = () => {
             View and manage system administrators and roles.
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={fetchUsers}
-          disabled={isLoading}
-          icon={RefreshCw}
-          className={isLoading ? 'animate-pulse' : ''}
-        >
-          Refresh
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={fetchUsers}
+            disabled={isLoading}
+            icon={RefreshCw}
+            className={isLoading ? 'animate-pulse' : ''}
+          >
+            Refresh
+          </Button>
+          <Button
+            variant="primary"
+            icon={UserPlus}
+            onClick={() => navigate('/users/create')}
+            className="shadow-[0_0_20px_rgba(59,130,246,0.2)]"
+          >
+            Create User
+          </Button>
+        </div>
       </div>
 
       <Card className="border-slate-700/50">

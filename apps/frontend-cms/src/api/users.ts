@@ -6,6 +6,7 @@ export interface User {
   email: string;
   phone: string | null;
   role: string;
+  password?: string;
   is_active: boolean;
   is_deleted: boolean;
   created_at: string;
@@ -57,6 +58,32 @@ export const getUserById = async (id: string): Promise<User> => {
     throw new Error(
       errorData?.message || `Failed to fetch user Details for ID: ${id}`,
     );
+  }
+
+  const result = await response.json();
+
+  // Depending on NestJS interceptors, it might be nested inside 'data'
+  return result.data || result;
+};
+
+export const createUser = async (data: Partial<User>): Promise<User> => {
+  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9002';
+
+  const response = await fetch(`${baseUrl}/user-admin/users`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'x-tenant-override': tenant,
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || 'Failed to create user');
   }
 
   const result = await response.json();

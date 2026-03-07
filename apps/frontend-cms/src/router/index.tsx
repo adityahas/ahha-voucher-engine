@@ -5,6 +5,7 @@ import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
 import { UserList } from '../pages/UserList';
 import { UserDetail } from '../pages/UserDetail';
+import { UserCreate } from '../pages/UserCreate';
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ export const router = createBrowserRouter([
       {
         path: '/users/:id',
         element: <UserDetail />,
+      },
+      {
+        path: '/users/create',
+        element: <UserCreate />,
       },
       // add more authenticated feature routes here
     ],
