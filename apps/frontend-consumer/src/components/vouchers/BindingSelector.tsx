@@ -14,6 +14,7 @@ interface BindingSelectorProps {
 
 const BINDING_TYPES = [
   { value: 'role', label: 'Role' },
+  { value: 'user_group', label: 'User Group' },
   { value: 'product_type', label: 'Product Type' },
   { value: 'product_sku', label: 'Product SKU' },
   { value: 'product_vendor', label: 'Product Vendor' },
