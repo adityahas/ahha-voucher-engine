@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/auth.store';
-import { LogOut, Ticket, Settings, User, AlertCircle, RefreshCw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { getEligibleVouchers } from '../api/vouchers';
+import { AlertCircle, LogOut, RefreshCw, Ticket, User } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { findEligibleVouchers } from '../api/vouchers';
 import type { Voucher } from '../types/voucher';
 import { VoucherCard } from '../components/vouchers/VoucherCard';
 import { Button } from '../components/ui/Button';
@@ -20,7 +20,7 @@ export default function VoucherDashboardView() {
     setError(null);
     try {
       // Pass the user's email or ID to fetch their specific eligible vouchers if the backend requires it
-      const data = await getEligibleVouchers(user?.email || user?.id);
+      const data = await findEligibleVouchers(user?.email || user?.id);
       setVouchers(data);
     } catch (err: any) {
       setError(err.message || 'Failed to load eligible vouchers.');
@@ -35,7 +35,7 @@ export default function VoucherDashboardView() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-cyan-500/30">
-       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/5 rounded-full blur-[100px]" />
       </div>
 
@@ -44,14 +44,16 @@ export default function VoucherDashboardView() {
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-cyan-500 to-fuchsia-500 flex items-center justify-center">
             <Ticket className="w-4 h-4 text-white" />
           </div>
-          <span className="font-semibold text-lg tracking-tight">Ahha Rewards</span>
+          <span className="font-semibold text-lg tracking-tight">
+            Ahha Rewards
+          </span>
         </div>
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-slate-300">
             <User className="w-4 h-4" />
             <span>{user?.email || 'User'}</span>
           </div>
-          <button 
+          <button
             onClick={clearAuth}
             className="p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
             title="Logout"
@@ -62,7 +64,7 @@ export default function VoucherDashboardView() {
       </nav>
 
       <main className="relative z-10 mx-auto max-w-6xl px-6 py-12">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -70,24 +72,29 @@ export default function VoucherDashboardView() {
         >
           <div>
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-              Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">Eligible Rewards</span>
+              Your{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">
+                Eligible Rewards
+              </span>
             </h1>
             <p className="text-slate-400 text-lg max-w-xl">
               Discover and claim exclusive vouchers curated just for you.
             </p>
           </div>
-          <Button 
-            onClick={fetchVouchers} 
+          <Button
+            onClick={fetchVouchers}
             disabled={isLoading}
             className="bg-white/5 hover:bg-white/10 text-white border border-white/10 shadow-none hover:border-cyan-500/30 gap-2 w-fit"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
+            />
             Refresh
           </Button>
         </motion.div>
 
         {error && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             className="mb-8 flex items-center gap-3 rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-red-500 backdrop-blur-md"
@@ -99,7 +106,7 @@ export default function VoucherDashboardView() {
 
         <AnimatePresence mode="wait">
           {isLoading ? (
-            <motion.div 
+            <motion.div
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -107,11 +114,14 @@ export default function VoucherDashboardView() {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {[1, 2, 3].map((i) => (
-                <div key={i} className="glass-panel h-[240px] rounded-2xl p-6 animate-pulse bg-slate-800/40" />
+                <div
+                  key={i}
+                  className="glass-panel h-[240px] rounded-2xl p-6 animate-pulse bg-slate-800/40"
+                />
               ))}
             </motion.div>
           ) : vouchers.length > 0 ? (
-            <motion.div 
+            <motion.div
               key="grid"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -122,18 +132,21 @@ export default function VoucherDashboardView() {
               ))}
             </motion.div>
           ) : (
-             <motion.div 
+            <motion.div
               key="empty"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center justify-center p-12 text-center glass-panel rounded-3xl border-dashed border-white/20 mt-8"
             >
               <div className="h-20 w-20 rounded-full bg-slate-800/50 flex flex-col items-center justify-center mb-6">
-                 <Ticket className="w-8 h-8 text-slate-500" />
+                <Ticket className="w-8 h-8 text-slate-500" />
               </div>
-              <h3 className="text-2xl font-semibold mb-2 text-white">No Vouchers Found</h3>
+              <h3 className="text-2xl font-semibold mb-2 text-white">
+                No Vouchers Found
+              </h3>
               <p className="text-slate-400 max-w-sm">
-                You don't have any eligible vouchers right now. Check back later for new offers!
+                You don't have any eligible vouchers right now. Check back later
+                for new offers!
               </p>
             </motion.div>
           )}

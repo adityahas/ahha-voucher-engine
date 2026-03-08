@@ -26,10 +26,10 @@ export class VoucherController {
 
   @Post('eligible')
   @UseGuards(ConsumerJwtGuard)
-  getEligibleVouchers(
+  findEligibleVouchers(
     @Body() dto: GetEligibleVoucherDto,
   ): Promise<VoucherResponseDto[]> {
-    return this.voucherService.getEligibleVouchers(dto);
+    return this.voucherService.findEligibleVouchers(dto);
   }
 
   @Get('my')
