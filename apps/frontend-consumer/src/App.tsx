@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/auth.store';
 import LoginView from './pages/LoginView';
 import VoucherDashboardView from './pages/VoucherDashboardView';
+import MyVouchersView from './pages/MyVouchersView';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((state) => state.token);
   
@@ -25,6 +27,14 @@ function App() {
           element={
             <ProtectedRoute>
               <VoucherDashboardView />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/my-vouchers" 
+          element={
+            <ProtectedRoute>
+              <MyVouchersView />
             </ProtectedRoute>
           } 
         />
