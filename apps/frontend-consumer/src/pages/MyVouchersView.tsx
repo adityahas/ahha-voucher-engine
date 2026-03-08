@@ -1,27 +1,24 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuthStore } from '../store/auth.store';
-import { AlertCircle, Ticket } from 'lucide-react';
+import { AlertCircle, List } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { getClaimedVouchers } from '../api/vouchers';
+import type { ClaimedVoucherInfo } from '../types/voucher';
+import { ClaimedVoucherCard } from '../components/vouchers/ClaimedVoucherCard';
 import { ConsumerLayout } from '../components/layout/ConsumerLayout';
-import { findEligibleVouchers } from '../api/vouchers';
-import type { Voucher, VoucherBinding } from '../types/voucher';
-import { VoucherCard } from '../components/vouchers/VoucherCard';
-import { BindingSelector } from '../components/vouchers/BindingSelector';
 
-export default function VoucherDashboardView() {
-  const [vouchers, setVouchers] = useState<Voucher[]>([]);
+export default function MyVouchersView() {
+  const [vouchers, setVouchers] = useState<ClaimedVoucherInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchVouchers = useCallback(async (bindings: VoucherBinding[] = []) => {
+  const fetchVouchers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      // Use dynamic bindings, identity is handled via JWT on backend
-      const data = await findEligibleVouchers(bindings);
-      setVouchers(data);
+      const response = await getClaimedVouchers(0, 50); // Get first 50 for now
+      setVouchers(response.data);
     } catch (err: any) {
-      setError(err.message || 'Failed to load eligible vouchers.');
+      setError(err.message || 'Failed to load claimed vouchers.');
     } finally {
       setIsLoading(false);
     }
@@ -42,17 +39,15 @@ export default function VoucherDashboardView() {
         >
           <div className="mb-8">
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-              Your{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">
-                Eligible Rewards
+              My{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-cyan-400">
+                Vouchers
               </span>
             </h1>
             <p className="text-slate-400 text-lg max-w-xl">
-              Discover and claim exclusive vouchers curated just for you.
+              View and manage the exclusive rewards you have claimed.
             </p>
           </div>
-
-          <BindingSelector onFind={fetchVouchers} isLoading={isLoading} />
         </motion.div>
 
         {error && (
@@ -87,14 +82,13 @@ export default function VoucherDashboardView() {
               key="grid"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20 md:pb-0" // Add padding for mobile nav if needed
             >
-              {vouchers.map((voucher, index) => (
-                <VoucherCard 
-                  key={voucher.code} 
-                  voucher={voucher} 
+              {vouchers.map((claimed, index) => (
+                <ClaimedVoucherCard 
+                  key={claimed.id} 
+                  claimedVoucher={claimed} 
                   index={index} 
-                  onClaimSuccess={() => fetchVouchers()} 
                 />
               ))}
             </motion.div>
@@ -106,14 +100,13 @@ export default function VoucherDashboardView() {
               className="flex flex-col items-center justify-center p-12 text-center glass-panel rounded-3xl border-dashed border-white/20 mt-8"
             >
               <div className="h-20 w-20 rounded-full bg-slate-800/50 flex flex-col items-center justify-center mb-6">
-                <Ticket className="w-8 h-8 text-slate-500" />
+                <List className="w-8 h-8 text-slate-500" />
               </div>
               <h3 className="text-2xl font-semibold mb-2 text-white">
-                No Vouchers Found
+                No Claimed Vouchers
               </h3>
               <p className="text-slate-400 max-w-sm">
-                You don't have any eligible vouchers right now. Check back later
-                for new offers!
+                You haven't claimed any vouchers yet. Head back to Explore Rewards to find amazing offers!
               </p>
             </motion.div>
           )}

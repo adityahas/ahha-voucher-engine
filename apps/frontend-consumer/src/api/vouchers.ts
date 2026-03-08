@@ -1,4 +1,4 @@
-import type { Voucher, VoucherBinding } from '../types/voucher';
+import type { Voucher, VoucherBinding, PaginatedResponse, ClaimedVoucherInfo } from '../types/voucher';
 import { useAuthStore } from '../store/auth.store';
 
 export const findEligibleVouchers = async (
@@ -52,6 +52,33 @@ export const claimVoucher = async (
 
   if (!response.ok) {
     throw new Error(data.message || 'Failed to claim voucher');
+  }
+
+  return data;
+};
+
+export const getClaimedVouchers = async (
+  page: number = 0,
+  size: number = 10,
+): Promise<PaginatedResponse<ClaimedVoucherInfo>> => {
+  const LOYALTY_API_URL =
+    import.meta?.env?.VITE_LOYALTY_API_URL || 'http://client1.ahha-be.local';
+
+  const { token, apiKey } = useAuthStore.getState();
+
+  const response = await fetch(`${LOYALTY_API_URL}/loyalty/vouchers/my?page=${page}&size=${size}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token || ''}`,
+      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to fetch claimed vouchers');
   }
 
   return data;
