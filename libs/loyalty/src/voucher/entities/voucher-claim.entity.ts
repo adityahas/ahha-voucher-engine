@@ -25,6 +25,4 @@ export class VoucherClaimEntity extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user: LoyaltyUserEntity;
 
-  @Column({ type: 'timetz', default: () => 'CURRENT_TIMESTAMP' })
-  claimed_at: Date;
 }
