@@ -19,7 +19,27 @@ export const findEligibleVouchers = async (
       Authorization: `Bearer ${token || ''}`,
       ...(apiKey ? { 'x-api-key': apiKey } : {}),
     },
-    body: JSON.stringify({ user_id: userId }),
+    body: JSON.stringify({
+      user_id: userId,
+      bindings: [
+        {
+          bind_type: 'user_group',
+          bind_value: 'linkaja_employee',
+        },
+        {
+          bind_type: 'role',
+          bind_value: 'loyal_member',
+        },
+        {
+          bind_type: 'product_sku',
+          bind_value: 'FKD893223',
+        },
+        {
+          bind_type: 'product_vendor',
+          bind_value: 'eiger',
+        },
+      ],
+    }),
   });
 
   if (!response.ok) {
