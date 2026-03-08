@@ -8,3 +8,8 @@ export interface Voucher {
   end_date: string;
   categories: { id: string; name: string }[];
 }
+
+export interface VoucherBinding {
+  bind_type: string;
+  bind_value: string;
+}
