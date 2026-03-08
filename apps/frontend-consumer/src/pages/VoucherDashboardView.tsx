@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '../store/auth.store';
-import { AlertCircle, LogOut, RefreshCw, Ticket, User } from 'lucide-react';
+import { AlertCircle, LogOut, Ticket, User } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { findEligibleVouchers } from '../api/vouchers';
-import type { Voucher } from '../types/voucher';
+import type { Voucher, VoucherBinding } from '../types/voucher';
 import { VoucherCard } from '../components/vouchers/VoucherCard';
-import { Button } from '../components/ui/Button';
+import { BindingSelector } from '../components/vouchers/BindingSelector';
 
 export default function VoucherDashboardView() {
   const user = useAuthStore((state) => state.user);
@@ -15,23 +15,23 @@ export default function VoucherDashboardView() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchVouchers = async () => {
+  const fetchVouchers = useCallback(async (bindings: VoucherBinding[] = []) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Pass the user's email or ID to fetch their specific eligible vouchers if the backend requires it
-      const data = await findEligibleVouchers(user?.id);
+      // Pass the user's ID and dynamic bindings
+      const data = await findEligibleVouchers(user?.id, bindings);
       setVouchers(data);
     } catch (err: any) {
       setError(err.message || 'Failed to load eligible vouchers.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id]);
 
   useEffect(() => {
     fetchVouchers();
-  }, []);
+  }, [fetchVouchers]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-cyan-500/30">
@@ -68,9 +68,9 @@ export default function VoucherDashboardView() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4"
+          className="mb-10"
         >
-          <div>
+          <div className="mb-8">
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
               Your{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">
@@ -81,16 +81,8 @@ export default function VoucherDashboardView() {
               Discover and claim exclusive vouchers curated just for you.
             </p>
           </div>
-          <Button
-            onClick={fetchVouchers}
-            disabled={isLoading}
-            className="bg-white/5 hover:bg-white/10 text-white border border-white/10 shadow-none hover:border-cyan-500/30 gap-2 w-fit"
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
-            />
-            Refresh
-          </Button>
+
+          <BindingSelector onFind={fetchVouchers} isLoading={isLoading} />
         </motion.div>
 
         {error && (

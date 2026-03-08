@@ -1,8 +1,9 @@
-import type { Voucher } from '../types/voucher';
+import type { Voucher, VoucherBinding } from '../types/voucher';
 import { useAuthStore } from '../store/auth.store';
 
 export const findEligibleVouchers = async (
   userId?: string,
+  bindings: VoucherBinding[] = [],
 ): Promise<Voucher[]> => {
   // Using port 3003 assuming loyalty-consumer runs there based on typical setups
   // Fallback to relative path if proxy is set up
@@ -21,24 +22,7 @@ export const findEligibleVouchers = async (
     },
     body: JSON.stringify({
       user_id: userId,
-      bindings: [
-        {
-          bind_type: 'user_group',
-          bind_value: 'linkaja_employee',
-        },
-        {
-          bind_type: 'role',
-          bind_value: 'loyal_member',
-        },
-        {
-          bind_type: 'product_sku',
-          bind_value: 'FKD893223',
-        },
-        {
-          bind_type: 'product_vendor',
-          bind_value: 'eiger',
-        },
-      ],
+      bindings: bindings,
     }),
   });
 
