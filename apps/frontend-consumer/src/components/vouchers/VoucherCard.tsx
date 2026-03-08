@@ -1,14 +1,36 @@
-import { motion } from 'framer-motion';
-import { Ticket, Tag } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Ticket, Tag, Check, Loader2, AlertCircle } from 'lucide-react';
 import type { Voucher } from '../../types/voucher';
 import { Button } from '../ui/Button';
+import { claimVoucher } from '../../api/vouchers';
 
 interface VoucherCardProps {
   voucher: Voucher;
   index: number;
+  onClaimSuccess?: () => void;
 }
 
-export function VoucherCard({ voucher, index }: VoucherCardProps) {
+export function VoucherCard({ voucher, index, onClaimSuccess }: VoucherCardProps) {
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleClaim = async () => {
+    setIsClaiming(true);
+    setError(null);
+    try {
+      await claimVoucher(voucher.code);
+      setIsSuccess(true);
+      if (onClaimSuccess) {
+        setTimeout(onClaimSuccess, 1500); // Give user time to see the success state
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to claim voucher');
+    } finally {
+      setIsClaiming(false);
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -71,9 +93,37 @@ export function VoucherCard({ voucher, index }: VoucherCardProps) {
           </div>
         </div>
 
-        <div className="mt-6">
-            <Button className="w-full py-2.5 bg-white/10 hover:bg-cyan-500 shadow-none hover:shadow-cyan-500/25 transition-all duration-300">
-               Claim Voucher
+        <div className="mt-6 flex flex-col gap-2">
+            <AnimatePresence>
+               {error && (
+                 <motion.div 
+                   initial={{ opacity: 0, height: 0 }}
+                   animate={{ opacity: 1, height: 'auto' }}
+                   exit={{ opacity: 0, height: 0 }}
+                   className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-lg flex items-center gap-2"
+                 >
+                   <AlertCircle size={14} />
+                   <span className="line-clamp-1">{error}</span>
+                 </motion.div>
+               )}
+            </AnimatePresence>
+
+            <Button 
+               className={`w-full py-2.5 transition-all duration-300 ${
+                 isSuccess 
+                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30' 
+                   : 'bg-white/10 hover:bg-cyan-500 shadow-none hover:shadow-cyan-500/25'
+               }`}
+               onClick={handleClaim}
+               disabled={isClaiming || isSuccess || voucher.quota <= 0}
+            >
+               {isClaiming ? (
+                 <Loader2 className="w-5 h-5 animate-spin" />
+               ) : isSuccess ? (
+                 <span className="flex items-center gap-2"><Check className="w-4 h-4" /> Claimed!</span>
+               ) : (
+                 'Claim Voucher'
+               )}
             </Button>
         </div>
       </div>

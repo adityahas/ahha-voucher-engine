@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Inject,
+  Param,
   Post,
   Query,
   Req,
@@ -45,5 +46,15 @@ export class VoucherController {
       req.user['userId'],
       paginationDto,
     );
+  }
+
+  @Post(':code/claim')
+  @UseGuards(ConsumerJwtGuard)
+  async claimVoucher(
+    @Param('code') voucherCode: string,
+    @Req() req: Request,
+  ) {
+    const userId = req.user['userId'];
+    return this.voucherService.claimVoucher(userId, voucherCode);
   }
 }

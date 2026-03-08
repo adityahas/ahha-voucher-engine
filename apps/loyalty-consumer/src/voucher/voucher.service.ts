@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -96,5 +96,51 @@ export class VoucherService {
         size: paginationDto.size,
       },
     };
+  }
+
+  async claimVoucher(
+    userId: string,
+    voucherCode: string,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.voucherRepository.manager.transaction(async (manager) => {
+      const voucher = await manager.findOne(VoucherEntity, {
+        where: { code: voucherCode },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!voucher) {
+        throw new NotFoundException('Voucher not found or currently unavailable');
+      }
+
+      if (voucher.quota <= 0) {
+        throw new BadRequestException('Voucher quota exhausted');
+      }
+
+      const existingClaim = await manager.findOne(VoucherClaimEntity, {
+        where: {
+          voucher: { code: voucherCode },
+          user: { id: userId },
+        },
+      });
+
+      if (existingClaim) {
+        throw new BadRequestException('You have already claimed this voucher');
+      }
+
+      const newClaim = manager.create(VoucherClaimEntity, {
+        voucher: { code: voucherCode },
+        user: { id: userId } as any,
+      });
+
+      voucher.quota -= 1;
+
+      await manager.save(VoucherClaimEntity, newClaim);
+      await manager.save(VoucherEntity, voucher);
+
+      return {
+        success: true,
+        message: 'Voucher claimed successfully!',
+      };
+    });
   }
 }
