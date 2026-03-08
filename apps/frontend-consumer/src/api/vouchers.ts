@@ -30,3 +30,29 @@ export const findEligibleVouchers = async (
 
   return response.json();
 };
+
+export const claimVoucher = async (
+  voucherCode: string,
+): Promise<{ success: boolean; message: string }> => {
+  const LOYALTY_API_URL =
+    import.meta?.env?.VITE_LOYALTY_API_URL || 'http://client1.ahha-be.local';
+
+  const { token, apiKey } = useAuthStore.getState();
+
+  const response = await fetch(`${LOYALTY_API_URL}/loyalty/vouchers/${voucherCode}/claim`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token || ''}`,
+      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to claim voucher');
+  }
+
+  return data;
+};
