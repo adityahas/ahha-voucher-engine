@@ -12,7 +12,7 @@ interface VoucherBindingModalProps {
   voucherId: string;
 }
 
-const BIND_TYPES = ['role', 'product_type', 'product_sku', 'product_vendor'];
+const BIND_TYPES = ['role', 'user_group', 'product_type', 'product_sku', 'product_vendor'];
 
 export const VoucherBindingModal: React.FC<VoucherBindingModalProps> = ({
   isOpen,
