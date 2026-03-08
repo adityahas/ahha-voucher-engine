@@ -1,7 +1,10 @@
 import { useAuthStore } from '../store/auth.store';
 import { VoucherCategory } from './voucher-categories';
 
+export type VoucherType = 'CLAIMABLE' | 'UNIQUE_CODE';
+
 export interface Voucher {
+  voucher_type: VoucherType;
   code: string;
   name: string;
   description: string | null;

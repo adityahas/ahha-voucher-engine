@@ -14,12 +14,23 @@ import { VoucherCategoryEntity } from './voucher-category.entity';
 import { BaseEntity } from '@core/base/entities/base.entity';
 import { LoyaltyUserEntity } from '../../entities/loyalty-user.entity';
 
+export enum VoucherType {
+  CLAIMABLE = 'CLAIMABLE',
+  UNIQUE_CODE = 'UNIQUE_CODE',
+}
+
 /**
  * Voucher adalah entitas utama yang merepresentasikan kupon yang dapat diklaim oleh user.
  * Setiap voucher memiliki kategori, masa berlaku, binding, dan daftar target user.
  */
 @Entity('vouchers')
 export class VoucherEntity extends BaseEntity {
+  @Column({
+    type: 'enum',
+    enum: VoucherType,
+    default: VoucherType.CLAIMABLE,
+  })
+  voucher_type: VoucherType;
   @PrimaryColumn({ type: 'varchar', unique: true, nullable: false })
   code: string;
 

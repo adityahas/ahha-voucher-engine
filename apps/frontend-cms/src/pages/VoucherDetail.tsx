@@ -151,9 +151,12 @@ export const VoucherDetail: React.FC = () => {
                           <Tag size={12} className="text-primary-500" />
                           Voucher Code
                        </label>
-                       <p className="text-xl font-mono font-bold text-primary-400 bg-primary-500/5 p-3 rounded-xl border border-primary-500/10">
-                          {voucher.code}
-                       </p>
+                       <div className="text-xl font-mono font-bold text-primary-400 bg-primary-500/5 p-3 rounded-xl border border-primary-500/10 flex items-center justify-between">
+                          <span>{voucher.code}</span>
+                          <span className="text-[10px] font-bold px-2 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider">
+                            {voucher.voucher_type?.replace('_', ' ') || 'CLAIMABLE'}
+                          </span>
+                       </div>
                     </div>
                     <div className="space-y-2">
                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">

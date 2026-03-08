@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { createVoucher } from '../api/vouchers';
+import { createVoucher, VoucherType } from '../api/vouchers';
 import { getVoucherCategories, VoucherCategory } from '../api/voucher-categories';
 import { getUsers, User } from '../api/users';
 import { 
@@ -24,6 +24,7 @@ import {
 export const VoucherCreate: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    voucher_type: 'CLAIMABLE' as VoucherType,
     code: '',
     description: '',
     quota: 1,
@@ -152,6 +153,24 @@ export const VoucherCreate: React.FC = () => {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="voucher_type" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Voucher Type</label>
+                    <div className="relative">
+                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                         <Tag className="h-4 w-4 text-slate-500" />
+                       </div>
+                       <select
+                         id="voucher_type"
+                         name="voucher_type"
+                         value={formData.voucher_type}
+                         onChange={(e) => setFormData(prev => ({ ...prev, voucher_type: e.target.value as VoucherType }))}
+                         className="w-full h-10 rounded-md bg-slate-800/50 border border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10 pr-4 text-sm text-slate-100 appearance-none focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+                       >
+                         <option value="CLAIMABLE">CLAIMABLE (Multi-claim)</option>
+                         <option value="UNIQUE_CODE">UNIQUE CODE (Single-claim)</option>
+                       </select>
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     <label htmlFor="code" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Voucher Code</label>
                     <div className="relative">

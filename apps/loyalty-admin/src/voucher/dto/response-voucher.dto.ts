@@ -2,7 +2,12 @@ import { Expose, Type } from '@nestjs/class-transformer';
 import { ResponseVoucherCategoryDto } from '../../voucher-category/dto/response-voucher-category.dto';
 import { ResponseLoyaltyUserDto } from './response-loyalty-user.dto';
 
+import { VoucherType } from '@core/loyalty/voucher/entities/voucher.entity';
+
 export class ResponseVoucherDto {
+  @Expose()
+  voucher_type: VoucherType;
+
   @Expose()
   code: string;
 
