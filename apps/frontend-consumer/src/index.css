@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-slate-950: #020617;
+  --color-slate-900: #0f172a;
+  --color-cyan-500: #06b6d4;
+  --color-fuchsia-500: #d946ef;
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-slate-900/40 backdrop-blur-xl border border-white/10 shadow-xl;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-slate-950);
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+}
