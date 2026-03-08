@@ -22,7 +22,9 @@ export class VoucherService {
   async findEligibleVouchers(
     searchCriteria: GetEligibleVoucherDto,
   ): Promise<VoucherResponseDto[]> {
-    const queryBuilder = this.voucherRepository.createQueryBuilder('voucher');
+    const queryBuilder = this.voucherRepository.createQueryBuilder('voucher')
+      .leftJoinAndSelect('voucher.categories', 'category');
+
     let whereClauseAdded = false;
 
     if (searchCriteria.user_id) {
@@ -36,10 +38,14 @@ export class VoucherService {
       );
     }
 
+    // We always want to see the bindings too, but we might filter by them
+    queryBuilder.leftJoinAndSelect('voucher.bindings', 'all_bindings');
+
     if (searchCriteria.bindings && searchCriteria.bindings.length > 0) {
-      queryBuilder.leftJoinAndSelect('voucher.bindings', 'binding');
+      // Use a separate alias for filtering to avoid messing with joining all bindings
+      queryBuilder.leftJoin('voucher.bindings', 'binding_filter');
       searchCriteria.bindings.forEach((binding, index) => {
-        const whereClause = `(binding.bind_type = :bindType${index} AND binding.bind_value = :bindValue${index})`;
+        const whereClause = `(binding_filter.bind_type = :bindType${index} AND binding_filter.bind_value = :bindValue${index})`;
         const whereValue = {
           [`bindType${index}`]: binding.bind_type,
           [`bindValue${index}`]: binding.bind_value,
@@ -53,10 +59,8 @@ export class VoucherService {
       });
     }
 
-    const vouchers = queryBuilder.getMany();
-    return (await vouchers).map((value) =>
-      VoucherResponseDto.fromEntity(value),
-    );
+    const vouchers = await queryBuilder.getMany();
+    return vouchers.map((voucher) => VoucherResponseDto.fromEntity(voucher));
   }
 
   async getClaimedVouchers(

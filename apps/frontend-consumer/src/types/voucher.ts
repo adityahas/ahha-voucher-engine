@@ -1,12 +1,11 @@
-// apps/frontend-consumer/src/types/voucher.ts
 export interface Voucher {
-  id: string;
+  code: string;
   name: string;
+  description: string;
   quota: number;
-  active: boolean;
-  start_date: string;
-  end_date: string;
+  image: string;
   categories: { id: string; name: string }[];
+  bindings: VoucherBinding[];
 }
 
 export interface VoucherBinding {
