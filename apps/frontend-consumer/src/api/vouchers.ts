@@ -2,7 +2,6 @@ import type { Voucher, VoucherBinding } from '../types/voucher';
 import { useAuthStore } from '../store/auth.store';
 
 export const findEligibleVouchers = async (
-  userId?: string,
   bindings: VoucherBinding[] = [],
 ): Promise<Voucher[]> => {
   // Using port 3003 assuming loyalty-consumer runs there based on typical setups
@@ -21,7 +20,6 @@ export const findEligibleVouchers = async (
       ...(apiKey ? { 'x-api-key': apiKey } : {}),
     },
     body: JSON.stringify({
-      user_id: userId,
       bindings: bindings,
     }),
   });

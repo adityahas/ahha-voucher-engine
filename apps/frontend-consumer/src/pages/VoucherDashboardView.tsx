@@ -19,15 +19,15 @@ export default function VoucherDashboardView() {
     setIsLoading(true);
     setError(null);
     try {
-      // Pass the user's ID and dynamic bindings
-      const data = await findEligibleVouchers(user?.id, bindings);
+      // Use dynamic bindings, identity is handled via JWT on backend
+      const data = await findEligibleVouchers(bindings);
       setVouchers(data);
     } catch (err: any) {
       setError(err.message || 'Failed to load eligible vouchers.');
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id]);
+  }, []);
 
   useEffect(() => {
     fetchVouchers();
