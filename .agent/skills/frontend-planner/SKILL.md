@@ -27,7 +27,7 @@ Icons: `lucide-react`
 Routing: `react-router-dom`
 Animation (if needed): `framer-motion` (highly recommended for vibe coding)
 State/Forms: React Hook Form (or local state for simple components)
-Directory: Always target `apps/frontend-cms` as the base directory.
+Directory: Always target `apps/frontend-cms` and `apps/frontend-consumer` as the base directory.
 
 ---
 
