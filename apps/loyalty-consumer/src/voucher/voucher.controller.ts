@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Inject,
+  Post,
   Query,
   Req,
   UseGuards,
@@ -23,7 +24,7 @@ export class VoucherController {
     private readonly voucherService: VoucherService,
   ) {}
 
-  @Get()
+  @Post('eligible')
   @UseGuards(ConsumerJwtGuard)
   getEligibleVouchers(
     @Body() dto: GetEligibleVoucherDto,
