@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateNested,
 } from '@nestjs/class-validator';
@@ -9,8 +10,8 @@ import { VoucherBindingDto } from './voucher-binding.dto';
 
 export class GetEligibleVoucherDto {
   @IsString()
-  @IsNotEmpty()
-  user_id: string;
+  @IsOptional()
+  user_id?: string;
 
   @IsArray()
   @ValidateNested({ each: true })

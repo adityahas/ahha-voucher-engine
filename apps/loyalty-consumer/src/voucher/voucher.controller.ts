@@ -27,8 +27,10 @@ export class VoucherController {
   @Post('eligible')
   @UseGuards(ConsumerJwtGuard)
   findEligibleVouchers(
+    @Req() req: Request,
     @Body() dto: GetEligibleVoucherDto,
   ): Promise<VoucherResponseDto[]> {
+    dto.user_id = req.user['userId'];
     return this.voucherService.findEligibleVouchers(dto);
   }
 
