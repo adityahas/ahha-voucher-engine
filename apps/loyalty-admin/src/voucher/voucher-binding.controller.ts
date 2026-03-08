@@ -57,7 +57,7 @@ export class VoucherBindingController {
   @Delete(':id')
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('write:vouchers')
-  remove(@Param('id') id: string) {
-    return this.voucherBindingService.remove(+id);
+  remove(@Param('voucherId') voucherId: string, @Param('id') id: string) {
+    return this.voucherBindingService.remove(voucherId, +id);
   }
 }

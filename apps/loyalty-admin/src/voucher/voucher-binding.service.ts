@@ -64,8 +64,20 @@ export class VoucherBindingService {
     return this.repository.save(binding);
   }
 
-  async remove(id: number): Promise<void> {
-    const binding = await this.findOne(id);
+  async remove(voucherId: string, id: number): Promise<void> {
+    const binding = await this.repository.findOne({
+      where: {
+        id,
+        voucher: { code: voucherId },
+      },
+    });
+
+    if (!binding) {
+      throw new NotFoundException(
+        `Voucher binding with id ${id} not found for voucher ${voucherId}`,
+      );
+    }
+
     await this.repository.remove(binding);
   }
 }
