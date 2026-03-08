@@ -14,14 +14,14 @@ export default function LoginView() {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [apiKey, setApiKey] = useState('');
+  const [apiKey, setApiKey] = useState('client1-api-key');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Auto redirect if already logged in
   useEffect(() => {
     if (token) {
-      navigate('/', { replace: true });
+      navigate('/loyalty/vouchers', { replace: true });
     }
   }, [token, navigate]);
 
@@ -45,7 +45,7 @@ export default function LoginView() {
       const userData = response.user || { email };
       
       setAuth(jwtToken, userData, apiKey);
-      navigate('/');
+      navigate('/loyalty/vouchers');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -87,18 +87,6 @@ export default function LoginView() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
-            <Input 
-              type="email" 
-              placeholder="name@example.com" 
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-12"
-            />
-          </div>
-
-          <div className="relative">
             <Key className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
             <Input 
               type="text" 
@@ -106,6 +94,18 @@ export default function LoginView() {
               required
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
+              className="pl-12"
+            />
+          </div>
+
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
+            <Input 
+              type="email" 
+              placeholder="name@example.com" 
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="pl-12"
             />
           </div>

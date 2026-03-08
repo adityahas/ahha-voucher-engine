@@ -10,7 +10,7 @@ export const getEligibleVouchers = async (userId?: string): Promise<Voucher[]> =
   const { token, apiKey } = useAuthStore.getState();
 
   // Endpoint updated to POST /loyalty/vouchers/eligible to accept Body per our fix
-  const response = await fetch(`${LOYALTY_API_URL}/loyalty/vouchers/eligible`, {
+  const response = await fetch(`${LOYALTY_API_URL}/loyalty/vouchers`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
