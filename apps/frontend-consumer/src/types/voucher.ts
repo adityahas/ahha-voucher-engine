@@ -15,7 +15,7 @@ export interface VoucherBinding {
 
 export interface ClaimedVoucherInfo {
   id: number;
-  claimed_at: string;
+  created_at: string;
   voucher: Voucher;
 }
 

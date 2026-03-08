@@ -8,10 +8,10 @@ interface ClaimedVoucherCardProps {
 }
 
 export function ClaimedVoucherCard({ claimedVoucher, index }: ClaimedVoucherCardProps) {
-  const { voucher, claimed_at } = claimedVoucher;
+  const { voucher, created_at } = claimedVoucher;
   let claimedDate = 'Unknown Date';
-  if (claimed_at) {
-    const d = new Date(claimed_at);
+  if (created_at) {
+    const d = new Date(created_at);
     if (!isNaN(d.getTime())) {
       claimedDate = d.toLocaleDateString('en-US', {
         year: 'numeric',
