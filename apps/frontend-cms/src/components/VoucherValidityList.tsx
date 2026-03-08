@@ -9,6 +9,7 @@ import {
 } from '../api/vouchers';
 import { Button } from './ui/Button';
 import VoucherValidityModal from './VoucherValidityModal';
+import { ConfirmationModal } from './ui/ConfirmationModal';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
 
 interface VoucherValidityListProps {
@@ -23,6 +24,10 @@ export const VoucherValidityList: React.FC<VoucherValidityListProps> = ({ vouche
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingValidity, setEditingValidity] = useState<VoucherValidity | null>(null);
+
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [validityToDelete, setValidityToDelete] = useState<number | null>(null);
 
   const fetchValidities = useCallback(async () => {
     setIsLoading(true);
@@ -52,15 +57,27 @@ export const VoucherValidityList: React.FC<VoucherValidityListProps> = ({ vouche
     await fetchValidities();
   };
 
-  const handleDelete = async (validityId: number) => {
-    if (window.confirm('Are you sure you want to delete this schedule?')) {
-      setError(null);
-      try {
-        await deleteVoucherValidity(voucherId, validityId);
-        await fetchValidities();
-      } catch (err: any) {
-        setError(err.message || 'Failed to delete schedule.');
-      }
+  const handleDelete = (e: React.MouseEvent, validityId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setValidityToDelete(validityId);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!validityToDelete) return;
+
+    setError(null);
+    setIsDeleting(validityToDelete);
+    try {
+      await deleteVoucherValidity(voucherId, validityToDelete);
+      await fetchValidities();
+      setIsConfirmOpen(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete schedule.');
+    } finally {
+      setIsDeleting(null);
+      setValidityToDelete(null);
     }
   };
 
@@ -151,18 +168,31 @@ export const VoucherValidityList: React.FC<VoucherValidityListProps> = ({ vouche
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => openEditModal(validity)}
-                          className="p-2 bg-slate-800/50 hover:bg-primary-500/20 text-slate-400 hover:text-primary-400 rounded-lg transition-colors border border-transparent hover:border-primary-500/20"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(validity);
+                          }}
+                          className="p-2 bg-slate-800/50 hover:bg-primary-500/20 text-slate-400 hover:text-primary-400 rounded-lg transition-colors border border-transparent hover:border-primary-500/20 disabled:opacity-30 disabled:cursor-not-allowed"
                           title="Edit"
+                          disabled={isDeleting !== null}
                         >
                           <Edit2 size={16} />
                         </button>
                         <button
-                          onClick={() => handleDelete(validity.id)}
-                          className="p-2 bg-slate-800/50 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
+                          type="button"
+                          onClick={(e) => handleDelete(e, validity.id)}
+                          className={`p-2 bg-slate-800/50 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed ${
+                            isDeleting === validity.id ? 'bg-red-500/10 text-red-500 border-red-500/20' : ''
+                          }`}
                           title="Delete"
+                          disabled={isDeleting !== null}
                         >
-                          <Trash2 size={16} />
+                          {isDeleting === validity.id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={16} />
+                          )}
                         </button>
                       </div>
                     </td>
@@ -180,6 +210,17 @@ export const VoucherValidityList: React.FC<VoucherValidityListProps> = ({ vouche
         onSave={handleCreateOrUpdate}
         validity={editingValidity}
         voucherId={voucherId}
+      />
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Schedule"
+        message="Are you sure you want to delete this validity schedule? This action cannot be undone."
+        confirmText="Delete"
+        isLoading={isDeleting !== null}
+        variant="danger"
       />
     </Card>
   );
