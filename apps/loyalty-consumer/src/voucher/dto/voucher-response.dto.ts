@@ -1,6 +1,7 @@
-import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
+import { VoucherEntity, VoucherType } from '@core/loyalty/voucher/entities/voucher.entity';
 
 export class VoucherResponseDto {
+  voucher_type: VoucherType;
   code: string;
   name: string;
   description: string;
@@ -10,6 +11,7 @@ export class VoucherResponseDto {
   bindings: { bind_type: string; bind_value: string }[];
 
   constructor(
+    voucher_type: VoucherType,
     code: string,
     name: string,
     description: string,
@@ -18,6 +20,7 @@ export class VoucherResponseDto {
     categories: { id: string; name: string }[] = [],
     bindings: { bind_type: string; bind_value: string }[] = [],
   ) {
+    this.voucher_type = voucher_type;
     this.code = code;
     this.name = name;
     this.description = description;
@@ -29,6 +32,7 @@ export class VoucherResponseDto {
 
   static fromEntity(voucher: VoucherEntity) {
     return new VoucherResponseDto(
+      voucher.voucher_type,
       voucher.code,
       voucher.code, // name might be same as code if not explicit, but VoucherEntity has no name? Checking entity...
       voucher.description,

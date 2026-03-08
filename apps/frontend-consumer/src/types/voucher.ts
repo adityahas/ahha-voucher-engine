@@ -1,4 +1,7 @@
+export type VoucherType = 'CLAIMABLE' | 'UNIQUE_CODE';
+
 export interface Voucher {
+  voucher_type: VoucherType;
   code: string;
   name: string;
   description: string;

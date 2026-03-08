@@ -46,9 +46,14 @@ export function ClaimedVoucherCard({ claimedVoucher, index }: ClaimedVoucherCard
           <h3 className="text-xl font-bold text-white mb-1 leading-tight">
             {voucher.name}
           </h3>
-          <p className="text-xs text-slate-500 mb-4 font-mono select-all bg-white/5 inline-block px-2 py-0.5 rounded border border-white/5">
-            {voucher.code}
-          </p>
+          <div className="flex items-center gap-2 mb-4">
+            <p className="text-xs text-slate-500 font-mono select-all bg-white/5 inline-block px-2 py-0.5 rounded border border-white/5">
+              {voucher.code}
+            </p>
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10 uppercase tracking-widest">
+              {voucher.voucher_type?.replace('_', ' ') || 'CLAIMABLE'}
+            </span>
+          </div>
           
           <p className="text-sm text-slate-400 mb-4 line-clamp-2">
             {voucher.description}

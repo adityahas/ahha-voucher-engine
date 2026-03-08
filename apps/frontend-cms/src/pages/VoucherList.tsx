@@ -138,7 +138,12 @@ export const VoucherList: React.FC = () => {
                       onClick={() => navigate(`/vouchers/${voucher.code}`)}
                     >
                       <TableCell className="font-mono text-primary-400 font-bold group-hover:pl-6 transition-all">
-                        {voucher.code}
+                        <div className="flex flex-col gap-1">
+                          <span>{voucher.code}</span>
+                          <span className="text-[9px] w-fit px-1.5 py-0.5 rounded-md bg-slate-800/80 text-slate-400 uppercase tracking-wider border border-slate-700/50">
+                            {voucher.voucher_type?.replace('_', ' ') || 'CLAIMABLE'}
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell className="max-w-xs overflow-hidden text-ellipsis whitespace-nowrap text-slate-300 font-medium">
                         {voucher.description || 'No description provided'}
