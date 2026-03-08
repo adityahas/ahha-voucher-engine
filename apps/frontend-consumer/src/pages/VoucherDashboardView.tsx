@@ -20,7 +20,7 @@ export default function VoucherDashboardView() {
     setError(null);
     try {
       // Pass the user's email or ID to fetch their specific eligible vouchers if the backend requires it
-      const data = await findEligibleVouchers(user?.email || user?.id);
+      const data = await findEligibleVouchers(user?.id);
       setVouchers(data);
     } catch (err: any) {
       setError(err.message || 'Failed to load eligible vouchers.');
