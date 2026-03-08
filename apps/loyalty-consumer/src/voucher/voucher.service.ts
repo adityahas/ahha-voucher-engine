@@ -19,7 +19,7 @@ export class VoucherService {
       dataSource.getRepository(VoucherClaimEntity);
   }
 
-  async getEligibleVouchers(
+  async findEligibleVouchers(
     searchCriteria: GetEligibleVoucherDto,
   ): Promise<VoucherResponseDto[]> {
     const queryBuilder = this.voucherRepository.createQueryBuilder('voucher');

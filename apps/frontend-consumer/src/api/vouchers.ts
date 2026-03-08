@@ -1,7 +1,7 @@
 import type { Voucher } from '../types/voucher';
 import { useAuthStore } from '../store/auth.store';
 
-export const getEligibleVouchers = async (
+export const findEligibleVouchers = async (
   userId?: string,
 ): Promise<Voucher[]> => {
   // Using port 3003 assuming loyalty-consumer runs there based on typical setups
