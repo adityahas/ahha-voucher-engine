@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Ticket, Tag, Check, Loader2, AlertCircle } from 'lucide-react';
+import { Ticket, Tag, Check, Loader2, AlertCircle, ExternalLink } from 'lucide-react';
 import type { Voucher } from '../../types/voucher';
 import { Button } from '../ui/Button';
 import { claimVoucher } from '../../api/vouchers';
+import { useNavigate } from 'react-router-dom';
 
 interface VoucherCardProps {
   voucher: Voucher;
@@ -12,6 +13,7 @@ interface VoucherCardProps {
 }
 
 export function VoucherCard({ voucher, index, onClaimSuccess }: VoucherCardProps) {
+  const navigate = useNavigate();
   const [isClaiming, setIsClaiming] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,8 +27,8 @@ export function VoucherCard({ voucher, index, onClaimSuccess }: VoucherCardProps
       if (onClaimSuccess) {
         setTimeout(onClaimSuccess, 1500); // Give user time to see the success state
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to claim voucher');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to claim voucher');
     } finally {
       setIsClaiming(false);
     }
@@ -112,6 +114,20 @@ export function VoucherCard({ voucher, index, onClaimSuccess }: VoucherCardProps
                  </motion.div>
                )}
             </AnimatePresence>
+
+            <Button
+               className="w-full py-2.5 border border-white/15 bg-white/5 text-slate-200 shadow-none hover:bg-white/10"
+               onClick={() =>
+                 navigate(`/vouchers/${voucher.code}`, {
+                   state: { voucher },
+                 })
+               }
+            >
+              <span className="inline-flex items-center gap-2">
+                <ExternalLink className="h-4 w-4" />
+                View Details
+              </span>
+            </Button>
 
             <Button 
                className={`w-full py-2.5 transition-all duration-300 ${

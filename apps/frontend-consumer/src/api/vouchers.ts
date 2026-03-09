@@ -31,6 +31,13 @@ export const findEligibleVouchers = async (
   return response.json();
 };
 
+export const findEligibleVoucherByCode = async (
+  code: string,
+): Promise<Voucher | null> => {
+  const vouchers = await findEligibleVouchers();
+  return vouchers.find((voucher) => voucher.code === code) ?? null;
+};
+
 export const claimVoucher = async (
   voucherCode: string,
 ): Promise<{ success: boolean; message: string }> => {
