@@ -25,14 +25,15 @@ export enum VoucherType {
  */
 @Entity('vouchers')
 export class VoucherEntity extends BaseEntity {
+  @PrimaryColumn({ type: 'varchar', unique: true, nullable: false })
+  code: string;
+
   @Column({
     type: 'enum',
     enum: VoucherType,
     default: VoucherType.CLAIMABLE,
   })
   voucher_type: VoucherType;
-  @PrimaryColumn({ type: 'varchar', unique: true, nullable: false })
-  code: string;
 
   @Column({ type: 'text', nullable: true })
   description: string;

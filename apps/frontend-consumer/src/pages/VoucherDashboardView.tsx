@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuthStore } from '../store/auth.store';
 import { AlertCircle, Ticket } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ConsumerLayout } from '../components/layout/ConsumerLayout';
@@ -20,8 +19,12 @@ export default function VoucherDashboardView() {
       // Use dynamic bindings, identity is handled via JWT on backend
       const data = await findEligibleVouchers(bindings);
       setVouchers(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load eligible vouchers.');
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to load eligible vouchers.',
+      );
     } finally {
       setIsLoading(false);
     }

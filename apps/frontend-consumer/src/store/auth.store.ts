@@ -1,11 +1,16 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+interface AuthUser {
+  email?: string;
+  [key: string]: unknown;
+}
+
 interface AuthState {
   token: string | null;
-  user: any | null;
+  user: AuthUser | null;
   apiKey: string | null;
-  setAuth: (token: string, user: any, apiKey?: string) => void;
+  setAuth: (token: string, user: AuthUser, apiKey?: string) => void;
   clearAuth: () => void;
 }
 

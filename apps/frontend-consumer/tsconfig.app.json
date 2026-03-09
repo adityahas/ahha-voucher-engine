@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "jsx": "react-jsx",
 
     /* Linting */
@@ -25,5 +26,5 @@
     }
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["src/**/*.spec.tsx", "src/**/*.test.tsx"]
 }

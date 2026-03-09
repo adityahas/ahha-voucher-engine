@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from './Button'; // Assuming `cn` is exported from Button.tsx, maybe we should move it to a lib/utils.ts later
+import { cn } from '../../lib/utils';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;

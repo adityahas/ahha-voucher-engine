@@ -17,8 +17,12 @@ export default function MyVouchersView() {
     try {
       const response = await getClaimedVouchers(0, 50); // Get first 50 for now
       setVouchers(response.data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load claimed vouchers.');
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to load claimed vouchers.',
+      );
     } finally {
       setIsLoading(false);
     }
