@@ -4,9 +4,9 @@ import type { Product } from '../types/product';
 export const getProducts = async (): Promise<Product[]> => {
   const BASE_URL = import.meta?.env?.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
   
-  // Based on nginx.conf, we use /product-admin prefix to route to port 9007
-  // NestJS controller is at /redistro/products
-  const url = `${BASE_URL}/product-admin/redistro/products`;
+  // Based on nginx.conf, we use /product prefix to route to port 9008
+  // NestJS controller for consumer is at /products
+  const url = `${BASE_URL}/product/products`;
 
   const { token, apiKey } = useAuthStore.getState();
 
