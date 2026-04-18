@@ -16,6 +16,8 @@ export class AclService {
       'write:quests',
       'read:voucher-categories',
       'write:voucher-categories',
+      'read:products',
+      'write:products',
     ],
     [Role.SALES]: ['read:products', 'read:warehouses'],
     [Role.DRIVER]: ['read:orders', 'write:orders'],

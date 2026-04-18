@@ -28,7 +28,6 @@ dotenv.config();
       logging: process.env.DB_LOGGING != 'false',
       entities: [ClientEntity],
     }),
-    TypeOrmModule.forFeature([ProductEntity]),
     DatabaseModule,
     AuthModule,
   ],
