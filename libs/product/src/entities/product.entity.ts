@@ -1,5 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BaseEntity } from '@core/base/entities/base.entity';
+import { ProductCategoryEntity } from './product-category.entity';
 
 @Entity('products')
 export class ProductEntity extends BaseEntity {
@@ -12,8 +19,9 @@ export class ProductEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  category: string;
+  @ManyToMany(() => ProductCategoryEntity, { eager: true, cascade: true })
+  @JoinTable({ name: 'products_categories' })
+  categories: ProductCategoryEntity[];
 
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   price: number;

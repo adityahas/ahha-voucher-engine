@@ -16,8 +16,8 @@ export class CreateProductDto {
   name: string;
 
   @IsOptional()
-  @IsString()
-  category?: string;
+  @IsString({ each: true })
+  categories?: string[];
 
   @IsNotEmpty()
   @IsNumber()

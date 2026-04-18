@@ -18,6 +18,7 @@ import { getProducts, Product } from '../api/products';
 import { Loader2, AlertCircle, RefreshCw, Package, Plus, ShoppingBag } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { CategoryChip } from '../components/ui/CategoryChip';
 
 export const ProductList: React.FC = () => {
   const navigate = useNavigate();
@@ -137,7 +138,7 @@ export const ProductList: React.FC = () => {
                       className="group cursor-pointer hover:bg-slate-800/20 transition-all duration-200"
                       onClick={() => navigate(`/products/${product.id}`)}
                     >
-                      <TableCell className="group-hover:pl-6 transition-all">
+                       <TableCell className="group-hover:pl-6 transition-all">
                         <div className="flex items-center gap-4">
                            <div className="w-12 h-12 rounded-lg bg-slate-800/50 flex items-center justify-center border border-slate-700 overflow-hidden">
                               {product.image_url ? (
@@ -146,9 +147,21 @@ export const ProductList: React.FC = () => {
                                 <ShoppingBag className="w-6 h-6 text-slate-600" />
                               )}
                            </div>
-                           <div className="flex flex-col">
+                           <div className="flex flex-col gap-1">
                              <span className="font-bold text-slate-200">{product.name}</span>
-                             <span className="text-xs text-slate-500 line-clamp-1 max-w-[200px]">{product.description || 'No description'}</span>
+                             {product.categories && product.categories.length > 0 ? (
+                               <div className="flex flex-wrap gap-1 mt-0.5">
+                                 {product.categories.map((cat) => (
+                                   <CategoryChip 
+                                     key={cat.id} 
+                                     name={cat.name} 
+                                     className="px-1.5 py-0.5 text-[10px] bg-slate-800/80 border-slate-700/50 text-slate-400 group-hover:bg-primary-500/10 group-hover:text-primary-300 transition-colors"
+                                   />
+                                 ))}
+                               </div>
+                             ) : (
+                               <span className="text-xs text-slate-500 line-clamp-1 max-w-[200px]">{product.description || 'No description'}</span>
+                             )}
                            </div>
                         </div>
                       </TableCell>
