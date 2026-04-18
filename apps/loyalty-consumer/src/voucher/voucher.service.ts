@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, EntityManager } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response.dto';
