@@ -8,16 +8,19 @@ import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response
 import { VoucherResponseDto } from './dto/voucher-response.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
+import { VoucherUsageEntity } from '@core/loyalty/voucher/entities/voucher-usage.entity';
 
 @Injectable()
 export class VoucherService {
   private voucherRepository: Repository<VoucherEntity>;
   private claimedVouchersRepository: Repository<VoucherClaimEntity>;
+  private usageRepository: Repository<VoucherUsageEntity>;
 
   constructor(dataSource: DataSource) {
     this.voucherRepository = dataSource.getRepository(VoucherEntity);
     this.claimedVouchersRepository =
       dataSource.getRepository(VoucherClaimEntity);
+    this.usageRepository = dataSource.getRepository(VoucherUsageEntity);
   }
 
   async findEligibleVouchers(
@@ -145,6 +148,44 @@ export class VoucherService {
         message: 'Voucher claimed successfully!',
       };
     });
+  }
+
+  async useVoucher(
+    coreUserId: string,
+    voucherCode: string,
+    manager?: EntityManager,
+  ): Promise<VoucherUsageEntity> {
+    const entityManager = manager || this.voucherRepository.manager;
+    const user = await this.getOrCreateLoyaltyUser(coreUserId, entityManager);
+
+    const claim = await entityManager.findOne(VoucherClaimEntity, {
+      where: {
+        voucher: { code: voucherCode },
+        user: { id: user.id },
+      },
+    });
+
+    if (!claim) {
+      throw new BadRequestException('You have not claimed this voucher yet');
+    }
+
+    const existingUsage = await entityManager.findOne(VoucherUsageEntity, {
+      where: {
+        voucher: { code: voucherCode },
+        user: { id: user.id },
+      },
+    });
+
+    if (existingUsage) {
+      throw new BadRequestException('Voucher has already been used');
+    }
+
+    const usage = entityManager.create(VoucherUsageEntity, {
+      voucher: { code: voucherCode },
+      user: user,
+    });
+
+    return entityManager.save(VoucherUsageEntity, usage);
   }
 
   private async getOrCreateLoyaltyUser(
