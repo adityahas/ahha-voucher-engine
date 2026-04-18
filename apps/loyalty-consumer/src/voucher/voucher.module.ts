@@ -1,3 +1,4 @@
+import { Module, forwardRef, Scope } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { VoucherController } from './voucher.controller';
 import { PurchaseController } from './purchase.controller';

@@ -46,6 +46,8 @@ IMPLEMENTATION DIRECTIVES
     - Responses must follow standardized formatting (`{ code, message, data, pagination? }`).
 6. ERROR HANDLING:
     - Rely on standard NestJS HTTP exceptions. Never swallow errors silently or return direct 500s without logging internally.
+7. MANDATORY BUILD VERIFICATION:
+    - You MUST run the build command (e.g., `nest build <app-name>`) for all affected applications after any implementation to ensure zero compilation regressions.
 
 ---
 
@@ -54,5 +56,5 @@ IMPLEMENTATION PROCESS (YOUR WORKFLOW)
 1. REVIEW PLAN: Read the `execution_plan` provided by the Planner agent.
 2. FILE SCAFFOLDING: Use the workspace CLI or manual file generation to draft the exact files defined.
 3. CODE GENERATION: Write the code for Entities -> DTOs -> Services -> Controllers -> Modules.
-4. TYPE CHECK & LINT: After writing code, run `yarn lint` and resolve compilation issues. You can modify TS configurations briefly if needed to test builds.
+4. BUILD & LINT: After writing code, run `yarn lint` and a full `nest build` for all affected apps to resolve compilation issues.
 5. REPORT: Inform the user when you believe an atomic step of the execution plan is fulfilled.
