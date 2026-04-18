@@ -52,8 +52,13 @@ describe('OrderService', () => {
   describe('create', () => {
     it('should successfully create and save an order', async () => {
       // Arrange
-      const createDto = { user_id: 'u1', product_id: 'p1', quantity: 1, total_price: 100 };
-      
+      const createDto = {
+        user_id: 'u1',
+        product_id: 'p1',
+        quantity: 1,
+        total_price: 100,
+      };
+
       // Act
       const result = await service.create(createDto);
 
@@ -70,7 +75,9 @@ describe('OrderService', () => {
       const result = await service.findOne('test-id');
 
       // Assert
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 'test-id' } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: 'test-id' },
+      });
       expect(result).toEqual(mockOrder);
     });
 
@@ -79,14 +86,19 @@ describe('OrderService', () => {
       mockRepository.findOne.mockResolvedValueOnce(null);
 
       // Act & Assert
-      await expect(service.findOne('invalid-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('updateStatus', () => {
     it('should update and save the order status', async () => {
       // Act
-      const result = await service.updateStatus('test-id', OrderStatus.COMPLETED);
+      const result = await service.updateStatus(
+        'test-id',
+        OrderStatus.COMPLETED,
+      );
 
       // Assert
       expect(repository.save).toHaveBeenCalled();

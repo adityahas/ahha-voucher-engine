@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { getProductById, updateProduct, Product } from '../api/products';
-import { 
-  ArrowLeft, 
-  Package, 
-  Loader2, 
-  AlertCircle, 
-  CheckCircle2, 
-  Hash, 
-  DollarSign,
+import { getProductById, Product, updateProduct } from '../api/products';
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
   Database,
-  Type,
+  DollarSign,
+  Hash,
   Image as ImageIcon,
-  Save
+  Loader2,
+  Package,
+  Save,
+  Type,
 } from 'lucide-react';
 
 import { CategoryChipsInput } from '../components/ui/CategoryChipsInput';
@@ -23,7 +29,9 @@ import { CategoryChipsInput } from '../components/ui/CategoryChipsInput';
 export const ProductEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<Partial<Product & { categories: string[] }>>({
+  const [formData, setFormData] = useState<
+    Partial<Product & { categories: string[] }>
+  >({
     name: '',
     sku: '',
     description: '',
@@ -60,11 +68,14 @@ export const ProductEdit: React.FC = () => {
     loadProduct();
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: (name === 'price' || name === 'stock') ? parseFloat(value) || 0 : value,
+      [name]:
+        name === 'price' || name === 'stock' ? parseFloat(value) || 0 : value,
     }));
   };
 
@@ -96,7 +107,9 @@ export const ProductEdit: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-500">
         <Loader2 className="h-10 w-10 animate-spin text-primary-500" />
-        <p className="mt-4 text-slate-400 font-medium">Synchronizing product data...</p>
+        <p className="mt-4 text-slate-400 font-medium">
+          Synchronizing product data...
+        </p>
       </div>
     );
   }
@@ -106,9 +119,12 @@ export const ProductEdit: React.FC = () => {
       <div className="flex flex-col items-center justify-center py-20 animate-in zoom-in-95 duration-500">
         <div className="p-8 rounded-2xl bg-green-500/10 border border-green-500/30 flex flex-col items-center space-y-4 max-w-md text-center backdrop-blur-md shadow-[0_0_40px_rgba(34,197,94,0.15)]">
           <CheckCircle2 className="h-16 w-16 text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]" />
-          <h2 className="text-2xl font-bold text-green-300">Update Successful!</h2>
+          <h2 className="text-2xl font-bold text-green-300">
+            Update Successful!
+          </h2>
           <p className="text-green-200/80 font-medium">
-            Product information has been updated across the engine. Redirecting...
+            Product information has been updated across the engine.
+            Redirecting...
           </p>
         </div>
       </div>
@@ -131,7 +147,9 @@ export const ProductEdit: React.FC = () => {
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight">
             Edit Product
           </h1>
-          <p className="text-slate-400 text-sm mt-1 font-medium font-mono text-primary-400/80 tracking-tighter uppercase">{formData.sku}</p>
+          <p className="text-slate-400 text-sm mt-1 font-medium font-mono text-primary-400/80 tracking-tighter uppercase">
+            {formData.sku}
+          </p>
         </div>
       </div>
 
@@ -144,7 +162,9 @@ export const ProductEdit: React.FC = () => {
                   <Package className="w-5 h-5 text-primary-400" />
                   General Information
                 </CardTitle>
-                <CardDescription>Adjustable product identification and pricing.</CardDescription>
+                <CardDescription>
+                  Adjustable product identification and pricing.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 pt-2">
                 {error && (
@@ -155,65 +175,85 @@ export const ProductEdit: React.FC = () => {
                 )}
 
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Product Name</label>
+                  <label
+                    htmlFor="name"
+                    className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+                  >
+                    Product Name
+                  </label>
                   <div className="relative">
-                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                       <Type className="h-4 w-4 text-slate-500" />
-                     </div>
-                     <Input
-                       id="name"
-                       name="name"
-                       placeholder="Hyper-Engine Pro"
-                       value={formData.name}
-                       onChange={handleChange}
-                       required
-                       className="bg-slate-800/50 border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10"
-                     />
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Type className="h-4 w-4 text-slate-500" />
+                    </div>
+                    <Input
+                      id="name"
+                      name="name"
+                      placeholder="Hyper-Engine Pro"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="bg-slate-800/50 border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10"
+                    />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label htmlFor="sku" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">SKU identifier</label>
+                    <label
+                      htmlFor="sku"
+                      className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+                    >
+                      SKU identifier
+                    </label>
                     <div className="relative">
-                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                         <Hash className="h-4 w-4 text-slate-500" />
-                       </div>
-                       <Input
-                         id="sku"
-                         name="sku"
-                         placeholder="HE-PRO-001"
-                         value={formData.sku}
-                         onChange={handleChange}
-                         required
-                         className="bg-slate-800/50 border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10 font-mono"
-                       />
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Hash className="h-4 w-4 text-slate-500" />
+                      </div>
+                      <Input
+                        id="sku"
+                        name="sku"
+                        placeholder="HE-PRO-001"
+                        value={formData.sku}
+                        onChange={handleChange}
+                        required
+                        className="bg-slate-800/50 border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10 font-mono"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="price" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Unit Price ($)</label>
+                    <label
+                      htmlFor="price"
+                      className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+                    >
+                      Unit Price ($)
+                    </label>
                     <div className="relative">
-                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                         <DollarSign className="h-4 w-4 text-slate-500" />
-                       </div>
-                       <Input
-                         id="price"
-                         name="price"
-                         type="number"
-                         step="0.01"
-                         min="0"
-                         placeholder="49.99"
-                         value={formData.price}
-                         onChange={handleChange}
-                         required
-                         className="bg-slate-800/50 border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10 font-mono"
-                       />
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <DollarSign className="h-4 w-4 text-slate-500" />
+                      </div>
+                      <Input
+                        id="price"
+                        name="price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="49.99"
+                        value={formData.price}
+                        onChange={handleChange}
+                        required
+                        className="bg-slate-800/50 border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10 font-mono"
+                      />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="description" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Product Description</label>
+                  <label
+                    htmlFor="description"
+                    className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+                  >
+                    Product Description
+                  </label>
                   <textarea
                     id="description"
                     name="description"
@@ -260,13 +300,18 @@ export const ProductEdit: React.FC = () => {
             <Card className="border-slate-700/50 bg-slate-900/40 backdrop-blur-xl overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 capitalize">
-                   <Database className="w-4 h-4 text-primary-400" />
-                   Stock Management
+                  <Database className="w-4 h-4 text-primary-400" />
+                  Stock Management
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <label htmlFor="stock" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Current Stock</label>
+                  <label
+                    htmlFor="stock"
+                    className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+                  >
+                    Current Stock
+                  </label>
                   <Input
                     id="stock"
                     name="stock"
@@ -285,20 +330,29 @@ export const ProductEdit: React.FC = () => {
             <Card className="border-slate-700/50 bg-slate-900/40 backdrop-blur-xl overflow-hidden">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 capitalize">
-                   <ImageIcon className="w-4 h-4 text-purple-400" />
-                   Product Image
+                  <ImageIcon className="w-4 h-4 text-purple-400" />
+                  Product Image
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="aspect-square rounded-xl bg-slate-800/50 border-2 border-dashed border-slate-700 flex items-center justify-center overflow-hidden group">
                   {formData.image_url ? (
-                    <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover animate-in fade-in duration-500" />
+                    <img
+                      src={formData.image_url}
+                      alt="Preview"
+                      className="w-full h-full object-cover animate-in fade-in duration-500"
+                    />
                   ) : (
                     <ImageIcon className="h-10 w-10 text-slate-600" />
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="image_url" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Image URL</label>
+                  <label
+                    htmlFor="image_url"
+                    className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+                  >
+                    Image URL
+                  </label>
                   <Input
                     id="image_url"
                     name="image_url"

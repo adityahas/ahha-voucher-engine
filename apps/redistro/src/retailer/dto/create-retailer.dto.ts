@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsNotEmpty } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateRetailerDto {
   @IsNotEmpty()

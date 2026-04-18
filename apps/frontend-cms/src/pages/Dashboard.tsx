@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../components/ui/Card';
-import { Ticket, Users, Activity, ExternalLink } from 'lucide-react';
+import { Activity, ExternalLink, Ticket, Users } from 'lucide-react';
 
 const StatCard = ({ title, value, subtitle, icon: Icon, trend }: any) => (
   <Card className="hover:scale-[1.02] transform transition-all duration-300">

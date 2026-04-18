@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -9,14 +9,14 @@ import {
 } from '../components/ui/Card';
 import { getUserById, User } from '../api/users';
 import {
-  Loader2,
+  Activity,
   AlertCircle,
   ArrowLeft,
+  Clock,
+  Loader2,
   Mail,
   Phone,
-  Clock,
   ShieldCheck,
-  Activity,
   UserCog,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';

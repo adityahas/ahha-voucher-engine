@@ -1,15 +1,14 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UserEdit } from './UserEdit';
+import { getUserById, updateUser } from '../api/users';
 
 // Mock the API layer
 vi.mock('../api/users', () => ({
   getUserById: vi.fn(),
   updateUser: vi.fn(),
 }));
-
-import { getUserById, updateUser } from '../api/users';
 
 describe('UserEdit Component', () => {
   const mockUser = {
@@ -34,7 +33,7 @@ describe('UserEdit Component', () => {
         <Routes>
           <Route path="/users/edit/:id" element={<UserEdit />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
   it('pre-fills the form with user data', async () => {
@@ -45,7 +44,9 @@ describe('UserEdit Component', () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText(/Full Name/i)).toHaveValue('John Doe');
-      expect(screen.getByLabelText(/Email Address/i)).toHaveValue('john@example.com');
+      expect(screen.getByLabelText(/Email Address/i)).toHaveValue(
+        'john@example.com',
+      );
       expect(screen.getByLabelText(/Account Status: Active/i)).toBeChecked();
     });
   });
@@ -59,7 +60,9 @@ describe('UserEdit Component', () => {
       expect(screen.getByLabelText(/Full Name/i)).toHaveValue('John Doe');
     });
 
-    fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Jane Doe' } });
+    fireEvent.change(screen.getByLabelText(/Full Name/i), {
+      target: { value: 'Jane Doe' },
+    });
     fireEvent.click(screen.getByText(/Apply Changes/i));
 
     await waitFor(() => {
@@ -69,14 +72,19 @@ describe('UserEdit Component', () => {
 
   it('shows success message and navigates on successful update', async () => {
     (getUserById as any).mockResolvedValueOnce(mockUser);
-    (updateUser as any).mockResolvedValueOnce({ ...mockUser, name: 'Jane Doe' });
+    (updateUser as any).mockResolvedValueOnce({
+      ...mockUser,
+      name: 'Jane Doe',
+    });
     renderComponent();
 
     await waitFor(() => {
       expect(screen.getByLabelText(/Full Name/i)).toHaveValue('John Doe');
     });
 
-    fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Jane Doe' } });
+    fireEvent.change(screen.getByLabelText(/Full Name/i), {
+      target: { value: 'Jane Doe' },
+    });
     fireEvent.click(screen.getByText(/Apply Changes/i));
 
     await waitFor(() => {
@@ -100,7 +108,9 @@ describe('UserEdit Component', () => {
       expect(screen.getByLabelText(/Full Name/i)).toHaveValue('John Doe');
     });
 
-    fireEvent.change(screen.getByLabelText(/New Password/i), { target: { value: 'new-password' } });
+    fireEvent.change(screen.getByLabelText(/New Password/i), {
+      target: { value: 'new-password' },
+    });
     fireEvent.click(screen.getByText(/Apply Changes/i));
 
     await waitFor(() => {
