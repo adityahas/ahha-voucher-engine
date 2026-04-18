@@ -21,6 +21,15 @@ export class ProductEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   unit: string;
 
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ type: 'int', default: 0 })
+  stock: number;
+
+  @Column({ type: 'text', nullable: true })
+  image_url: string;
+
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 }

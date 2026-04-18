@@ -1,6 +1,12 @@
-import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
+import {
+  forwardRef,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  Scope,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductEntity } from '@core/product/entities/product.entity';
 import { ProductAdminService } from './product-admin.service';
 import { ProductAdminController } from './product-admin.controller';
 import { DatabaseModule, DatabaseService } from '@core/database';
@@ -32,12 +38,13 @@ dotenv.config();
       logging: process.env.DB_LOGGING != 'false',
       entities: [ClientEntity],
     }),
+    PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1w' },
     }),
     DatabaseModule,
-    AuthModule,
+    forwardRef(() => AuthModule),
   ],
   providers: [
     JwtStrategy,
