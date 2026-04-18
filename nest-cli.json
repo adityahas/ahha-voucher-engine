@@ -111,6 +111,15 @@
         "tsConfigPath": "libs/product/tsconfig.lib.json"
       }
     },
+    "product-consumer": {
+      "type": "application",
+      "root": "apps/product-consumer",
+      "entryFile": "main",
+      "sourceRoot": "apps/product-consumer/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/product-consumer/tsconfig.lib.json"
+      }
+    },
     "product-admin": {
       "type": "application",
       "root": "apps/product-admin",
