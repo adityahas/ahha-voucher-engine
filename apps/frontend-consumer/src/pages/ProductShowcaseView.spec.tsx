@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ProductShowcaseView } from './ProductShowcaseView';
+import { MemoryRouter } from 'react-router-dom';
 import * as productsApi from '../api/products';
 import type { Product } from '../types/product';
 
@@ -12,6 +13,16 @@ vi.mock('framer-motion', () => ({
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
+
+// Mock react-router-dom
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual as any,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 // Mock API module
 vi.mock('../api/products', () => ({
@@ -44,21 +55,21 @@ describe('ProductShowcaseView', () => {
     vi.clearAllMocks();
   });
 
+  const renderComponent = () => render(
+    <MemoryRouter>
+      <ProductShowcaseView />
+    </MemoryRouter>
+  );
+
   it('renders loading skeletons on initial load', async () => {
-    // Return a promise that doesn't resolve immediately
     (productsApi.getProducts as any).mockReturnValue(new Promise(() => {}));
-    
-    const { container } = render(<ProductShowcaseView />);
-    
-    // Skeletons have animate-pulse class
+    const { container } = renderComponent();
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('renders product cards after successful fetch', async () => {
     (productsApi.getProducts as any).mockResolvedValue(mockProducts);
-    
-    render(<ProductShowcaseView />);
-
+    renderComponent();
     await waitFor(() => {
       expect(screen.getByText('Product 1')).toBeInTheDocument();
       expect(screen.getByText('Product 2')).toBeInTheDocument();
@@ -67,9 +78,7 @@ describe('ProductShowcaseView', () => {
 
   it('renders empty state when no products are returned', async () => {
     (productsApi.getProducts as any).mockResolvedValue([]);
-    
-    render(<ProductShowcaseView />);
-
+    renderComponent();
     await waitFor(() => {
       expect(screen.getByText(/Our shelves are empty/i)).toBeInTheDocument();
     });
@@ -77,9 +86,7 @@ describe('ProductShowcaseView', () => {
 
   it('renders error message when API fails', async () => {
     (productsApi.getProducts as any).mockRejectedValue(new Error('Backend Offline'));
-    
-    render(<ProductShowcaseView />);
-
+    renderComponent();
     await waitFor(() => {
       expect(screen.getByText('Backend Offline')).toBeInTheDocument();
       expect(screen.getByText(/Try Again/i)).toBeInTheDocument();
