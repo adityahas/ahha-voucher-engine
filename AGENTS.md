@@ -431,17 +431,6 @@ JWT_SECRET="your-jwt-secret"       # JWT signing secret
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-# Application Ports
-PORT_ADMIN=9002
-PORT_USER_ADMIN=9004
-PORT_USER_CONSUMER=9006
-PORT_LOYALTY_ADMIN=9003
-PORT_LOYALTY_CONSUMER=9005
-
-# Internal URLs
-URL_ADMIN_INTERNAL="http://localhost:9002"
-URL_LOYAL_INTERNAL="http://localhost:9003"
-
 # AI Model (for analysis features)
 GEMINI_MODEL="gemini-2.5-flash"
 ```

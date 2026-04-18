@@ -38,8 +38,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.PORT_USER_CONSUMER || 9006, () => {
-    console.log(`Running on ${process.env.PORT_USER_CONSUMER || 9006}`);
+  await app.listen(process.env.PORT_USER_CONSUMER || 9004, () => {
+    console.log(`Running on ${process.env.PORT_USER_CONSUMER || 9004}`);
   });
 }
 

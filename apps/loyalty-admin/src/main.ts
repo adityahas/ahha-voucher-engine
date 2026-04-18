@@ -38,8 +38,8 @@ async function bootstrap() {
     },
   });
 
-  await app.listen(process.env.PORT_LOYALTY_ADMIN || 9003, () => {
-    console.log(`Running on ${process.env.PORT_LOYALTY_ADMIN || 9003}`);
+  await app.listen(process.env.PORT_LOYALTY_ADMIN || 9005, () => {
+    console.log(`Running on ${process.env.PORT_LOYALTY_ADMIN || 9005}`);
   });
 }
 
