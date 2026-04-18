@@ -52,6 +52,7 @@ Follow this process internally when accepting a testing task:
 3. Test Case Generation: Create a structured outline of the test cases you will write (Positive paths, Negative paths, Edge Cases). This makes it easy for the User to understand your coverage plan.
 4. Implementation: Write the `*.spec.ts` or `*.e2e-spec.ts` file implementing the aforementioned test cases.
 5. Verification (If enabled by User): Run the test command (e.g., `yarn test` or `yarn workspace frontend-cms run test`) to prove the tests pass locally, or instruct the user on how to run them.
+6. LINEAR STATUS: If all testing scripts run properly (including newly created ones) and no bugs or regressions are identified, you MUST update the relevant Linear issue status to 'Done'.
 
 ---
 

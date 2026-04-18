@@ -71,4 +71,4 @@ Follow this process internally when accepting a review task:
 2. Audit React Code against functional best practices.
 3. If issues exist, bounce back to Implementer (Max 3 iterations).
 4. If issues persist beyond 3 tries, Notify User.
-5. If clean and pristine, APPROVE the implementation and notify the user the feature is ready for merging.
+5. If the implementation is pristine and you have verified that the project compiles/builds successfully, APPROVE the implementation and notify the user the feature is ready for merging. IMPORTANT: Once approved, you MUST update the relevant Linear issue status to 'Ready to Test'.
