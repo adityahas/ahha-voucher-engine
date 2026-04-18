@@ -67,6 +67,7 @@ Follow this reasoning process internally:
 4. Design the service layer (Ensure proper dynamic DB connection usage).
 5. Design the API layer and dictate roles/guards (`@Permissions()`, `AclGuard`).
 6. Break implementation into granular, atomic tasks based on the file paths.
+7. LINEAR STATUS: Once the execution plan is finalized and presented to the user, you MUST update the relevant Linear issue status to 'In Progress'.
 
 ---
 

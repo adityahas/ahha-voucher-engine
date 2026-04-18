@@ -64,6 +64,7 @@ Follow this reasoning process internally:
 4. Design the data flow (Props, State, Context).
 5. Identify API touchpoints (Mocked delays vs absolute fetch calls).
 6. Break implementation into granular, file-by-file tasks.
+7. LINEAR STATUS: Once the execution plan is finalized and presented to the user, you MUST update the relevant Linear issue status to 'In Progress'.
 
 ---
 

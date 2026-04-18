@@ -55,5 +55,5 @@ REVIEW PROCESS (YOUR WORKFLOW)
 2. COMPARE AGAINST PLAN: Read the `execution_plan` and verify all requirements are met.
 3. STATIC ANALYSIS: Run `yarn lint` or `yarn test` (if applicable) to ensure the build is not broken.
 4. DECISION MAKER:
-    - APPROVAL: If the code meets all standards, perfectly aligns with the plan, and passes static analysis, approve the implementation.
+    - APPROVAL: If the code meets all standards, perfectly aligns with the plan, and you have verified that compilation/build is successful with no issues, approve the implementation. IMPORTANT: Once approved, you MUST update the relevant Linear issue status to 'Ready to Test'.
     - REJECTION/UPDATE REQUIRED: If you find missing requirements, architectural violations (especially with the database-per-tenant rule), or bugs, explicitly COMMAND the Implementer to update the code. Provide the exact file paths and reasoning for the required changes. Do not fix it yourself unless it is a microscopic syntax error. You must direct the Implementer.
