@@ -1,6 +1,7 @@
-import { forwardRef, Module, Scope } from '@nestjs/common';
 import { VoucherService } from './voucher.service';
 import { VoucherController } from './voucher.controller';
+import { PurchaseController } from './purchase.controller';
+import { OrderService } from '@core/product/order.service';
 import { DataSource } from 'typeorm';
 import { LoyaltyConsumerModule } from '../loyalty-consumer.module';
 import { AuthModule } from '@core/auth';
@@ -10,8 +11,9 @@ import { AuthModule } from '@core/auth';
     forwardRef(() => AuthModule),
     forwardRef(() => LoyaltyConsumerModule),
   ],
-  controllers: [VoucherController],
+  controllers: [VoucherController, PurchaseController],
   providers: [
+    OrderService,
     {
       provide: 'VOUCHER_SERVICE',
       scope: Scope.REQUEST,
