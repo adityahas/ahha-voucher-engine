@@ -22,7 +22,9 @@ export interface Product {
 }
 
 const getBaseUrl = () => {
-  return import.meta.env.VITE_PRODUCT_API_BASE_URL || 'http://client1.ahha-be.local';
+  return (
+    import.meta.env.VITE_PRODUCT_API_BASE_URL || 'http://client1.ahha-be.local'
+  );
 };
 
 const getHeaders = () => {
@@ -58,14 +60,18 @@ export const getProductById = async (id: string): Promise<Product> => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
-    throw new Error(errorData?.message || `Failed to fetch product details for id: ${id}`);
+    throw new Error(
+      errorData?.message || `Failed to fetch product details for id: ${id}`,
+    );
   }
 
   const result = await response.json();
   return result.data || result;
 };
 
-export const createProduct = async (product: Partial<Product>): Promise<Product> => {
+export const createProduct = async (
+  product: Partial<Product>,
+): Promise<Product> => {
   const response = await fetch(`${getBaseUrl()}/product-admin/products`, {
     method: 'POST',
     headers: getHeaders(),
@@ -81,7 +87,10 @@ export const createProduct = async (product: Partial<Product>): Promise<Product>
   return result.data || result;
 };
 
-export const updateProduct = async (id: string, product: Partial<Product>): Promise<Product> => {
+export const updateProduct = async (
+  id: string,
+  product: Partial<Product>,
+): Promise<Product> => {
   const response = await fetch(`${getBaseUrl()}/product-admin/products/${id}`, {
     method: 'PATCH',
     headers: getHeaders(),
@@ -110,10 +119,13 @@ export const deleteProduct = async (id: string): Promise<void> => {
 };
 
 export const getProductCategories = async (): Promise<ProductCategory[]> => {
-  const response = await fetch(`${getBaseUrl()}/product-admin/product-categories`, {
-    method: 'GET',
-    headers: getHeaders(),
-  });
+  const response = await fetch(
+    `${getBaseUrl()}/product-admin/product-categories`,
+    {
+      method: 'GET',
+      headers: getHeaders(),
+    },
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);

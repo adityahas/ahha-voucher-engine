@@ -20,7 +20,12 @@ export interface Voucher {
 
 export interface VoucherBinding {
   id: number;
-  bind_type: 'ROLE' | 'PRODUCT_TYPE' | 'PRODUCT_SKU' | 'PRODUCT_VENDOR' | string;
+  bind_type:
+    | 'ROLE'
+    | 'PRODUCT_TYPE'
+    | 'PRODUCT_SKU'
+    | 'PRODUCT_VENDOR'
+    | string;
   bind_value: string;
   created_at?: string;
   updated_at?: string;
@@ -29,7 +34,8 @@ export interface VoucherBinding {
 export const getVouchers = async (): Promise<Voucher[]> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
   // According to loyalty-admin/src/main.ts, it listens on 9003
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/vouchers`, {
     method: 'GET',
@@ -54,7 +60,8 @@ export const getVouchers = async (): Promise<Voucher[]> => {
 
 export const getVoucherByCode = async (code: string): Promise<Voucher> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${code}`, {
     method: 'GET',
@@ -79,19 +86,25 @@ export const getVoucherByCode = async (code: string): Promise<Voucher> => {
   return result.data || result;
 };
 
-export const getVoucherBindings = async (voucherId: string): Promise<VoucherBinding[]> => {
+export const getVoucherBindings = async (
+  voucherId: string,
+): Promise<VoucherBinding[]> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/bindings`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/vouchers/${voucherId}/bindings`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -102,20 +115,27 @@ export const getVoucherBindings = async (voucherId: string): Promise<VoucherBind
   return result.data || result;
 };
 
-export const createVoucherBinding = async (voucherId: string, binding: Partial<VoucherBinding>): Promise<VoucherBinding> => {
+export const createVoucherBinding = async (
+  voucherId: string,
+  binding: Partial<VoucherBinding>,
+): Promise<VoucherBinding> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/bindings`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/vouchers/${voucherId}/bindings`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(binding),
     },
-    body: JSON.stringify(binding),
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -126,20 +146,28 @@ export const createVoucherBinding = async (voucherId: string, binding: Partial<V
   return result.data || result;
 };
 
-export const updateVoucherBinding = async (voucherId: string, bindingId: number, binding: Partial<VoucherBinding>): Promise<VoucherBinding> => {
+export const updateVoucherBinding = async (
+  voucherId: string,
+  bindingId: number,
+  binding: Partial<VoucherBinding>,
+): Promise<VoucherBinding> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/bindings/${bindingId}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/vouchers/${voucherId}/bindings/${bindingId}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(binding),
     },
-    body: JSON.stringify(binding),
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -150,19 +178,26 @@ export const updateVoucherBinding = async (voucherId: string, bindingId: number,
   return result.data || result;
 };
 
-export const deleteVoucherBinding = async (voucherId: string, bindingId: number): Promise<void> => {
+export const deleteVoucherBinding = async (
+  voucherId: string,
+  bindingId: number,
+): Promise<void> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/bindings/${bindingId}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/vouchers/${voucherId}/bindings/${bindingId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -181,19 +216,25 @@ export interface VoucherValidity {
   updated_at?: string;
 }
 
-export const getVoucherValidities = async (voucherId: string): Promise<VoucherValidity[]> => {
+export const getVoucherValidities = async (
+  voucherId: string,
+): Promise<VoucherValidity[]> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -204,20 +245,27 @@ export const getVoucherValidities = async (voucherId: string): Promise<VoucherVa
   return result.data || result;
 };
 
-export const createVoucherValidity = async (voucherId: string, validity: Partial<VoucherValidity>): Promise<VoucherValidity> => {
+export const createVoucherValidity = async (
+  voucherId: string,
+  validity: Partial<VoucherValidity>,
+): Promise<VoucherValidity> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(validity),
     },
-    body: JSON.stringify(validity),
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -228,20 +276,28 @@ export const createVoucherValidity = async (voucherId: string, validity: Partial
   return result.data || result;
 };
 
-export const updateVoucherValidity = async (voucherId: string, validityId: number, validity: Partial<VoucherValidity>): Promise<VoucherValidity> => {
+export const updateVoucherValidity = async (
+  voucherId: string,
+  validityId: number,
+  validity: Partial<VoucherValidity>,
+): Promise<VoucherValidity> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities/${validityId}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities/${validityId}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(validity),
     },
-    body: JSON.stringify(validity),
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -252,19 +308,26 @@ export const updateVoucherValidity = async (voucherId: string, validityId: numbe
   return result.data || result;
 };
 
-export const deleteVoucherValidity = async (voucherId: string, validityId: number): Promise<void> => {
+export const deleteVoucherValidity = async (
+  voucherId: string,
+  validityId: number,
+): Promise<void> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities/${validityId}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/vouchers/${voucherId}/validities/${validityId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -272,9 +335,12 @@ export const deleteVoucherValidity = async (voucherId: string, validityId: numbe
   }
 };
 
-export const createVoucher = async (voucher: Partial<Voucher>): Promise<Voucher> => {
+export const createVoucher = async (
+  voucher: Partial<Voucher>,
+): Promise<Voucher> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/vouchers`, {
     method: 'POST',
@@ -296,9 +362,13 @@ export const createVoucher = async (voucher: Partial<Voucher>): Promise<Voucher>
   return result.data || result;
 };
 
-export const updateVoucher = async (code: string, voucher: Partial<Voucher>): Promise<Voucher> => {
+export const updateVoucher = async (
+  code: string,
+  voucher: Partial<Voucher>,
+): Promise<Voucher> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${code}`, {
     method: 'PATCH',
@@ -322,7 +392,8 @@ export const updateVoucher = async (code: string, voucher: Partial<Voucher>): Pr
 
 export const deleteVoucher = async (code: string): Promise<void> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/vouchers/${code}`, {
     method: 'DELETE',

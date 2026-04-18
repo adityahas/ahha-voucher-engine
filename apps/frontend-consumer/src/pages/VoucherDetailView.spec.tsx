@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import VoucherDetailView from './VoucherDetailView';
 import type { Voucher } from '../types/voucher';
 import { findEligibleVoucherByCode } from '../api/vouchers';
+import React from 'react';
 
 vi.mock('../api/vouchers', () => ({
   claimVoucher: vi.fn(),

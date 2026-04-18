@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { VoucherEntity } from './voucher.entity';
 import { BaseEntity } from '@core/base/entities/base.entity';
 import { LoyaltyUserEntity } from '../../entities/loyalty-user.entity';
@@ -24,5 +18,4 @@ export class VoucherClaimEntity extends BaseEntity {
   @ManyToOne(() => LoyaltyUserEntity, (user) => user.id)
   @JoinColumn({ name: 'user_id' })
   user: LoyaltyUserEntity;
-
 }

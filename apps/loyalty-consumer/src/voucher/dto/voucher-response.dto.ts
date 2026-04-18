@@ -1,4 +1,7 @@
-import { VoucherEntity, VoucherType } from '@core/loyalty/voucher/entities/voucher.entity';
+import {
+  VoucherEntity,
+  VoucherType,
+} from '@core/loyalty/voucher/entities/voucher.entity';
 
 export class VoucherResponseDto {
   voucher_type: VoucherType;
@@ -38,7 +41,8 @@ export class VoucherResponseDto {
       voucher.description,
       voucher.quota,
       voucher.image,
-      voucher.categories?.map((cat) => ({ id: cat.slug, name: cat.name })) || [],
+      voucher.categories?.map((cat) => ({ id: cat.slug, name: cat.name })) ||
+        [],
       voucher.bindings?.map((bind) => ({
         bind_type: bind.bind_type,
         bind_value: bind.bind_value,

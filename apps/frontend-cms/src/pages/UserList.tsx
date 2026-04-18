@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '../components/ui/Table';
 import { getUsers, User } from '../api/users';
-import { Loader2, AlertCircle, RefreshCw, UserPlus } from 'lucide-react';
+import { AlertCircle, Loader2, RefreshCw, UserPlus } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 

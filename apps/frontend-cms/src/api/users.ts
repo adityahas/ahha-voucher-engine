@@ -16,7 +16,8 @@ export interface User {
 
 export const getUsers = async (): Promise<User[]> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/user-admin/users`, {
     method: 'GET',
@@ -41,7 +42,8 @@ export const getUsers = async (): Promise<User[]> => {
 
 export const getUserById = async (id: string): Promise<User> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/user-admin/users/${id}`, {
     method: 'GET',
@@ -68,7 +70,8 @@ export const getUserById = async (id: string): Promise<User> => {
 
 export const createUser = async (data: Partial<User>): Promise<User> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/user-admin/users`, {
     method: 'POST',
@@ -97,7 +100,8 @@ export const updateUser = async (
   data: Partial<User>,
 ): Promise<User> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/user-admin/users/${id}`, {
     method: 'PUT',
@@ -120,4 +124,3 @@ export const updateUser = async (
   // Depending on NestJS interceptors, it might be nested inside 'data'
   return result.data || result;
 };
-

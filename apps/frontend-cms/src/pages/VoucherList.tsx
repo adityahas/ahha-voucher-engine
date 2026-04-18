@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '../components/ui/Table';
 import { getVouchers, Voucher } from '../api/vouchers';
-import { Loader2, AlertCircle, RefreshCw, Ticket, Plus } from 'lucide-react';
+import { AlertCircle, Loader2, Plus, RefreshCw, Ticket } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 
@@ -102,32 +102,56 @@ export const VoucherList: React.FC = () => {
             <div className="flex flex-col items-center justify-center py-12 space-y-6">
               <div className="p-6 rounded-2xl bg-red-500/5 border border-red-500/20 max-w-md w-full text-center">
                 <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-red-200 mb-2">Engine Connection Failed</h3>
-                <p className="text-sm text-red-400/80 leading-relaxed font-medium">{error}</p>
+                <h3 className="text-lg font-bold text-red-200 mb-2">
+                  Engine Connection Failed
+                </h3>
+                <p className="text-sm text-red-400/80 leading-relaxed font-medium">
+                  {error}
+                </p>
               </div>
-              <Button variant="outline" onClick={fetchVouchers} className="border-red-500/30 text-red-400 hover:bg-red-500/10">
+              <Button
+                variant="outline"
+                onClick={fetchVouchers}
+                className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+              >
                 Retry Connection
               </Button>
             </div>
           ) : vouchers.length === 0 ? (
             <div className="text-center py-24 group">
-               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-800/30 border border-slate-700/50 mb-6 group-hover:scale-110 transition-transform duration-500">
-                  <Ticket className="h-10 w-10 text-slate-600 group-hover:text-primary-400 transition-colors" />
-               </div>
-              <p className="text-slate-400 text-lg font-medium">No vouchers found.</p>
-              <p className="text-slate-500 text-sm mt-1">Start by creating your first promotional campaign.</p>
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-800/30 border border-slate-700/50 mb-6 group-hover:scale-110 transition-transform duration-500">
+                <Ticket className="h-10 w-10 text-slate-600 group-hover:text-primary-400 transition-colors" />
+              </div>
+              <p className="text-slate-400 text-lg font-medium">
+                No vouchers found.
+              </p>
+              <p className="text-slate-500 text-sm mt-1">
+                Start by creating your first promotional campaign.
+              </p>
             </div>
           ) : (
             <div className="overflow-hidden rounded-xl border border-slate-800/50">
               <Table>
                 <TableHeader className="bg-slate-800/30">
                   <TableRow>
-                    <TableHead className="font-bold text-slate-300">Code</TableHead>
-                    <TableHead className="font-bold text-slate-300">Description</TableHead>
-                    <TableHead className="font-bold text-slate-300">Categories</TableHead>
-                    <TableHead className="font-bold text-slate-300">Quota</TableHead>
-                    <TableHead className="font-bold text-slate-300">Status</TableHead>
-                    <TableHead className="text-right font-bold text-slate-300">Created At</TableHead>
+                    <TableHead className="font-bold text-slate-300">
+                      Code
+                    </TableHead>
+                    <TableHead className="font-bold text-slate-300">
+                      Description
+                    </TableHead>
+                    <TableHead className="font-bold text-slate-300">
+                      Categories
+                    </TableHead>
+                    <TableHead className="font-bold text-slate-300">
+                      Quota
+                    </TableHead>
+                    <TableHead className="font-bold text-slate-300">
+                      Status
+                    </TableHead>
+                    <TableHead className="text-right font-bold text-slate-300">
+                      Created At
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -141,7 +165,8 @@ export const VoucherList: React.FC = () => {
                         <div className="flex flex-col gap-1">
                           <span>{voucher.code}</span>
                           <span className="text-[9px] w-fit px-1.5 py-0.5 rounded-md bg-slate-800/80 text-slate-400 uppercase tracking-wider border border-slate-700/50">
-                            {voucher.voucher_type?.replace('_', ' ') || 'CLAIMABLE'}
+                            {voucher.voucher_type?.replace('_', ' ') ||
+                              'CLAIMABLE'}
                           </span>
                         </div>
                       </TableCell>
@@ -151,16 +176,27 @@ export const VoucherList: React.FC = () => {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {voucher.categories?.map((cat) => (
-                            <span key={cat.slug} className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary-500/10 text-primary-400 border border-primary-500/20">
+                            <span
+                              key={cat.slug}
+                              className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-primary-500/10 text-primary-400 border border-primary-500/20"
+                            >
                               {cat.name}
                             </span>
-                          )) || <span className="text-slate-600 text-[10px] italic">None</span>}
+                          )) || (
+                            <span className="text-slate-600 text-[10px] italic">
+                              None
+                            </span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                           <span className="text-slate-200 font-mono font-bold">{voucher.quota}</span>
-                           <span className="text-xs text-slate-500 font-medium uppercase tracking-tighter">Items remaining</span>
+                          <span className="text-slate-200 font-mono font-bold">
+                            {voucher.quota}
+                          </span>
+                          <span className="text-xs text-slate-500 font-medium uppercase tracking-tighter">
+                            Items remaining
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -175,11 +211,14 @@ export const VoucherList: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell className="text-right text-slate-500 font-mono text-xs">
-                        {new Date(voucher.created_at).toLocaleDateString(undefined, {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
+                        {new Date(voucher.created_at).toLocaleDateString(
+                          undefined,
+                          {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          },
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

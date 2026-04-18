@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { createUser } from '../api/users';
-import { ArrowLeft, UserPlus, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  UserPlus,
+} from 'lucide-react';
 
 export const UserCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -36,7 +48,9 @@ export const UserCreate: React.FC = () => {
       setSuccess(true);
       setTimeout(() => navigate('/users'), 1500);
     } catch (err: any) {
-      setError(err.message || 'Failed to create user. Please check your inputs.');
+      setError(
+        err.message || 'Failed to create user. Please check your inputs.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +63,8 @@ export const UserCreate: React.FC = () => {
           <CheckCircle2 className="h-16 w-16 text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]" />
           <h2 className="text-2xl font-bold text-green-300">User Created!</h2>
           <p className="text-green-200/80 font-medium">
-            The new user account has been successfully provisioned. Redirecting to the list...
+            The new user account has been successfully provisioned. Redirecting
+            to the list...
           </p>
         </div>
       </div>
@@ -72,7 +87,10 @@ export const UserCreate: React.FC = () => {
           <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight">
             Create User
           </h1>
-          <p className="text-slate-400 text-sm mt-1 font-medium"> Provision a new administrative account.</p>
+          <p className="text-slate-400 text-sm mt-1 font-medium">
+            {' '}
+            Provision a new administrative account.
+          </p>
         </div>
       </div>
 
@@ -83,7 +101,9 @@ export const UserCreate: React.FC = () => {
             <UserPlus className="w-5 h-5 text-primary-400" />
             Account Information
           </CardTitle>
-          <CardDescription>Enter the necessary details for the new user profile.</CardDescription>
+          <CardDescription>
+            Enter the necessary details for the new user profile.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -96,7 +116,12 @@ export const UserCreate: React.FC = () => {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label htmlFor="name" className="text-sm font-semibold text-slate-300 ml-1">Full Name</label>
+                <label
+                  htmlFor="name"
+                  className="text-sm font-semibold text-slate-300 ml-1"
+                >
+                  Full Name
+                </label>
                 <Input
                   id="name"
                   name="name"
@@ -109,7 +134,12 @@ export const UserCreate: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-semibold text-slate-300 ml-1">Email Address</label>
+                <label
+                  htmlFor="email"
+                  className="text-sm font-semibold text-slate-300 ml-1"
+                >
+                  Email Address
+                </label>
                 <Input
                   id="email"
                   name="email"
@@ -123,7 +153,12 @@ export const UserCreate: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-semibold text-slate-300 ml-1">Secure Password</label>
+                <label
+                  htmlFor="password"
+                  className="text-sm font-semibold text-slate-300 ml-1"
+                >
+                  Secure Password
+                </label>
                 <Input
                   id="password"
                   name="password"
@@ -147,7 +182,10 @@ export const UserCreate: React.FC = () => {
                     className="w-5 h-5 rounded border-slate-700/50 bg-slate-800/50 text-primary-600 focus:ring-primary-500/30 focus:ring-offset-0 transition-all duration-300 cursor-pointer accent-primary-500"
                   />
                 </div>
-                <label htmlFor="is_active" className="text-sm font-medium text-slate-300 cursor-pointer">
+                <label
+                  htmlFor="is_active"
+                  className="text-sm font-medium text-slate-300 cursor-pointer"
+                >
                   Mark account as active immediately
                 </label>
               </div>

@@ -11,7 +11,8 @@ export interface VoucherCategory {
 
 export const getVoucherCategories = async (): Promise<VoucherCategory[]> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/voucher-categories`, {
     method: 'GET',
@@ -32,24 +33,31 @@ export const getVoucherCategories = async (): Promise<VoucherCategory[]> => {
   return result.data || result;
 };
 
-export const getVoucherCategoryBySlug = async (slug: string): Promise<VoucherCategory> => {
+export const getVoucherCategoryBySlug = async (
+  slug: string,
+): Promise<VoucherCategory> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/voucher-categories/${slug}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/voucher-categories/${slug}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
     throw new Error(
-      errorData?.message || `Failed to fetch voucher category details for slug: ${slug}`,
+      errorData?.message ||
+        `Failed to fetch voucher category details for slug: ${slug}`,
     );
   }
 
@@ -57,9 +65,12 @@ export const getVoucherCategoryBySlug = async (slug: string): Promise<VoucherCat
   return result.data || result;
 };
 
-export const createVoucherCategory = async (category: Partial<VoucherCategory>): Promise<VoucherCategory> => {
+export const createVoucherCategory = async (
+  category: Partial<VoucherCategory>,
+): Promise<VoucherCategory> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/voucher-categories`, {
     method: 'POST',
@@ -81,20 +92,27 @@ export const createVoucherCategory = async (category: Partial<VoucherCategory>):
   return result.data || result;
 };
 
-export const updateVoucherCategory = async (slug: string, category: Partial<VoucherCategory>): Promise<VoucherCategory> => {
+export const updateVoucherCategory = async (
+  slug: string,
+  category: Partial<VoucherCategory>,
+): Promise<VoucherCategory> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/voucher-categories/${slug}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/voucher-categories/${slug}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(category),
     },
-    body: JSON.stringify(category),
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
@@ -107,17 +125,21 @@ export const updateVoucherCategory = async (slug: string, category: Partial<Vouc
 
 export const deleteVoucherCategory = async (slug: string): Promise<void> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
-  const baseUrl = import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+  const baseUrl =
+    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
 
-  const response = await fetch(`${baseUrl}/loyalty-admin/voucher-categories/${slug}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'x-tenant-override': tenant,
-      Authorization: `Bearer ${token}`,
+  const response = await fetch(
+    `${baseUrl}/loyalty-admin/voucher-categories/${slug}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'x-tenant-override': tenant,
+        Authorization: `Bearer ${token}`,
+      },
     },
-  });
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => null);
