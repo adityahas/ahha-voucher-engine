@@ -38,6 +38,8 @@ export const VoucherCreate: React.FC = () => {
     description: '',
     quota: 1,
     image: '',
+    discount_type: 'PERCENTAGE' as 'PERCENTAGE' | 'FIXED_AMOUNT',
+    discount_value: 0,
     categories: [] as string[],
     allow_combine_categories: [] as string[],
     target_users: [] as string[],
@@ -75,7 +77,7 @@ export const VoucherCreate: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'quota' ? parseInt(value) || 0 : value,
+      [name]: name === 'quota' || name === 'discount_value' ? parseFloat(value) || 0 : value,
     }));
   };
 
@@ -254,6 +256,63 @@ export const VoucherCreate: React.FC = () => {
                         onChange={handleChange}
                         required
                         className="bg-slate-800/50 border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10 font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 space-y-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+                      <Hash className="w-4 h-4 text-indigo-400" />
+                    </div>
+                    <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">
+                      Reward Calculation
+                    </h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="discount_type"
+                        className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1"
+                      >
+                        Reward Type
+                      </label>
+                      <select
+                        id="discount_type"
+                        name="discount_type"
+                        value={formData.discount_type}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            discount_type: e.target.value as 'PERCENTAGE' | 'FIXED_AMOUNT',
+                          }))
+                        }
+                        className="w-full h-12 rounded-xl bg-slate-900/50 border border-slate-700/50 focus:border-indigo-500/50 transition-all duration-300 px-4 text-sm text-slate-100 appearance-none focus:outline-none"
+                      >
+                        <option value="PERCENTAGE">PERCENTAGE (%)</option>
+                        <option value="FIXED_AMOUNT">FIXED AMOUNT (Value)</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="discount_value"
+                        className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1"
+                      >
+                        {formData.discount_type === 'PERCENTAGE' ? 'Discount Percentage (%)' : 'Discount Amount'}
+                      </label>
+                      <Input
+                        id="discount_value"
+                        name="discount_value"
+                        type="number"
+                        step={formData.discount_type === 'PERCENTAGE' ? '1' : '0.01'}
+                        placeholder={formData.discount_type === 'PERCENTAGE' ? '10' : '5.00'}
+                        value={formData.discount_value}
+                        onChange={handleChange}
+                        required
+                        className="bg-slate-900/50 border-slate-700/50 focus:border-indigo-500/50 h-12 rounded-xl font-mono text-indigo-300"
                       />
                     </div>
                   </div>

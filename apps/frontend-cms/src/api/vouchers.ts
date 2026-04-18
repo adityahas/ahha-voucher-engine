@@ -13,6 +13,8 @@ export interface Voucher {
   categories?: VoucherCategory[];
   allow_combine_categories?: VoucherCategory[];
   target_users?: { id: string; core_user_id: string }[];
+  discount_type: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discount_value: number;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

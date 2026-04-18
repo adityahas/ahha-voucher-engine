@@ -19,6 +19,11 @@ export enum VoucherType {
   UNIQUE_CODE = 'UNIQUE_CODE',
 }
 
+export enum DiscountType {
+  PERCENTAGE = 'PERCENTAGE',
+  FIXED_AMOUNT = 'FIXED_AMOUNT',
+}
+
 /**
  * Voucher adalah entitas utama yang merepresentasikan kupon yang dapat diklaim oleh user.
  * Setiap voucher memiliki kategori, masa berlaku, binding, dan daftar target user.
@@ -43,6 +48,16 @@ export class VoucherEntity extends BaseEntity {
 
   @Column({ type: 'text', nullable: true })
   image: string;
+
+  @Column({
+    type: 'enum',
+    enum: DiscountType,
+    default: DiscountType.FIXED_AMOUNT,
+  })
+  discount_type: DiscountType;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  discount_value: number;
 
   @ManyToMany(
     () => VoucherCategoryEntity,

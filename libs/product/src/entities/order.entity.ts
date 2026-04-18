@@ -21,6 +21,12 @@ export class OrderEntity extends BaseEntity {
   @Column({ type: 'int' })
   quantity: number;
 
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  subtotal: number;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  discount_amount: number;
+
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   total_price: number;
 
