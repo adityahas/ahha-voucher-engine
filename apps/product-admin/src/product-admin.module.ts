@@ -9,6 +9,8 @@ import {
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductAdminService } from './product-admin.service';
 import { ProductAdminController } from './product-admin.controller';
+import { ProductCategoryService } from './product-category.service';
+import { ProductCategoryController } from './product-category.controller';
 import { DatabaseModule, DatabaseService } from '@core/database';
 import { AuthModule } from '@core/auth';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
@@ -49,6 +51,7 @@ dotenv.config();
   providers: [
     JwtStrategy,
     ProductAdminService,
+    ProductCategoryService,
     {
       provide: 'PRODUCT_ADMIN_CONNECTION',
       scope: Scope.REQUEST,
@@ -65,8 +68,12 @@ dotenv.config();
       inject: [REQUEST, DatabaseService],
     },
   ],
-  controllers: [ProductAdminController],
-  exports: [ProductAdminService, 'PRODUCT_ADMIN_CONNECTION'],
+  controllers: [ProductAdminController, ProductCategoryController],
+  exports: [
+    ProductAdminService,
+    ProductCategoryService,
+    'PRODUCT_ADMIN_CONNECTION',
+  ],
 })
 export class ProductAdminModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -18,16 +18,19 @@ import {
   Save
 } from 'lucide-react';
 
+import { CategoryChipsInput } from '../components/ui/CategoryChipsInput';
+
 export const ProductEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<Partial<Product>>({
+  const [formData, setFormData] = useState<Partial<Product & { categories: string[] }>>({
     name: '',
     sku: '',
     description: '',
     price: 0,
     stock: 0,
     image_url: '',
+    categories: [],
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingInitial, setIsFetchingInitial] = useState(true);
@@ -46,6 +49,7 @@ export const ProductEdit: React.FC = () => {
           price: productData.price,
           stock: productData.stock,
           image_url: productData.image_url || '',
+          categories: productData.categories?.map((c: any) => c.name) || [],
         });
       } catch (err: any) {
         setError(err.message || 'Failed to load product data.');
@@ -61,6 +65,13 @@ export const ProductEdit: React.FC = () => {
     setFormData((prev) => ({
       ...prev,
       [name]: (name === 'price' || name === 'stock') ? parseFloat(value) || 0 : value,
+    }));
+  };
+
+  const handleCategoriesChange = (categories: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      categories,
     }));
   };
 
@@ -211,6 +222,13 @@ export const ProductEdit: React.FC = () => {
                     onChange={handleChange}
                     rows={4}
                     className="w-full rounded-2xl bg-slate-800/50 border border-slate-700/50 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-primary-500/50 focus:outline-none focus:ring-1 focus:ring-primary-500/50 transition-all duration-300 resize-none font-medium"
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-slate-700/30">
+                  <CategoryChipsInput
+                    values={formData.categories || []}
+                    onChange={handleCategoriesChange}
                   />
                 </div>
               </CardContent>

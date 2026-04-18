@@ -1,0 +1,3 @@
+yarn run v1.22.22
+$ /Users/adityahas/Projects/NodeJS/ahha-voucher-engine/apps/frontend-cms/node_modules/.bin/tsc -p tsconfig.json --noEmit
+Done in 0.46s.
