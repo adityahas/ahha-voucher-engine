@@ -23,9 +23,21 @@ export class CreateProductDto {
   @IsNumber()
   price: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  unit: string;
+  unit?: string = 'pcs';
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsNumber()
+  stock?: number;
+
+  @IsOptional()
+  @IsString()
+  image_url?: string;
 
   @IsOptional()
   @IsBoolean()
