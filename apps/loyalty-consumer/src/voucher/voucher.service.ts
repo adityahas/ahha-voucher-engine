@@ -3,6 +3,7 @@ import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { DataSource, Repository } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
+import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response.dto';
 import { VoucherResponseDto } from './dto/voucher-response.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
@@ -31,7 +32,7 @@ export class VoucherService {
       queryBuilder.leftJoinAndSelect(
         'voucher.target_users',
         'user',
-        'user.id = :userId',
+        'user.core_user_id = :userId',
         {
           userId: searchCriteria.user_id,
         },
@@ -75,7 +76,7 @@ export class VoucherService {
       {
         where: {
           user: {
-            id: userId,
+            core_user_id: userId,
           },
         },
         relations: ['voucher', 'user'],
@@ -103,6 +104,8 @@ export class VoucherService {
     voucherCode: string,
   ): Promise<{ success: boolean; message: string }> {
     return this.voucherRepository.manager.transaction(async (manager) => {
+      const user = await this.getOrCreateLoyaltyUser(userId, manager);
+
       const voucher = await manager.findOne(VoucherEntity, {
         where: { code: voucherCode },
         lock: { mode: 'pessimistic_write' },
@@ -119,7 +122,7 @@ export class VoucherService {
       const existingClaim = await manager.findOne(VoucherClaimEntity, {
         where: {
           voucher: { code: voucherCode },
-          user: { id: userId },
+          user: { id: user.id },
         },
       });
 
@@ -129,7 +132,7 @@ export class VoucherService {
 
       const newClaim = manager.create(VoucherClaimEntity, {
         voucher: { code: voucherCode },
-        user: { id: userId } as any,
+        user: user,
       });
 
       voucher.quota -= 1;
@@ -142,5 +145,24 @@ export class VoucherService {
         message: 'Voucher claimed successfully!',
       };
     });
+  }
+
+  private async getOrCreateLoyaltyUser(
+    coreUserId: string,
+    manager?: any,
+  ): Promise<LoyaltyUserEntity> {
+    const entityManager = manager || this.voucherRepository.manager;
+    const repository = entityManager.getRepository(LoyaltyUserEntity);
+
+    let user = await repository.findOne({
+      where: { core_user_id: coreUserId },
+    });
+
+    if (!user) {
+      user = repository.create({ core_user_id: coreUserId });
+      user = await repository.save(user);
+    }
+
+    return user;
   }
 }
