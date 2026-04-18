@@ -1,16 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Inject, Injectable } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { ProductEntity } from '@core/product/entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductAdminService {
+  private productRepository: Repository<ProductEntity>;
+
   constructor(
-    @InjectRepository(ProductEntity)
-    private productRepository: Repository<ProductEntity>,
-  ) {}
+    @Inject('PRODUCT_ADMIN_CONNECTION')
+    private dataSource: DataSource,
+  ) {
+    this.productRepository = this.dataSource.getRepository(ProductEntity);
+  }
 
   create(createProductDto: CreateProductDto): Promise<ProductEntity> {
     return this.productRepository.save(createProductDto);
