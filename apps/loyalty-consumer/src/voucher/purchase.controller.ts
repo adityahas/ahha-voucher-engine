@@ -40,20 +40,48 @@ export class PurchaseController {
         throw new NotFoundException('Product not found or inactive');
       }
 
-      // 2. Calculate Total Price (Simplified: no discount logic yet)
-      const totalPrice = product.price * dto.quantity;
+      // 2. Calculate Subtotal
+      const subtotal = product.price * dto.quantity;
+      let discountAmount = 0;
+      let finalPrice = subtotal;
 
-      // 3. Optional Voucher Usage
+      // 3. Optional Voucher Usage & Calculation
       if (dto.voucher_code) {
+        // Fetch product components (categories) for binding validation
+        const productWithCategories = await manager.findOne(ProductEntity, {
+          where: { id: dto.product_id },
+          relations: ['categories'],
+        });
+
+        const categoryNames = productWithCategories?.categories?.map((c) => c.name) || [];
+
+        const calculation = await this.voucherService.validateAndCalculateDiscount(
+          dto.voucher_code,
+          subtotal,
+          userId,
+          product.id,
+          categoryNames,
+        );
+
+        if (!calculation.isValid) {
+          throw new BadRequestException(calculation.message);
+        }
+
+        discountAmount = calculation.discountAmount;
+        finalPrice = calculation.finalPrice;
+
+        // Mark voucher as used within the transaction
         await this.voucherService.useVoucher(userId, dto.voucher_code, manager);
       }
 
-      // 4. Create Order
+      // 4. Create Order with breakdown
       const order = await this.orderService.create({
         user_id: userId,
         product_id: product.id,
         quantity: dto.quantity,
-        total_price: totalPrice,
+        subtotal: Number(subtotal),
+        discount_amount: Number(discountAmount),
+        total_price: Number(finalPrice),
         voucher_code: dto.voucher_code || null,
       });
 

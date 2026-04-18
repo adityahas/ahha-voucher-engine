@@ -17,6 +17,7 @@ import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response
 import { VoucherResponseDto } from './dto/voucher-response.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
+import { CalculateDiscountDto } from './dto/calculate-discount.dto';
 
 @Controller('/loyalty/vouchers')
 export class VoucherController {
@@ -56,5 +57,15 @@ export class VoucherController {
   ) {
     const userId = req.user['userId'];
     return this.voucherService.claimVoucher(userId, voucherCode);
+  }
+
+  @Post('calculate-discount')
+  @UseGuards(ConsumerJwtGuard)
+  async calculateDiscount(
+    @Body() dto: CalculateDiscountDto,
+    @Req() req: Request,
+  ) {
+    const userId = req.user['userId'];
+    return this.voucherService.calculateDiscount(dto, userId);
   }
 }

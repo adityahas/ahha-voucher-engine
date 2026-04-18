@@ -1,4 +1,5 @@
 export type VoucherType = 'CLAIMABLE' | 'UNIQUE_CODE';
+export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT';
 
 export interface Voucher {
   voucher_type: VoucherType;
@@ -7,8 +8,23 @@ export interface Voucher {
   description: string;
   quota: number;
   image: string;
+  discount_type: DiscountType;
+  discount_value: number;
   categories: { id: string; name: string }[];
   bindings: VoucherBinding[];
+}
+
+export interface CalculateDiscountRequest {
+  voucher_code: string;
+  product_id: string;
+  quantity: number;
+}
+
+export interface CalculateDiscountResponse {
+  isValid: boolean;
+  discountAmount: number;
+  finalPrice: number;
+  message: string;
 }
 
 export interface VoucherBinding {

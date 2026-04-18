@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Tag, ShoppingBag, Info } from 'lucide-react';
 import { getProductById } from '../api/products';
 import { executePurchase } from '../api/purchase';
+import { calculateDiscount } from '../api/vouchers';
 import { FeedbackOverlay } from '../components/FeedbackOverlay';
 import type { Product } from '../types/product';
+import type { CalculateDiscountResponse } from '../types/voucher';
 
 export const CheckoutView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +19,9 @@ export const CheckoutView: React.FC = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [voucherCode, setVoucherCode] = useState('');
+  const [calculation, setCalculation] = useState<CalculateDiscountResponse | null>(null);
+  const [calculating, setCalculating] = useState(false);
+  const [voucherError, setVoucherError] = useState<string | null>(null);
   const [txnStatus, setTxnStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [txnMessage, setTxnMessage] = useState('');
 
@@ -36,6 +41,38 @@ export const CheckoutView: React.FC = () => {
 
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    // Reset calculation if quantity changes OR voucher is manually changed without applying
+    setCalculation(null);
+    setVoucherError(null);
+  }, [quantity]);
+
+  const handleApplyVoucher = async () => {
+    if (!product || !voucherCode) return;
+
+    try {
+      setCalculating(true);
+      setVoucherError(null);
+      const result = await calculateDiscount({
+        voucher_code: voucherCode,
+        product_id: product.id,
+        quantity,
+      });
+
+      if (!result.isValid) {
+        setVoucherError(result.message);
+        setCalculation(null);
+      } else {
+        setCalculation(result);
+      }
+    } catch (err: any) {
+      setVoucherError(err.message || 'Failed to validate voucher');
+      setCalculation(null);
+    } finally {
+      setCalculating(false);
+    }
+  };
 
   const handlePurchase = async () => {
     if (!product) return;
@@ -77,9 +114,11 @@ export const CheckoutView: React.FC = () => {
   }
 
   const subtotal = product.price * quantity;
-  const isVoucherApplied = voucherCode.length > 3; // Simple UX simulation
-  const discount = isVoucherApplied ? subtotal * 0.1 : 0; // Simulated 10% discount for UI vibe
-  const total = subtotal - discount;
+  const discount = calculation?.discountAmount || 0;
+  const total = calculation?.finalPrice || subtotal;
+  const isVoucherApplied = !!calculation && calculation.isValid && voucherCode === calculation.message.includes('successfully') ? true : !!calculation; 
+  // Simplified: if calculation exists and was valid
+  const effectiveApplied = calculation?.isValid && calculation.discountAmount > 0;
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] p-6 overflow-hidden flex items-center justify-center">
@@ -180,18 +219,40 @@ export const CheckoutView: React.FC = () => {
                   type="text"
                   placeholder="Enter code..."
                   value={voucherCode}
-                  onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
-                  className={`w-full pl-11 pr-4 py-4 rounded-2xl bg-black/20 border transition-all outline-none font-bold placeholder:text-slate-600 ${
-                    isVoucherApplied ? 'border-emerald-500/50 text-emerald-400 ring-2 ring-emerald-500/10' : 'border-white/10 focus:border-indigo-500/50 text-white'
+                  onChange={(e) => {
+                    setVoucherCode(e.target.value.toUpperCase());
+                    if (calculation) setCalculation(null);
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleApplyVoucher()}
+                  className={`w-full pl-11 pr-24 py-4 rounded-2xl bg-black/20 border transition-all outline-none font-bold placeholder:text-slate-600 ${
+                    effectiveApplied ? 'border-emerald-500/50 text-emerald-400 ring-2 ring-emerald-500/10' : 
+                    voucherError ? 'border-rose-500/50 text-rose-400 ring-2 ring-rose-500/10' :
+                    'border-white/10 focus:border-indigo-500/50 text-white'
                   }`}
                 />
-                {isVoucherApplied && (
+                <button
+                  onClick={handleApplyVoucher}
+                  disabled={calculating || !voucherCode}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-all disabled:opacity-30"
+                >
+                  {calculating ? '...' : 'APPLY'}
+                </button>
+                {effectiveApplied && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-1 rounded-md font-black border border-emerald-500/30"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="absolute -bottom-6 left-1 text-[10px] text-emerald-400 font-bold uppercase tracking-tight"
                   >
-                    APPLIED
+                    Voucher Applied Successfully!
+                  </motion.div>
+                )}
+                {voucherError && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="absolute -bottom-6 left-1 text-[10px] text-rose-400 font-bold uppercase tracking-tight"
+                  >
+                    {voucherError}
                   </motion.div>
                 )}
               </div>
@@ -203,12 +264,18 @@ export const CheckoutView: React.FC = () => {
                 <span>Subtotal</span>
                 <span>${subtotal.toLocaleString()}</span>
               </div>
-              {isVoucherApplied && (
+              <motion.div 
+                animate={effectiveApplied ? { height: 'auto', opacity: 1, marginTop: 16 } : { height: 0, opacity: 0, marginTop: 0 }}
+                className="overflow-hidden"
+              >
                 <div className="flex justify-between text-emerald-400 font-medium">
-                  <span>Voucher Discount</span>
+                  <div className="flex items-center gap-2">
+                    <Tag size={14} />
+                    <span>Voucher Savings</span>
+                  </div>
                   <span>-${discount.toLocaleString()}</span>
                 </div>
-              )}
+              </motion.div>
               <div className="flex justify-between text-white font-black text-2xl pt-2">
                 <span>Total</span>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">

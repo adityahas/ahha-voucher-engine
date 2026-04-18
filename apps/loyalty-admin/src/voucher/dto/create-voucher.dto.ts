@@ -11,8 +11,8 @@ import { Type } from '@nestjs/class-transformer';
 import { CreateVoucherCategoryDto } from './create-voucher-category.dto';
 import { CreateVoucherValidityDto } from './create-voucher-validity.dto';
 import { CreateVoucherBindingDto } from './create-voucher-binding.dto';
-import { IsUUID, IsEnum } from 'class-validator';
-import { VoucherType } from '@core/loyalty/voucher/entities/voucher.entity';
+import { IsUUID, IsEnum, IsNumber } from 'class-validator';
+import { VoucherType, DiscountType } from '@core/loyalty/voucher/entities/voucher.entity';
 
 export class CreateVoucherDto {
   @IsEnum(VoucherType)
@@ -29,6 +29,14 @@ export class CreateVoucherDto {
 
   @IsInt()
   quota: number;
+
+  @IsEnum(DiscountType)
+  @IsOptional()
+  discount_type?: DiscountType;
+
+  @IsNumber()
+  @IsOptional()
+  discount_value?: number;
 
   @IsArray()
   @ValidateNested({ each: true })

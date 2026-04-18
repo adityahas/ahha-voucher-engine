@@ -1,9 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
-import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
+import { VoucherEntity, DiscountType } from '@core/loyalty/voucher/entities/voucher.entity';
 import { DataSource, Repository, EntityManager } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
+import { ProductEntity } from '@core/product/entities/product.entity';
+import { CalculateDiscountDto } from './dto/calculate-discount.dto';
 import { GetClaimedVoucherResponseDto } from './dto/get-claimed-voucher-response.dto';
 import { VoucherResponseDto } from './dto/voucher-response.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
@@ -186,6 +188,141 @@ export class VoucherService {
     });
 
     return entityManager.save(VoucherUsageEntity, usage);
+  }
+
+  async validateAndCalculateDiscount(
+    voucherCode: string,
+    subtotal: number,
+    userId: string,
+    productId?: string,
+    categoryNames: string[] = [],
+  ): Promise<{
+    isValid: boolean;
+    discountAmount: number;
+    finalPrice: number;
+    message: string;
+  }> {
+    const voucher = await this.voucherRepository.findOne({
+      where: { code: voucherCode },
+      relations: ['bindings', 'validities', 'categories', 'target_users'],
+    });
+
+    if (!voucher) {
+      return {
+        isValid: false,
+        discountAmount: 0,
+        finalPrice: subtotal,
+        message: 'Voucher not found',
+      };
+    }
+
+    // 1. Check Quota
+    if (voucher.quota <= 0) {
+      return {
+        isValid: false,
+        discountAmount: 0,
+        finalPrice: subtotal,
+        message: 'Voucher quota exhausted',
+      };
+    }
+
+    // 2. Check Validity Dates
+    const now = new Date();
+    const activeValidity = voucher.validities.find((v) => {
+      const start = new Date(v.start_date);
+      const end = new Date(v.end_date);
+      return now >= start && now <= end;
+    });
+
+    if (voucher.validities.length > 0 && !activeValidity) {
+      return {
+        isValid: false,
+        discountAmount: 0,
+        finalPrice: subtotal,
+        message: 'Voucher is not valid at this time',
+      };
+    }
+
+    // 3. Check Target Users
+    if (voucher.target_users.length > 0) {
+      const isTargeted = voucher.target_users.some(
+        (u) => u.core_user_id === userId,
+      );
+      if (!isTargeted) {
+        return {
+          isValid: false,
+          discountAmount: 0,
+          finalPrice: subtotal,
+          message: 'Voucher is not valid for this user',
+        };
+      }
+    }
+
+    // 4. Check Bindings (Product/Category)
+    if (voucher.bindings.length > 0) {
+      const isBound = voucher.bindings.some((b) => {
+        if (b.bind_type === 'product' && productId && b.bind_value === productId)
+          return true;
+        if (
+          b.bind_type === 'category' &&
+          categoryNames.includes(b.bind_value)
+        )
+          return true;
+        return false;
+      });
+
+      if (!isBound) {
+        return {
+          isValid: false,
+          discountAmount: 0,
+          finalPrice: subtotal,
+          message: 'Voucher is not valid for this product or category',
+        };
+      }
+    }
+
+    // 5. Calculate Discount
+    let discountAmount = 0;
+    if (voucher.discount_type === DiscountType.PERCENTAGE) {
+      discountAmount = (subtotal * Number(voucher.discount_value)) / 100;
+    } else {
+      discountAmount = Number(voucher.discount_value);
+    }
+
+    // Cap discount to subtotal
+    if (discountAmount > subtotal) {
+      discountAmount = subtotal;
+    }
+
+    return {
+      isValid: true,
+      discountAmount,
+      finalPrice: subtotal - discountAmount,
+      message: 'Voucher applied successfully',
+    };
+  }
+
+  async calculateDiscount(dto: CalculateDiscountDto, userId: string) {
+    const entityManager = this.voucherRepository.manager;
+    const product = await entityManager.findOne(ProductEntity, {
+      where: { id: dto.product_id, is_active: true },
+      relations: ['categories'],
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const subtotal = product.price * dto.quantity;
+    const categoryNames = product.categories?.map((c) => c.name) || [];
+
+    return this.validateAndCalculateDiscount(
+      dto.voucher_code,
+      subtotal,
+      userId,
+      product.id,
+      categoryNames,
+    );
   }
 
   private async getOrCreateLoyaltyUser(
