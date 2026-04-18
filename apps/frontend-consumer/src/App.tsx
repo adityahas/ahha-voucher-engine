@@ -6,6 +6,7 @@ import VoucherDashboardView from './pages/VoucherDashboardView';
 import MyVouchersView from './pages/MyVouchersView';
 import VoucherDetailView from './pages/VoucherDetailView';
 import { ProductShowcaseView } from './pages/ProductShowcaseView';
+import { CheckoutView } from './pages/CheckoutView';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((state) => state.token);
@@ -45,6 +46,14 @@ function App() {
           element={
             <ProtectedRoute>
               <VoucherDetailView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout/:id"
+          element={
+            <ProtectedRoute>
+              <CheckoutView />
             </ProtectedRoute>
           }
         />

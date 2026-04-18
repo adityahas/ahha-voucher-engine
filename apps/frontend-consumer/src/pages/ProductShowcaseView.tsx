@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Package, Search, LayoutGrid, RefreshCw } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { getProducts } from '../api/products';
@@ -16,6 +17,7 @@ const containerVariants = {
 };
 
 export const ProductShowcaseView: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -131,7 +133,7 @@ export const ProductShowcaseView: React.FC = () => {
                 <ProductCard 
                   key={product.id} 
                   product={product} 
-                  onBuy={(p) => console.log('Initiating purchase for:', p.name)}
+                  onBuy={(p) => navigate(`/checkout/${p.id}`)}
                 />
               ))}
             </motion.div>

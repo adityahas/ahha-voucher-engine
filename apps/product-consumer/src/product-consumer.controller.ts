@@ -1,7 +1,7 @@
 import { Controller, Get, Inject, Param } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { ProductEntity } from '@core/product/entities/product.entity';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Products')
 @Controller('products')
@@ -16,7 +16,9 @@ export class ProductConsumerController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all active products for the consumer storefront' })
+  @ApiOperation({
+    summary: 'Get all active products for the consumer storefront',
+  })
   @ApiResponse({ status: 200, description: 'Return all active products' })
   async findAll(): Promise<ProductEntity[]> {
     return this.productRepository.find({
