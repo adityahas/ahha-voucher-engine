@@ -13,7 +13,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AdminJwtGuard, AclGuard, Permissions } from '@core/auth';
 
-@Controller('redistro/products')
+@Controller('products')
 @UseGuards(AdminJwtGuard, AclGuard)
 export class ProductAdminController {
   constructor(private readonly productService: ProductAdminService) {}
