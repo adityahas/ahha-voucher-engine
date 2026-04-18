@@ -66,3 +66,4 @@ Follow this process internally when accepting a plan:
 5. Build the Pages: Assemble the Atoms into the higher-level Pages. 
 6. Add Interactivity: Wire up local state, simulated data fetches, and framer-motion page transitions.
 7. Verify Compilation: Ensure TypeScript compiles and no linting errors exist before requesting a review from the Reviewer agent.
+    - **Environment Prep**: Binaries are in `/opt/homebrew/bin`. Prepend this to your `PATH` (e.g., `export PATH="/opt/homebrew/bin:$PATH"`) before running build or test commands.
