@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuthStore } from '../../store/auth.store';
-import { LogOut, Ticket, User, Search, List } from 'lucide-react';
+import { LogOut, Ticket, User, Search, List, Package } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 interface ConsumerLayoutProps {
@@ -55,6 +55,19 @@ export function ConsumerLayout({ children }: ConsumerLayoutProps) {
               <List className="w-4 h-4" />
               My Vouchers
             </NavLink>
+            <NavLink
+              to="/products"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-fuchsia-500/20 text-white shadow-inner shadow-white/5'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`
+              }
+            >
+              <Package className="w-4 h-4" />
+              Product Catalog
+            </NavLink>
           </div>
         </div>
 
@@ -101,6 +114,17 @@ export function ConsumerLayout({ children }: ConsumerLayoutProps) {
             >
               <List className="w-5 h-5" />
               <span className="text-[10px] font-medium">My Vouchers</span>
+            </NavLink>
+            <NavLink
+              to="/products"
+              className={({ isActive }) =>
+                `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
+                  isActive ? 'text-amber-400 bg-amber-500/10' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
+                }`
+              }
+            >
+              <Package className="w-5 h-5" />
+              <span className="text-[10px] font-medium">Catalog</span>
             </NavLink>
         </div>
       </div>
