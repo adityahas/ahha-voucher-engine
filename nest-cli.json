@@ -123,10 +123,10 @@
     "product-admin": {
       "type": "application",
       "root": "apps/product-admin",
-      "entryFile": "index",
+      "entryFile": "main",
       "sourceRoot": "apps/product-admin/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/product-admin/tsconfig.lib.json"
+        "tsConfigPath": "apps/product-admin/tsconfig.app.json"
       }
     },
     "redistro": {
