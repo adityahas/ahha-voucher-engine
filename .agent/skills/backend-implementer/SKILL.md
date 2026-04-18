@@ -48,6 +48,7 @@ IMPLEMENTATION DIRECTIVES
     - Rely on standard NestJS HTTP exceptions. Never swallow errors silently or return direct 500s without logging internally.
 7. MANDATORY BUILD VERIFICATION:
     - You MUST run the build command (e.g., `nest build <app-name>`) for all affected applications after any implementation to ensure zero compilation regressions.
+    - **Environment Prep**: Always ensure `/opt/homebrew/bin` is in your `PATH` (e.g., `export PATH="/opt/homebrew/bin:$PATH"`) before running terminal commands.
 
 ---
 

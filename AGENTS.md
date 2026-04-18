@@ -467,6 +467,23 @@ yarn test:cov                     # Run tests with coverage
 yarn test:e2e                     # Run end-to-end tests
 ```
 
+## 🛠️ Execution & Environment Guidelines (AI Agents)
+
+To ensure smooth command execution and avoid trial-and-error, follow these environment-specific rules:
+
+### 1. macOS Path Configuration
+On this system, Node extensions (yarn, npm, node) are typically located in `/opt/homebrew/bin`. Always ensure this is in your `PATH` or use absolute paths for terminal commands.
+- **Recommended**: `export PATH="/opt/homebrew/bin:$PATH"` at the start of persistent sessions.
+
+### 2. Command Execution
+- **Persistent Terminals**: Use a `RequestedTerminalID` (e.g., `main_terminal`) with `RunPersistent: true` to preserve path exports.
+- **Builds**: Use `yarn nest build <app>` or `npm run build` from the relevant directory.
+- **Nginx & Ports**: Ensure you map internal ports correctly (e.g., `product-consumer` -> 9008).
+
+### 3. Verification Workflow
+- Always run a build of the modified application before declaring a task done.
+- For consumer frontend changes, run `vitest` in `apps/frontend-consumer` to ensure zero regressions.
+
 ---
 
 ## 💅 Code Style Guidelines
