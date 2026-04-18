@@ -5,6 +5,7 @@ import { ProductConsumerModule } from './product-consumer.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(ProductConsumerModule);
+  app.setGlobalPrefix('product');
 
   app.useGlobalPipes(
     new ValidationPipe({
