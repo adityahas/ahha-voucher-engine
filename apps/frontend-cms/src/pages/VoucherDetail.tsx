@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -13,16 +13,16 @@ import { getUsers, User } from '../api/users';
 import { VoucherBindingList } from '../components/VoucherBindingList';
 import { VoucherValidityList } from '../components/VoucherValidityList';
 import {
-  Loader2,
   AlertCircle,
   ArrowLeft,
   Calendar,
-  Ticket,
   Clock,
+  Database,
+  Hash,
+  Loader2,
   ShieldCheck,
   Tag,
-  Hash,
-  Database,
+  Ticket,
   Users,
 } from 'lucide-react';
 
@@ -200,6 +200,34 @@ export const VoucherDetail: React.FC = () => {
                     <span className="text-xs text-slate-500 font-medium pb-1 uppercase">
                       Allocated Items
                     </span>
+                  </div>
+                </div>
+
+                {/* New Reward Calculation Section */}
+                <div className="space-y-4 pt-4 border-t border-slate-800/50">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                    <CreditCard size={12} className="text-emerald-500" />
+                    Reward Calculation
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-2xl bg-slate-800/30 border border-slate-700/50 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+                        Discount Type
+                      </span>
+                      <div className="text-lg font-bold text-slate-200 uppercase">
+                        {voucher.discount_type || 'NOT CONFIGURED'}
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-1">
+                      <span className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-tighter">
+                        Value
+                      </span>
+                      <div className="text-2xl font-black text-emerald-400">
+                        {voucher.discount_type === 'PERCENTAGE'
+                          ? `${voucher.discount_value}%`
+                          : `$${(voucher.discount_value || 0).toLocaleString()}`}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

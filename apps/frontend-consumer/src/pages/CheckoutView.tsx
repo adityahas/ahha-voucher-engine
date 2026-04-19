@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, CreditCard, Tag, ShoppingBag, Info } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowLeft, CreditCard, Info, ShoppingBag, Tag } from 'lucide-react';
 import { getProductById } from '../api/products';
 import { executePurchase } from '../api/purchase';
 import { calculateDiscount } from '../api/vouchers';
@@ -19,10 +19,13 @@ export const CheckoutView: React.FC = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [voucherCode, setVoucherCode] = useState('');
-  const [calculation, setCalculation] = useState<CalculateDiscountResponse | null>(null);
+  const [calculation, setCalculation] =
+    useState<CalculateDiscountResponse | null>(null);
   const [calculating, setCalculating] = useState(false);
   const [voucherError, setVoucherError] = useState<string | null>(null);
-  const [txnStatus, setTxnStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+  const [txnStatus, setTxnStatus] = useState<
+    'idle' | 'processing' | 'success' | 'error'
+  >('idle');
   const [txnMessage, setTxnMessage] = useState('');
 
   useEffect(() => {
@@ -85,10 +88,15 @@ export const CheckoutView: React.FC = () => {
         voucher_code: voucherCode || undefined,
       });
       setTxnStatus('success');
-      setTxnMessage(`You've successfully purchased ${quantity}x ${product.name}!`);
+      setTxnMessage(
+        `You've successfully purchased ${quantity}x ${product.name}!`,
+      );
     } catch (err: any) {
       setTxnStatus('error');
-      setTxnMessage(err.message || 'Transaction failed. Please check your balance or voucher validity.');
+      setTxnMessage(
+        err.message ||
+          'Transaction failed. Please check your balance or voucher validity.',
+      );
     }
   };
 
@@ -106,7 +114,10 @@ export const CheckoutView: React.FC = () => {
         <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 mb-6">
           {error || 'Product not found'}
         </div>
-        <button onClick={() => navigate(-1)} className="text-white hover:underline flex items-center gap-2">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-white hover:underline flex items-center gap-2"
+        >
           <ArrowLeft size={18} /> Back to Showcase
         </button>
       </div>
@@ -116,9 +127,8 @@ export const CheckoutView: React.FC = () => {
   const subtotal = product.price * quantity;
   const discount = calculation?.discountAmount || 0;
   const total = calculation?.finalPrice || subtotal;
-  const isVoucherApplied = !!calculation && calculation.isValid && voucherCode === calculation.message.includes('successfully') ? true : !!calculation; 
-  // Simplified: if calculation exists and was valid
-  const effectiveApplied = calculation?.isValid && calculation.discountAmount > 0;
+  const isVoucherApplied = !!calculation && calculation.isValid;
+  const effectiveApplied = isVoucherApplied && discount > 0;
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] p-6 overflow-hidden flex items-center justify-center">
@@ -137,7 +147,10 @@ export const CheckoutView: React.FC = () => {
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4 group"
           >
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft
+              size={18}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
             Back to Showcase
           </button>
 
@@ -145,18 +158,28 @@ export const CheckoutView: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-8">
               <div className="w-full md:w-48 h-48 rounded-2xl overflow-hidden bg-slate-800/50 border border-white/5">
                 <img
-                  src={product.image || 'https://via.placeholder.com/300?text=Product'}
+                  src={
+                    product.image ||
+                    'https://via.placeholder.com/300?text=Product'
+                  }
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
               <div className="flex-1 space-y-4">
                 <div>
-                  <h2 className="text-3xl font-black text-white tracking-tight">{product.name}</h2>
-                  <p className="text-slate-400 text-sm line-clamp-2 mt-1">{product.description}</p>
+                  <h2 className="text-3xl font-black text-white tracking-tight">
+                    {product.name}
+                  </h2>
+                  <p className="text-slate-400 text-sm line-clamp-2 mt-1">
+                    {product.description}
+                  </p>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">
+                  <div
+                    data-testid="product-price"
+                    className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400"
+                  >
                     ${product.price.toLocaleString()}
                   </div>
                   <div className="flex items-center gap-4 bg-white/5 rounded-xl p-1 border border-white/10">
@@ -166,7 +189,9 @@ export const CheckoutView: React.FC = () => {
                     >
                       -
                     </button>
-                    <span className="w-8 text-center text-white font-bold">{quantity}</span>
+                    <span className="w-8 text-center text-white font-bold">
+                      {quantity}
+                    </span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
                       className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 text-white"
@@ -183,23 +208,32 @@ export const CheckoutView: React.FC = () => {
             <div className="glass-panel p-6 rounded-2xl border-white/5 bg-white/[0.02]">
               <div className="flex items-center gap-3 text-cyan-400 mb-2">
                 <ShoppingBag size={20} />
-                <span className="font-bold text-sm uppercase tracking-wider">Fast Delivery</span>
+                <span className="font-bold text-sm uppercase tracking-wider">
+                  Fast Delivery
+                </span>
               </div>
-              <p className="text-slate-400 text-xs">Instant digital key delivery to your email and dashboard.</p>
+              <p className="text-slate-400 text-xs">
+                Instant digital key delivery to your email and dashboard.
+              </p>
             </div>
             <div className="glass-panel p-6 rounded-2xl border-white/5 bg-white/[0.02]">
               <div className="flex items-center gap-3 text-fuchsia-400 mb-2">
                 <Info size={20} />
-                <span className="font-bold text-sm uppercase tracking-wider">Secure Payment</span>
+                <span className="font-bold text-sm uppercase tracking-wider">
+                  Secure Payment
+                </span>
               </div>
-              <p className="text-slate-400 text-xs">All transactions are encrypted and secured via standard protocols.</p>
+              <p className="text-slate-400 text-xs">
+                All transactions are encrypted and secured via standard
+                protocols.
+              </p>
             </div>
           </div>
         </div>
 
         {/* Right Column: Order Summary & Actions */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass-panel p-8 rounded-[32px] border-white/10 bg-white/5 shadow-2xl space-y-8">
+          <div className="glass-panel backdrop-blur-xl p-8 rounded-[32px] border-white/10 bg-white/5 shadow-2xl space-y-8">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
               <CreditCard className="text-indigo-400" />
               Order Summary
@@ -207,11 +241,15 @@ export const CheckoutView: React.FC = () => {
 
             {/* Voucher Field */}
             <div className="space-y-3">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Voucher Code</label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">
+                Voucher Code
+              </label>
               <div className="relative group">
                 <Tag
                   className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
-                    isVoucherApplied ? 'text-emerald-400' : 'text-slate-500 group-focus-within:text-indigo-400'
+                    isVoucherApplied
+                      ? 'text-emerald-400'
+                      : 'text-slate-500 group-focus-within:text-indigo-400'
                   }`}
                   size={18}
                 />
@@ -225,9 +263,11 @@ export const CheckoutView: React.FC = () => {
                   }}
                   onKeyDown={(e) => e.key === 'Enter' && handleApplyVoucher()}
                   className={`w-full pl-11 pr-24 py-4 rounded-2xl bg-black/20 border transition-all outline-none font-bold placeholder:text-slate-600 ${
-                    effectiveApplied ? 'border-emerald-500/50 text-emerald-400 ring-2 ring-emerald-500/10' : 
-                    voucherError ? 'border-rose-500/50 text-rose-400 ring-2 ring-rose-500/10' :
-                    'border-white/10 focus:border-indigo-500/50 text-white'
+                    effectiveApplied
+                      ? 'border-emerald-500/50 text-emerald-400 ring-2 ring-emerald-500/10'
+                      : voucherError
+                        ? 'border-rose-500/50 text-rose-400 ring-2 ring-rose-500/10'
+                        : 'border-white/10 focus:border-indigo-500/50 text-white'
                   }`}
                 />
                 <button
@@ -262,23 +302,34 @@ export const CheckoutView: React.FC = () => {
             <div className="space-y-4 pt-4 border-t border-white/5">
               <div className="flex justify-between text-slate-400">
                 <span>Subtotal</span>
-                <span>${subtotal.toLocaleString()}</span>
+                <span data-testid="subtotal-amount">
+                  ${subtotal.toLocaleString()}
+                </span>
               </div>
-              <motion.div 
-                animate={effectiveApplied ? { height: 'auto', opacity: 1, marginTop: 16 } : { height: 0, opacity: 0, marginTop: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="flex justify-between text-emerald-400 font-medium">
-                  <div className="flex items-center gap-2">
-                    <Tag size={14} />
-                    <span>Voucher Savings</span>
-                  </div>
-                  <span>-${discount.toLocaleString()}</span>
-                </div>
-              </motion.div>
+              <AnimatePresence>
+                {effectiveApplied && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                    animate={{ height: 'auto', opacity: 1, marginTop: 16 }}
+                    exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex justify-between text-emerald-400 font-medium">
+                      <div className="flex items-center gap-2">
+                        <Tag size={14} />
+                        <span>Voucher Savings</span>
+                      </div>
+                      <span>-${discount.toLocaleString()}</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <div className="flex justify-between text-white font-black text-2xl pt-2">
                 <span>Total</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
+                <span
+                  data-testid="total-amount"
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400"
+                >
                   ${total.toLocaleString()}
                 </span>
               </div>
@@ -295,7 +346,15 @@ export const CheckoutView: React.FC = () => {
             </motion.button>
 
             <p className="text-center text-[10px] text-slate-500 uppercase tracking-widest leading-relaxed">
-              By completing this purchase, you agree to our <span className="text-indigo-400 underline cursor-pointer">Terms of Service</span> and <span className="text-indigo-400 underline cursor-pointer">Consumer Rights</span>.
+              By completing this purchase, you agree to our{' '}
+              <span className="text-indigo-400 underline cursor-pointer">
+                Terms of Service
+              </span>{' '}
+              and{' '}
+              <span className="text-indigo-400 underline cursor-pointer">
+                Consumer Rights
+              </span>
+              .
             </p>
           </div>
         </div>
