@@ -7,23 +7,31 @@
 ## 🎯 Project Overview
 
 **Ahha Voucher Engine** is a multi-tenant SaaS backend system built with NestJS for managing voucher distribution and
-redemption. It supports multiple clients (tenants), each with their own isolated database.
+redemption. It supports multiple clients (tenants), each with their own isolated database. The platform also includes
+two frontend React/Vite applications: a consumer storefront and a CMS admin panel.
 
 ### Key Features
 
 - **Multi-tenant architecture**: Database-per-tenant with dynamic connection management
-- **Voucher management**: Create, claim, and use vouchers with categories, validities, and bindings
+- **Voucher management**: Create, claim, and use vouchers with categories, validities, bindings, and discount pricing
+- **Discount system**: Percentage and fixed-amount discounts calculated in real-time via
+  `POST /loyalty/vouchers/calculate-discount`
+- **Product catalog**: Product management (admin) and consumer-facing product listing APIs
 - **Reward system**: Strategy-pattern based reward claiming (GoPay, etc.)
 - **Quest & gamification**: Framework for loyalty program quests
 - **JWT-based authentication**: Separate guards for admin and consumer endpoints
 - **ACL (Access Control List)**: Role-based permissions for admin operations
 - **AES encryption**: For sensitive database credentials
+- **Frontend CMS**: React/Vite admin panel (`apps/frontend-cms`) for voucher, user, and product management
+- **Frontend Consumer**: React/Vite storefront (`apps/frontend-consumer`) for product browsing, voucher claiming, and
+  checkout
 
 ---
 
 ## 🤖 AI Agent Pipelines
 
-When instructed to create a frontend feature or implementation, you MUST strict adhere to the following 5-step autonomous agent pipeline:
+When instructed to create a frontend feature or implementation, you MUST strictly adhere to the following 5-step
+autonomous agent pipeline:
 
 1. **Product Owner**: Translates user requests into UI specs and verifies backend API readiness.
 2. **Frontend Planner**: Architects the React components, establishes data flows, and defines aesthetic "Vibe Coding" directives for Tailwind/Framer Motion.
@@ -31,7 +39,15 @@ When instructed to create a frontend feature or implementation, you MUST strict 
 4. **Frontend Reviewer**: Audits the code for aesthetic compliance ("Vibes") and React best practices (max 3 iterations push-back allowed).
 5. **Automation Engineer**: Creates Vitest/React Testing Library test cases to confirm logic and aesthetics.
 
+When instructed to create a backend feature, use the corresponding backend pipeline:
+
+1. **Backend Planner**: Analyzes user requests and produces a precise execution plan.
+2. **Backend Implementer**: Implements the plan into the monorepo architecture.
+3. **Backend Reviewer**: Audits the implementation for architectural standards compliance.
+4. **Automation Engineer**: Creates NestJS unit/integration tests to confirm behavior.
+
 ---
+
 ## 🛠️ Tech Stack
 
 | Category        | Technology                                      |
@@ -46,6 +62,9 @@ When instructed to create a frontend feature or implementation, you MUST strict 
 | Documentation   | Swagger/OpenAPI                                 |
 | Naming Strategy | SnakeNamingStrategy (typeorm-naming-strategies) |
 | Package Manager | Yarn 1.22.22                                    |
+| Frontend        | React 18 + Vite + TypeScript                    |
+| Frontend UI     | Tailwind CSS + Framer Motion                    |
+| Frontend Tests  | Vitest + React Testing Library                  |
 
 ---
 
@@ -61,6 +80,19 @@ When instructed to create a frontend feature or implementation, you MUST strict 
 │   │   ├── src/admin.service.ts
 │   │   ├── src/entities/admin.entity.ts
 │   │   └── src/seeder/            # Database seeders
+│   ├── frontend-cms/              # CMS Admin React/Vite App (port 5173 dev)
+│   │   ├── src/pages/             # Voucher, User, Product, Category pages
+│   │   ├── src/components/        # Shared UI components
+│   │   ├── src/router/index.tsx   # React Router v6 config
+│   │   ├── src/store/             # Zustand state management
+│   │   ├── src/api/               # Axios API client wrappers
+│   │   └── src/lib/               # Utilities
+│   ├── frontend-consumer/         # Consumer React/Vite App (port 5174 dev)
+│   │   ├── src/pages/             # CheckoutView, ProductShowcaseView, VoucherDashboardView, etc.
+│   │   ├── src/components/        # Shared UI components + spec files
+│   │   ├── src/store/             # Zustand state management
+│   │   ├── src/api/               # Axios API client wrappers
+│   │   └── src/lib/               # Utilities
 │   ├── loyalty-admin/             # Voucher & loyalty admin API (port 9003)
 │   │   ├── src/voucher/           # Voucher CRUD operations
 │   │   ├── src/voucher-category/  # Voucher category management
@@ -69,9 +101,16 @@ When instructed to create a frontend feature or implementation, you MUST strict 
 │   │   ├── src/quest/             # Quest management
 │   │   └── src/...                # Stub modules (gamification, tier, trading)
 │   ├── loyalty-consumer/          # Consumer-facing loyalty API (port 9005)
-│   │   ├── src/voucher/           # Consumer voucher operations
+│   │   ├── src/voucher/           # Consumer voucher ops + purchase controller
+│   │   │   ├── voucher.controller.ts
+│   │   │   ├── voucher.service.ts       # validateAndCalculateDiscount, useVoucher
+│   │   │   ├── purchase.controller.ts   # POST /loyalty/purchase (JWT-protected)
+│   │   │   └── dto/
 │   │   └── src/reward/            # Reward claiming with strategies
-│   ├── product-admin/             # Product management API
+│   ├── product-admin/             # Product management API (port 9007)
+│   │   └── src/product/           # CRUD for ProductEntity
+│   ├── product-consumer/          # Consumer product listing API (port 9008)
+│   │   └── src/                   # GET /products, GET /products/:id
 │   ├── redistro/                  # Redistribution/inventory API
 │   ├── user-admin/                # User management admin API (port 9004)
 │   └── user-consumer/             # User-facing API (port 9006)
@@ -95,14 +134,14 @@ When instructed to create a frontend feature or implementation, you MUST strict 
 │   ├── encryption/                # AES encryption service
 │   │   └── encryption.service.ts
 │   ├── loyalty/                   # Loyalty domain entities
-│   │   ├── voucher/entities/      # Voucher-related entities
+│   │   ├── voucher/entities/      # Voucher-related entities (inc. discount_type, discount_value)
 │   │   ├── reward-item/entities/  # Reward item entities
 │   │   ├── quest/entities/        # Quest entities
 │   │   └── entities/loyalty-user.entity.ts
 │   ├── middleware/                # Subdomain & credential middleware
-│   │   ├── subdomain.middleware.ts
-│   │   └── credential.middleware.ts
-│   ├── product/                   # Product domain entities
+│   │   ├── subdomain.middleware.ts  # Skips OPTIONS (CORS preflight)
+│   │   └── credential.middleware.ts # Skips OPTIONS (CORS preflight)
+│   ├── product/                   # Product domain entities (ProductEntity)
 │   └── user/                      # User domain entities
 │
 ├── nginx.conf                     # Nginx reverse proxy configuration
@@ -129,6 +168,8 @@ Request → Nginx → Extract Subdomain → SubdomainMiddleware → CredentialMi
 |------------------------|--------------------------------------------------------------|-------|
 | `SubdomainMiddleware`  | Extracts subdomain from Host header, validates client exists | 1st   |
 | `CredentialMiddleware` | Validates `x-api-key` header against `client.api_key`        | 2nd   |
+
+> **Note**: Both middlewares skip validation for `OPTIONS` requests to enable proper CORS preflight handling.
 
 ---
 
@@ -197,6 +238,13 @@ export class VoucherEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   image: string;
 
+  // Discount pricing fields
+  @Column({ type: 'varchar', default: 'percentage' })
+  discount_type: string;       // 'percentage' | 'fixed'
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  discount_value: number;      // Amount or percentage (e.g. 25 = 25%)
+
   @ManyToMany(() => VoucherCategoryEntity, { cascade: true })
   @JoinTable({ name: 'vouchers_categories' })
   categories: VoucherCategoryEntity[];
@@ -220,6 +268,25 @@ export class VoucherEntity extends BaseEntity {
   @ManyToMany(() => LoyaltyUserEntity, { cascade: true })
   @JoinTable({ name: 'vouchers_target_users' })
   target_users: LoyaltyUserEntity[];  // Specific users allowed
+}
+
+// Product Domain (libs/product/src/entities/)
+@Entity('products')
+export class ProductEntity extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar' })
+  name: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2 })
+  price: number;
+
+  @Column({ type: 'boolean', default: true })
+  is_active: boolean;
 }
 
 // Reward Domain
@@ -251,7 +318,6 @@ export class RewardItemEntity extends BaseEntity {
 Manages dynamic database connections per tenant:
 
 ```typescript
-
 @Injectable()
 export class DatabaseService {
   private _dataSources: Map<string, DataSource> = new Map();
@@ -270,7 +336,6 @@ export class DatabaseService {
 ### EncryptionService (`libs/encryption/src/encryption.service.ts`)
 
 ```typescript
-
 @Injectable()
 export class EncryptionService {
   private readonly algorithm = 'aes-256-cbc';
@@ -282,12 +347,39 @@ export class EncryptionService {
 }
 ```
 
+### VoucherService (Consumer — `apps/loyalty-consumer/src/voucher/voucher.service.ts`)
+
+Key methods for the consumer-facing purchase flow:
+
+```typescript
+
+@Injectable()
+export class VoucherService {
+  // Validates voucher and returns discount breakdown
+  async validateAndCalculateDiscount(
+    code: string,
+    productId: string,
+    subtotal: number,
+  ): Promise<{ discount_amount: number; final_price: number }>
+
+  // Marks voucher as used (called inside a DB transaction during purchase)
+  async useVoucher(code: string, userId: string): Promise<void>
+}
+```
+
+### PurchaseController (Consumer — `apps/loyalty-consumer/src/voucher/purchase.controller.ts`)
+
+```
+POST /loyalty/purchase
+Auth: ConsumerJwtGuard
+Body: { product_id, quantity, voucher_code? }
+```
+
 ### VoucherService (Admin)
 
 CRUD operations for vouchers with category/user resolution:
 
 ```typescript
-
 @Injectable()
 export class VoucherService {
   constructor(dataSource: DataSource) {
@@ -295,13 +387,9 @@ export class VoucherService {
   }
 
   create(createVoucherDto: CreateVoucherDto): Promise<VoucherEntity>
-
   findAll(paginationDto: BasePaginationDto): Promise<PaginatedResponse>
-
   findOne(id: string): Promise<VoucherEntity>
-
   update(id: string, updateVoucherDto: UpdateVoucherDto): Promise<VoucherEntity>
-
   remove(id: number): Promise<void>
 }
 ```
@@ -309,7 +397,6 @@ export class VoucherService {
 ### ACLService (`libs/auth/src/acl.service.ts`)
 
 ```typescript
-
 @Injectable()
 export class AclService {
   private readonly acl: Record<Role, string[]> = {
@@ -331,17 +418,27 @@ export class AclService {
 
 ## 🚀 Applications
 
+### Backend Applications
+
 | App              | Port | Environment Variable    | Base Path        | Auth                 |
 |------------------|------|-------------------------|------------------|----------------------|
 | admin            | 9002 | `PORT_ADMIN`            | `/admin`         | JWT Bearer + API Key |
 | loyalty-admin    | 9003 | `PORT_LOYALTY_ADMIN`    | `/loyalty-admin` | JWT Bearer + API Key |
 | loyalty-consumer | 9005 | `PORT_LOYALTY_CONSUMER` | `/loyalty`       | JWT + API Key        |
-| product-admin    | -    | -                       | -                | -                    |
+| product-admin    | 9007 | `PORT_PRODUCT_ADMIN`    | `/product-admin` | JWT Bearer + API Key |
+| product-consumer | 9008 | `PORT_PRODUCT_CONSUMER` | `/products`      | API Key              |
 | redistro         | -    | -                       | -                | -                    |
 | user-admin       | 9004 | `PORT_USER_ADMIN`       | `/user-admin`    | JWT Bearer + API Key |
 | user-consumer    | 9006 | `PORT_USER_CONSUMER`    | `/user`          | JWT + API Key        |
 
-### Running Applications
+### Frontend Applications
+
+| App               | Dev Port | Build Command                           | Description         |
+|-------------------|----------|-----------------------------------------|---------------------|
+| frontend-cms      | 5173     | `cd apps/frontend-cms && yarn dev`      | Admin/CMS panel     |
+| frontend-consumer | 5174     | `cd apps/frontend-consumer && yarn dev` | Consumer storefront |
+
+### Running Backend Applications
 
 ```bash
 # Development mode with watch
@@ -350,10 +447,26 @@ yarn start:loyalty-admin --watch
 yarn start:loyalty-consumer --watch
 yarn start:user-admin --watch
 yarn start:user-consumer --watch
+yarn nest start product-admin --watch
+yarn nest start product-consumer --watch
 
 # Production
 yarn build
 node dist/apps/admin/main.js
+```
+
+### Running Frontend Applications
+
+```bash
+# Consumer storefront
+cd apps/frontend-consumer && yarn dev
+
+# CMS Admin panel
+cd apps/frontend-cms && yarn dev
+
+# Run frontend tests (Vitest)
+cd apps/frontend-consumer && yarn test   # or npx vitest run
+cd apps/frontend-cms && yarn test
 ```
 
 ---
@@ -379,7 +492,6 @@ Authorization: Bearer {jwt}            # For protected endpoints
 ### Permissions Decorator
 
 ```typescript
-
 @Controller('vouchers')
 @UseGuards(AdminJwtGuard, AclGuard)
 export class VoucherController {
@@ -405,6 +517,11 @@ export enum Role {
   DRIVER = 'driver'
 }
 ```
+
+### CORS Preflight
+
+Both `SubdomainMiddleware` and `CredentialMiddleware` are configured to short-circuit on `OPTIONS` requests, allowing
+CORS preflight to pass through without tenant/API key validation.
 
 ---
 
@@ -447,11 +564,13 @@ yarn install
 yarn build
 
 # Run applications (development)
-yarn start:admin --watch          # Admin API on port 9002
-yarn start:loyalty-admin --watch  # Loyalty Admin API on port 9003
-yarn start:loyalty-consumer --watch # Consumer API on port 9005
-yarn start:user-admin --watch     # User Admin API on port 9004
-yarn start:user-consumer --watch  # User Consumer API on port 9006
+yarn start:admin --watch             # Admin API on port 9002
+yarn start:loyalty-admin --watch     # Loyalty Admin API on port 9003
+yarn start:loyalty-consumer --watch  # Consumer API on port 9005
+yarn start:user-admin --watch        # User Admin API on port 9004
+yarn start:user-consumer --watch     # User Consumer API on port 9006
+yarn nest start product-admin --watch       # Product Admin API on port 9007
+yarn nest start product-consumer --watch    # Product Consumer API on port 9008
 
 # Database seeding (creates clients and admins)
 yarn seed
@@ -460,11 +579,15 @@ yarn seed
 yarn lint                         # Run ESLint with auto-fix
 yarn format                       # Run Prettier on all source files
 
-# Testing
+# Backend Testing (Jest)
 yarn test                         # Run unit tests
 yarn test:watch                   # Run tests in watch mode
 yarn test:cov                     # Run tests with coverage
 yarn test:e2e                     # Run end-to-end tests
+
+# Frontend Testing (Vitest)
+cd apps/frontend-consumer && npx vitest run    # Run consumer frontend tests
+cd apps/frontend-cms && npx vitest run         # Run CMS admin frontend tests
 ```
 
 ## 🛠️ Execution & Environment Guidelines (AI Agents)
@@ -478,11 +601,13 @@ On this system, Node extensions (yarn, npm, node) are typically located in `/opt
 ### 2. Command Execution
 - **Persistent Terminals**: Use a `RequestedTerminalID` (e.g., `main_terminal`) with `RunPersistent: true` to preserve path exports.
 - **Builds**: Use `yarn nest build <app>` or `npm run build` from the relevant directory.
-- **Nginx & Ports**: Ensure you map internal ports correctly (e.g., `product-consumer` -> 9008).
+- **Nginx & Ports**: Ensure you map internal ports correctly (e.g., `product-consumer` → 9008).
 
 ### 3. Verification Workflow
-- Always run a build of the modified application before declaring a task done.
-- For consumer frontend changes, run `vitest` in `apps/frontend-consumer` to ensure zero regressions.
+
+- Always run a build of the modified backend application before declaring a task done.
+- For frontend changes, run `vitest` inside the relevant `apps/frontend-*` directory to ensure zero regressions.
+- Use `tsc --noEmit` inside the frontend app directory for quick type-safety checks without a full build.
 
 ---
 
@@ -531,12 +656,16 @@ module.exports = {
 - **Database columns**: snake_case (via SnakeNamingStrategy)
 - **Entities**: Suffix with `Entity` (e.g., `VoucherEntity`)
 - **DTOs**: Suffix with `Dto` (e.g., `CreateVoucherDto`)
+- **Frontend components**: PascalCase with descriptive suffix (e.g., `CheckoutView.tsx`, `ProductCard.tsx`)
+- **Frontend pages**: PascalCase `*View.tsx` for full-page components, `*.tsx` otherwise
 
 ---
 
 ## 🧪 Testing Strategy
 
-### Test Configuration (from `package.json`)
+### Backend (Jest)
+
+#### Test Configuration (from `package.json`)
 
 ```json
 {
@@ -558,23 +687,36 @@ module.exports = {
     "moduleNameMapper": {
       "^@core/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
       "^@core/base(|/.*)$": "<rootDir>/libs/base/src/$1",
-      "^@core/database(|/.*)$": "<rootDir>/libs/database/src/$1"
+      "^@core/database(|/.*)$": "<rootDir>/libs/database/src/$1",
+      "^@core/encryption(|/.*)$": "<rootDir>/libs/encryption/src/$1",
+      "^@core/loyalty(|/.*)$": "<rootDir>/libs/loyalty/src/$1",
+      "^@core/middleware(|/.*)$": "<rootDir>/libs/middleware/src/$1",
+      "^@core/product(|/.*)$": "<rootDir>/libs/product/src/$1"
     }
   }
 }
 ```
 
-### Test Files Location
+#### Test Files Location
 
 - Unit tests: `*.spec.ts` alongside source files
 - E2E tests: `test/*.e2e-spec.ts` in app directories
-
-### Running Tests
 
 ```bash
 yarn test                         # All unit tests
 yarn test --testPathPattern=voucher  # Specific pattern
 yarn test:cov                     # With coverage report
+```
+
+### Frontend (Vitest + React Testing Library)
+
+- Test files: `*.spec.tsx` alongside component/page files
+- Config: `vitest.config.ts` in each frontend app directory
+- Mocking: `vi.mock(...)` for API modules, `msw` for HTTP mocking if needed
+
+```bash
+cd apps/frontend-consumer && npx vitest run
+cd apps/frontend-cms && npx vitest run
 ```
 
 ---
@@ -586,7 +728,8 @@ yarn test:cov                     # With coverage report
 3. **JWT Tokens**: Admin tokens expire in 1 week; consumer tokens have separate validation
 4. **Database Credentials**: Stored encrypted in master database, decrypted at runtime
 5. **Soft Deletes**: All entities extend `BaseEntity` with `deleted_at` for soft deletion
-6. **CORS**: Enabled in production mode only (`app.enableCors()`)
+6. **CORS**: Enabled in production mode only (`app.enableCors()`); OPTIONS middleware bypass is required for preflight
+7. **Financial Precision**: All monetary values use `decimal(12,2)` to avoid floating-point inaccuracies
 
 ---
 
@@ -653,6 +796,12 @@ http {
         }
         location /loyalty {
             proxy_pass http://localhost:9005;
+        }
+        location /product-admin {
+            proxy_pass http://localhost:9007;
+        }
+        location /products {
+            proxy_pass http://localhost:9008;
         }
 
         # CORS headers
@@ -737,6 +886,35 @@ class ListVouchersDto extends BasePaginationDto {
 }
 ```
 
+### Discount Calculation (Consumer Checkout)
+
+```typescript
+// Real-time discount preview (unauthenticated)
+POST / loyalty / vouchers / calculate - discount
+Body: {
+  voucher_code: string, product_id
+:
+  string, quantity
+:
+  number
+}
+Response: {
+  subtotal, discount_amount, final_price
+}
+
+// Full purchase (JWT-protected)
+POST / loyalty / purchase
+Headers: Authorization: Bearer <consumer_jwt>
+Body: {
+  product_id: string, quantity
+:
+  number, voucher_code ? : string
+}
+Response: {
+  order_id, subtotal, discount_amount, final_price
+}
+```
+
 ---
 
 ## ⚠️ Important Notes
@@ -749,21 +927,37 @@ class ListVouchersDto extends BasePaginationDto {
 5. **BaseEntity** provides `created_at`, `updated_at`, `deleted_at` (soft delete)
 6. **Middleware order matters**: SubdomainMiddleware → CredentialMiddleware
 7. **Stock values**: `-1` = unlimited, `0` = out of stock, `>0` = limited
+8. **Monetary values**: Always use `decimal(12,2)` — never `float` — to prevent floating-point drift in financial
+   calculations
+9. **CORS preflight**: Both middlewares skip validation for `OPTIONS` method; ensure this remains in place
+10. **Frontend apps are standalone**: `apps/frontend-cms` and `apps/frontend-consumer` have their own `package.json`,
+    `node_modules`, and Vite configs — always `cd` into them before running their commands
+11. **Voucher usage is transactional**: `useVoucher()` must always be called inside a TypeORM transaction together with
+    order creation to ensure atomic rollback on failure
 
 ---
 
 ## 📚 Related Files Reference
 
-| Concern           | Files                                                               |
-|-------------------|---------------------------------------------------------------------|
-| Tenant Resolution | `libs/middleware/src/middleware/subdomain.middleware.ts`            |
-| Credential Check  | `libs/middleware/src/middleware/credential.middleware.ts`           |
-| DB Connection     | `libs/database/src/database.service.ts`                             |
-| Encryption        | `libs/encryption/src/encryption.service.ts`                         |
-| JWT Strategy      | `libs/auth/src/jwt.strategy.ts`                                     |
-| ACL System        | `libs/auth/src/acl.service.ts`, `libs/auth/src/guards/acl.guard.ts` |
-| Voucher Domain    | `libs/loyalty/src/voucher/entities/*.entity.ts`                     |
-| Voucher Admin     | `apps/loyalty-admin/src/voucher/*.ts`                               |
-| Voucher Consumer  | `apps/loyalty-consumer/src/voucher/*.ts`                            |
-| Reward Strategy   | `apps/loyalty-consumer/src/reward/strategy/*.ts`                    |
-| Seeding           | `apps/admin/src/seeder/*.ts`                                        |
+| Concern              | Files                                                               |
+|----------------------|---------------------------------------------------------------------|
+| Tenant Resolution    | `libs/middleware/src/middleware/subdomain.middleware.ts`            |
+| Credential Check     | `libs/middleware/src/middleware/credential.middleware.ts`           |
+| DB Connection        | `libs/database/src/database.service.ts`                             |
+| Encryption           | `libs/encryption/src/encryption.service.ts`                         |
+| JWT Strategy         | `libs/auth/src/jwt.strategy.ts`                                     |
+| ACL System           | `libs/auth/src/acl.service.ts`, `libs/auth/src/guards/acl.guard.ts` |
+| Voucher Domain       | `libs/loyalty/src/voucher/entities/*.entity.ts`                     |
+| Voucher Admin        | `apps/loyalty-admin/src/voucher/*.ts`                               |
+| Voucher Consumer     | `apps/loyalty-consumer/src/voucher/*.ts`                            |
+| Purchase Endpoint    | `apps/loyalty-consumer/src/voucher/purchase.controller.ts`          |
+| Discount Calculation | `apps/loyalty-consumer/src/voucher/voucher.service.ts`              |
+| Product Domain       | `libs/product/src/entities/product.entity.ts`                       |
+| Product Admin API    | `apps/product-admin/src/product/*.ts`                               |
+| Product Consumer API | `apps/product-consumer/src/*.ts`                                    |
+| Reward Strategy      | `apps/loyalty-consumer/src/reward/strategy/*.ts`                    |
+| Seeding              | `apps/admin/src/seeder/*.ts`                                        |
+| CMS Router           | `apps/frontend-cms/src/router/index.tsx`                            |
+| Consumer Router      | `apps/frontend-consumer/src/App.tsx`                                |
+| Checkout UI          | `apps/frontend-consumer/src/pages/CheckoutView.tsx`                 |
+| CMS Voucher CRUD     | `apps/frontend-cms/src/pages/VoucherCreate.tsx`, `VoucherEdit.tsx`  |
