@@ -1,0 +1,290 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redisdata:/data
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  admin:
+    image: ${BACKEND_IMAGE:-ghcr.io/ahha/ahha-backend}:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: admin
+      PORT_ADMIN: "9002"
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_SYNC: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  loyalty-admin:
+    image: ${BACKEND_IMAGE:-ghcr.io/ahha/ahha-backend}:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: loyalty-admin
+      PORT_LOYALTY_ADMIN: "9003"
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_SYNC: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  user-admin:
+    image: ${BACKEND_IMAGE:-ghcr.io/ahha/ahha-backend}:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: user-admin
+      PORT_USER_ADMIN: "9004"
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_SYNC: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  loyalty-consumer:
+    image: ${BACKEND_IMAGE:-ghcr.io/ahha/ahha-backend}:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: loyalty-consumer
+      PORT_LOYALTY_CONSUMER: "9005"
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_SYNC: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  user-consumer:
+    image: ${BACKEND_IMAGE:-ghcr.io/ahha/ahha-backend}:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: user-consumer
+      PORT_USER_CONSUMER: "9006"
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_SYNC: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  product-admin:
+    image: ${BACKEND_IMAGE:-ghcr.io/ahha/ahha-backend}:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: product-admin
+      PORT_PRODUCT_ADMIN: "9007"
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_SYNC: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  product-consumer:
+    image: ${BACKEND_IMAGE:-ghcr.io/ahha/ahha-backend}:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: product-consumer
+      PORT_PRODUCT_CONSUMER: "9008"
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_SYNC: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redistro:
+    image: ${BACKEND_IMAGE:-ghcr.io/ahha/ahha-backend}:${TAG:-latest}
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: redistro
+      PORT_REDISTRO: "9009"
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_SYNC: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend-cms:
+    image: ${CMS_IMAGE:-ghcr.io/ahha/ahha-frontend-cms}:${TAG:-latest}
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend-consumer:
+    image: ${CONSUMER_IMAGE:-ghcr.io/ahha/ahha-frontend-consumer}:${TAG:-latest}
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  pgdata:
+  redisdata:

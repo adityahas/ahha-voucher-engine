@@ -1,0 +1,265 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      POSTGRES_DB: ${DB_NAME:-ahha_admin_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-ahha_admin_db}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redisdata:/data
+
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: admin
+      PORT_ADMIN: "9002"
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-false}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  loyalty-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: loyalty-admin
+      PORT_LOYALTY_ADMIN: "9003"
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-false}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  user-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: user-admin
+      PORT_USER_ADMIN: "9004"
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-false}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  loyalty-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: loyalty-consumer
+      PORT_LOYALTY_CONSUMER: "9005"
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-false}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  user-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: user-consumer
+      PORT_USER_CONSUMER: "9006"
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-false}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  product-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: product-admin
+      PORT_PRODUCT_ADMIN: "9007"
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-false}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  product-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: product-consumer
+      PORT_PRODUCT_CONSUMER: "9008"
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-false}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redistro:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      SERVICE_NAME: redistro
+      PORT_REDISTRO: "9009"
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-false}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend-cms:
+    build:
+      context: .
+      dockerfile: Dockerfile.cms
+    ports:
+      - "5173:80"
+    depends_on:
+      - admin
+      - loyalty-admin
+      - product-admin
+      - user-admin
+    restart: unless-stopped
+
+  frontend-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    ports:
+      - "5174:80"
+    depends_on:
+      - loyalty-consumer
+      - product-consumer
+      - user-consumer
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:

@@ -51,10 +51,7 @@ export class VoucherController {
 
   @Post(':code/claim')
   @UseGuards(ConsumerJwtGuard)
-  async claimVoucher(
-    @Param('code') voucherCode: string,
-    @Req() req: Request,
-  ) {
+  async claimVoucher(@Param('code') voucherCode: string, @Req() req: Request) {
     const userId = req.user['userId'];
     return this.voucherService.claimVoucher(userId, voucherCode);
   }
@@ -67,5 +64,12 @@ export class VoucherController {
   ) {
     const userId = req.user['userId'];
     return this.voucherService.calculateDiscount(dto, userId);
+  }
+
+  @Post(':code/redeem')
+  @UseGuards(ConsumerJwtGuard)
+  async redeemVoucher(@Param('code') voucherCode: string, @Req() req: Request) {
+    const userId = req.user['userId'];
+    return this.voucherService.useVoucher(userId, voucherCode);
   }
 }
