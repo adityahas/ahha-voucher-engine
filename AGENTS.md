@@ -51,7 +51,7 @@ When instructed to create a backend feature, use the corresponding backend pipel
 ## 🛠️ Tech Stack
 
 | Category        | Technology                                      |
-|-----------------|-------------------------------------------------|
+| --------------- | ----------------------------------------------- |
 | Framework       | NestJS 11.x                                     |
 | Language        | TypeScript 5.x                                  |
 | ORM             | TypeORM 0.3.x                                   |
@@ -165,7 +165,7 @@ Request → Nginx → Extract Subdomain → SubdomainMiddleware → CredentialMi
 ### Key Middleware
 
 | Middleware             | Purpose                                                      | Order |
-|------------------------|--------------------------------------------------------------|-------|
+| ---------------------- | ------------------------------------------------------------ | ----- |
 | `SubdomainMiddleware`  | Extracts subdomain from Host header, validates client exists | 1st   |
 | `CredentialMiddleware` | Validates `x-api-key` header against `client.api_key`        | 2nd   |
 
@@ -182,19 +182,19 @@ Request → Nginx → Extract Subdomain → SubdomainMiddleware → CredentialMi
 @Entity('clients', { synchronize: false })
 export class ClientEntity extends BaseEntity {
   @Column({ unique: true })
-  subdomain: string;           // Unique subdomain identifier (e.g., "client1")
+  subdomain: string; // Unique subdomain identifier (e.g., "client1")
 
   @Column()
-  api_key: string;             // API key for credential validation
+  api_key: string; // API key for credential validation
 
   @PrimaryColumn()
-  database_name: string;       // Primary key, tenant database name
+  database_name: string; // Primary key, tenant database name
 
   @Column()
-  database_username: string;   // Encrypted DB credentials
+  database_username: string; // Encrypted DB credentials
 
   @Column()
-  database_password: string;   // Encrypted
+  database_password: string; // Encrypted
 
   @Column()
   database_port: string;
@@ -209,14 +209,22 @@ export class ClientEntity extends BaseEntity {
 ```typescript
 // libs/base/src/entities/base.entity.ts
 export class BaseEntity {
-  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', precision: 3 })
+  @CreateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    precision: 3,
+  })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', precision: 3 })
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    precision: 3,
+  })
   updated_at: Date;
 
   @DeleteDateColumn({ type: 'timestamptz', nullable: true, precision: 3 })
-  deleted_at: Date | null;     // Soft delete support
+  deleted_at: Date | null; // Soft delete support
 }
 ```
 
@@ -227,23 +235,23 @@ export class BaseEntity {
 @Entity('vouchers')
 export class VoucherEntity extends BaseEntity {
   @PrimaryColumn({ type: 'varchar', unique: true })
-  code: string;                // Voucher code (primary key)
+  code: string; // Voucher code (primary key)
 
   @Column({ type: 'text', nullable: true })
   description: string;
 
   @Column({ type: 'int', default: 1 })
-  quota: number;               // Max usage count
+  quota: number; // Max usage count
 
   @Column({ type: 'text', nullable: true })
   image: string;
 
   // Discount pricing fields
   @Column({ type: 'varchar', default: 'percentage' })
-  discount_type: string;       // 'percentage' | 'fixed'
+  discount_type: string; // 'percentage' | 'fixed'
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  discount_value: number;      // Amount or percentage (e.g. 25 = 25%)
+  discount_value: number; // Amount or percentage (e.g. 25 = 25%)
 
   @ManyToMany(() => VoucherCategoryEntity, { cascade: true })
   @JoinTable({ name: 'vouchers_categories' })
@@ -257,7 +265,7 @@ export class VoucherEntity extends BaseEntity {
   validities: VoucherValidityEntity[];
 
   @OneToMany(() => VoucherBindingEntity, (b) => b.voucher, { cascade: true })
-  bindings: VoucherBindingEntity[];  // Product/brand/store bindings
+  bindings: VoucherBindingEntity[]; // Product/brand/store bindings
 
   @OneToMany(() => VoucherClaimEntity, (c) => c.voucher, { cascade: true })
   claims: VoucherClaimEntity[];
@@ -267,7 +275,7 @@ export class VoucherEntity extends BaseEntity {
 
   @ManyToMany(() => LoyaltyUserEntity, { cascade: true })
   @JoinTable({ name: 'vouchers_target_users' })
-  target_users: LoyaltyUserEntity[];  // Specific users allowed
+  target_users: LoyaltyUserEntity[]; // Specific users allowed
 }
 
 // Product Domain (libs/product/src/entities/)
@@ -299,10 +307,10 @@ export class RewardItemEntity extends BaseEntity {
   name: string;
 
   @Column({ type: 'varchar' })
-  type: string;                // 'gopay', 'pulsa', etc.
+  type: string; // 'gopay', 'pulsa', etc.
 
   @Column({ type: 'int', default: -1 })
-  stock: number;               // -1 = unlimited, 0 = out of stock
+  stock: number; // -1 = unlimited, 0 = out of stock
 
   @ManyToOne(() => RewardItemSourceEntity)
   source: RewardItemSourceEntity;
@@ -323,13 +331,16 @@ export class DatabaseService {
   private _dataSources: Map<string, DataSource> = new Map();
 
   // Get or create DataSource for tenant
-  async getConnection(databaseName: string, ...entityPath: string[]): Promise<DataSource>
+  async getConnection(
+    databaseName: string,
+    ...entityPath: string[]
+  ): Promise<DataSource>;
 
   // Create new connection with decrypted credentials
-  async createConnection(name: string, initFn: Function): Promise<DataSource>
+  async createConnection(name: string, initFn: Function): Promise<DataSource>;
 
   // Close and remove connection
-  async closeConnection(name: string): Promise<void>
+  async closeConnection(name: string): Promise<void>;
 }
 ```
 
@@ -341,9 +352,9 @@ export class EncryptionService {
   private readonly algorithm = 'aes-256-cbc';
   private readonly secretKey = process.env.CLIENT_DB_SECRET;
 
-  encrypt(text: string): string      // Returns "iv:encrypted" format
-  decrypt(text: string): string      // Decrypts AES format
-  comparePassword(raw: string, hashed: string): Promise<boolean>  // bcrypt
+  encrypt(text: string): string; // Returns "iv:encrypted" format
+  decrypt(text: string): string; // Decrypts AES format
+  comparePassword(raw: string, hashed: string): Promise<boolean>; // bcrypt
 }
 ```
 
@@ -352,7 +363,6 @@ export class EncryptionService {
 Key methods for the consumer-facing purchase flow:
 
 ```typescript
-
 @Injectable()
 export class VoucherService {
   // Validates voucher and returns discount breakdown
@@ -360,10 +370,10 @@ export class VoucherService {
     code: string,
     productId: string,
     subtotal: number,
-  ): Promise<{ discount_amount: number; final_price: number }>
+  ): Promise<{ discount_amount: number; final_price: number }>;
 
   // Marks voucher as used (called inside a DB transaction during purchase)
-  async useVoucher(code: string, userId: string): Promise<void>
+  async useVoucher(code: string, userId: string): Promise<void>;
 }
 ```
 
@@ -386,11 +396,14 @@ export class VoucherService {
     this.repository = dataSource.getRepository(VoucherEntity);
   }
 
-  create(createVoucherDto: CreateVoucherDto): Promise<VoucherEntity>
-  findAll(paginationDto: BasePaginationDto): Promise<PaginatedResponse>
-  findOne(id: string): Promise<VoucherEntity>
-  update(id: string, updateVoucherDto: UpdateVoucherDto): Promise<VoucherEntity>
-  remove(id: number): Promise<void>
+  create(createVoucherDto: CreateVoucherDto): Promise<VoucherEntity>;
+  findAll(paginationDto: BasePaginationDto): Promise<PaginatedResponse>;
+  findOne(id: string): Promise<VoucherEntity>;
+  update(
+    id: string,
+    updateVoucherDto: UpdateVoucherDto,
+  ): Promise<VoucherEntity>;
+  remove(id: number): Promise<void>;
 }
 ```
 
@@ -402,15 +415,21 @@ export class AclService {
   private readonly acl: Record<Role, string[]> = {
     [Role.USER]: ['read:profile'],
     [Role.ADMIN]: [
-      'read:profile', 'write:profile', 'read:users', 'write:users',
-      'read:vouchers', 'write:vouchers', 'read:quests', 'write:quests',
-      'read:voucher-categories'
+      'read:profile',
+      'write:profile',
+      'read:users',
+      'write:users',
+      'read:vouchers',
+      'write:vouchers',
+      'read:quests',
+      'write:quests',
+      'read:voucher-categories',
     ],
     [Role.SALES]: ['read:products', 'read:warehouses'],
-    [Role.DRIVER]: ['read:orders', 'write:orders']
+    [Role.DRIVER]: ['read:orders', 'write:orders'],
   };
 
-  can(role: Role, permission: string): boolean
+  can(role: Role, permission: string): boolean;
 }
 ```
 
@@ -421,7 +440,7 @@ export class AclService {
 ### Backend Applications
 
 | App              | Port | Environment Variable    | Base Path        | Auth                 |
-|------------------|------|-------------------------|------------------|----------------------|
+| ---------------- | ---- | ----------------------- | ---------------- | -------------------- |
 | admin            | 9002 | `PORT_ADMIN`            | `/admin`         | JWT Bearer + API Key |
 | loyalty-admin    | 9003 | `PORT_LOYALTY_ADMIN`    | `/loyalty-admin` | JWT Bearer + API Key |
 | loyalty-consumer | 9005 | `PORT_LOYALTY_CONSUMER` | `/loyalty`       | JWT + API Key        |
@@ -434,7 +453,7 @@ export class AclService {
 ### Frontend Applications
 
 | App               | Dev Port | Build Command                           | Description         |
-|-------------------|----------|-----------------------------------------|---------------------|
+| ----------------- | -------- | --------------------------------------- | ------------------- |
 | frontend-cms      | 5173     | `cd apps/frontend-cms && yarn dev`      | Admin/CMS panel     |
 | frontend-consumer | 5174     | `cd apps/frontend-consumer && yarn dev` | Consumer storefront |
 
@@ -484,7 +503,7 @@ Authorization: Bearer {jwt}            # For protected endpoints
 ### Guards
 
 | Guard              | Purpose                           | Usage                                 |
-|--------------------|-----------------------------------|---------------------------------------|
+| ------------------ | --------------------------------- | ------------------------------------- |
 | `AdminJwtGuard`    | Validates JWT for admin endpoints | `@UseGuards(AdminJwtGuard)`           |
 | `ConsumerJwtGuard` | Validates JWT for consumer        | `@UseGuards(ConsumerJwtGuard)`        |
 | `AclGuard`         | Permission-based access control   | `@UseGuards(AdminJwtGuard, AclGuard)` |
@@ -497,13 +516,11 @@ Authorization: Bearer {jwt}            # For protected endpoints
 export class VoucherController {
   @Post()
   @Permissions('write:vouchers')
-  create(@Body() dto: CreateVoucherDto) {
-  }
+  create(@Body() dto: CreateVoucherDto) {}
 
   @Get()
   @Permissions('read:vouchers')
-  findAll(@Query() pagination: BasePaginationDto) {
-  }
+  findAll(@Query() pagination: BasePaginationDto) {}
 }
 ```
 
@@ -514,7 +531,7 @@ export enum Role {
   USER = 'user',
   ADMIN = 'admin',
   SALES = 'sales',
-  DRIVER = 'driver'
+  DRIVER = 'driver',
 }
 ```
 
@@ -595,10 +612,13 @@ cd apps/frontend-cms && npx vitest run         # Run CMS admin frontend tests
 To ensure smooth command execution and avoid trial-and-error, follow these environment-specific rules:
 
 ### 1. macOS Path Configuration
+
 On this system, Node extensions (yarn, npm, node) are typically located in `/opt/homebrew/bin`. Always ensure this is in your `PATH` or use absolute paths for terminal commands.
+
 - **Recommended**: `export PATH="/opt/homebrew/bin:$PATH"` at the start of persistent sessions.
 
 ### 2. Command Execution
+
 - **Persistent Terminals**: Use a `RequestedTerminalID` (e.g., `main_terminal`) with `RunPersistent: true` to preserve path exports.
 - **Builds**: Use `yarn nest build <app>` or `npm run build` from the relevant directory.
 - **Nginx & Ports**: Ensure you map internal ports correctly (e.g., `product-consumer` → 9008).
@@ -670,20 +690,13 @@ module.exports = {
 ```json
 {
   "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
+    "moduleFileExtensions": ["js", "json", "ts"],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "testEnvironment": "node",
-    "roots": [
-      "<rootDir>/apps/",
-      "<rootDir>/libs/"
-    ],
+    "roots": ["<rootDir>/apps/", "<rootDir>/libs/"],
     "moduleNameMapper": {
       "^@core/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
       "^@core/base(|/.*)$": "<rootDir>/libs/base/src/$1",
@@ -777,7 +790,7 @@ http {
     server {
         listen 80;
         server_name ~^(?<client>[^.]+)\.ahha-be\.local$;
-        
+
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -863,8 +876,8 @@ export class MyService {
 
 ```typescript
 class ListVouchersDto extends BasePaginationDto {
-  page: number;    // 0-indexed
-  size: number;    // Items per page (default: 10)
+  page: number; // 0-indexed
+  size: number; // Items per page (default: 10)
   search?: string;
   sort?: string;
   order?: 'ASC' | 'DESC';
@@ -937,10 +950,74 @@ Response: {
 
 ---
 
+## 🔄 PR Review Workflow (Paperclip)
+
+When reviewing pull requests as the CTO agent, follow this workflow:
+
+### Trigger
+
+PRs opened against `main` or `staging` automatically create a Paperclip review issue via the `pr-review.yml` GitHub
+Actions workflow. The CTO agent is assigned for review.
+
+### Review Checklist
+
+1. **Architecture alignment** — Does the change follow the architecture principles?
+   - Database-per-tenant isolation maintained?
+   - Middleware ordering preserved? (SubdomainMiddleware → CredentialMiddleware)
+   - Path aliases used correctly? (`@core/auth`, `@core/database`, etc.)
+
+2. **Code quality**
+   - Pre-commit hooks pass: `yarn format:check`, `yarn lint`, `yarn type-check`
+   - No console.log or debug artifacts
+   - DTOs use proper validation decorators
+   - Repository pattern followed (DataSource from request context)
+
+3. **Security**
+   - JWT guards on admin and consumer endpoints
+   - ACL permissions checked for admin operations
+   - AES encryption for sensitive data
+   - No secrets or credentials in code
+   - CORS properly configured
+
+4. **Financial correctness**
+   - Monetary values use `decimal(12,2)` — never `float`
+   - Voucher usage is transactional (within TypeORM transaction)
+   - Discount calculations verified
+
+5. **Testing**
+   - New services/controllers have corresponding `.spec.ts` files
+   - E2E tests for critical paths (voucher claiming, purchase)
+   - Frontend changes have Vitest tests
+
+### PR Review Commands
+
+When reviewing via Paperclip:
+
+```
+# Link PR to review
+github:link ahha-voucher-engine <pr-number>
+
+# Review the PR diff
+review-checkout-pr ahha-voucher-engine <pr-number>
+
+# Post review result
+@paperclip comment "Review complete. See findings in thread."
+```
+
+### Post-Merge
+
+On merge to `main`, the `pr-local-deploy.yml` workflow triggers:
+
+- Builds Docker images and deploys to staging
+- Updates Paperclip issue with deployment status
+- Posts confirmation comment on PR
+
+---
+
 ## 📚 Related Files Reference
 
 | Concern              | Files                                                               |
-|----------------------|---------------------------------------------------------------------|
+| -------------------- | ------------------------------------------------------------------- |
 | Tenant Resolution    | `libs/middleware/src/middleware/subdomain.middleware.ts`            |
 | Credential Check     | `libs/middleware/src/middleware/credential.middleware.ts`           |
 | DB Connection        | `libs/database/src/database.service.ts`                             |
@@ -961,3 +1038,6 @@ Response: {
 | Consumer Router      | `apps/frontend-consumer/src/App.tsx`                                |
 | Checkout UI          | `apps/frontend-consumer/src/pages/CheckoutView.tsx`                 |
 | CMS Voucher CRUD     | `apps/frontend-cms/src/pages/VoucherCreate.tsx`, `VoucherEdit.tsx`  |
+| PR Review Workflow   | `.github/workflows/pr-review.yml`                                   |
+| Local Deploy         | `.github/workflows/pr-local-deploy.yml`                             |
+| Paperclip Setup      | `docs/paperclip-integration.md`                                     |

@@ -10,7 +10,7 @@ This application provides administrative endpoints for managing loyalty program 
 architecture with per-client database isolation.
 
 | Attribute      | Value                        |
-|----------------|------------------------------|
+| -------------- | ---------------------------- |
 | **Port**       | 9003 (`PORT_LOYALTY_ADMIN`)  |
 | **Base Path**  | `/loyalty-admin`             |
 | **Swagger UI** | `http://localhost:9003/api`  |
@@ -52,7 +52,7 @@ Authorization: Bearer {jwt}
 CRUD operations for vouchers with full feature support.
 
 | Method | Endpoint                      | Auth      | Permission       | Description               |
-|--------|-------------------------------|-----------|------------------|---------------------------|
+| ------ | ----------------------------- | --------- | ---------------- | ------------------------- |
 | POST   | `/loyalty-admin/vouchers`     | JWT + ACL | `write:vouchers` | Create voucher            |
 | GET    | `/loyalty-admin/vouchers`     | JWT + ACL | `read:vouchers`  | List vouchers (paginated) |
 | GET    | `/loyalty-admin/vouchers/:id` | JWT + ACL | `read:vouchers`  | Get voucher by code       |
@@ -72,7 +72,7 @@ CRUD operations for vouchers with full feature support.
 CRUD for voucher categorization.
 
 | Method | Endpoint                                | Auth      | Permission                  | Description     |
-|--------|-----------------------------------------|-----------|-----------------------------|-----------------|
+| ------ | --------------------------------------- | --------- | --------------------------- | --------------- |
 | GET    | `/loyalty-admin/voucher-categories`     | JWT + ACL | `read:voucher-categories`   | List categories |
 | GET    | `/loyalty-admin/voucher-categories/:id` | JWT + ACL | `read:voucher-categories`   | Get category    |
 | POST   | `/loyalty-admin/voucher-categories`     | JWT + ACL | `create:voucher-categories` | Create category |
@@ -84,7 +84,7 @@ CRUD for voucher categorization.
 CRUD for reward items (e.g., gopay, pulsa rewards).
 
 | Method | Endpoint                         | Auth | Description        |
-|--------|----------------------------------|------|--------------------|
+| ------ | -------------------------------- | ---- | ------------------ |
 | POST   | `/loyalty-admin/reward-item`     | None | Create reward item |
 | GET    | `/loyalty-admin/reward-item`     | None | List reward items  |
 | GET    | `/loyalty-admin/reward-item/:id` | None | Get reward item    |
@@ -98,7 +98,7 @@ CRUD for reward items (e.g., gopay, pulsa rewards).
 CRUD for reward item sources/strategies.
 
 | Method | Endpoint                                | Auth | Description   |
-|--------|-----------------------------------------|------|---------------|
+| ------ | --------------------------------------- | ---- | ------------- |
 | POST   | `/loyalty-admin/reward-item-source`     | None | Create source |
 | GET    | `/loyalty-admin/reward-item-source`     | None | List sources  |
 | GET    | `/loyalty-admin/reward-item-source/:id` | None | Get source    |
@@ -112,7 +112,7 @@ CRUD for reward item sources/strategies.
 Quest management for loyalty gamification.
 
 | Method | Endpoint                   | Auth      | Permission     | Description  |
-|--------|----------------------------|-----------|----------------|--------------|
+| ------ | -------------------------- | --------- | -------------- | ------------ |
 | POST   | `/loyalty-admin/quest`     | JWT + ACL | `write:quests` | Create quest |
 | GET    | `/loyalty-admin/quest`     | JWT + ACL | `read:quests`  | List quests  |
 | GET    | `/loyalty-admin/quest/:id` | JWT + ACL | `read:quests`  | Get quest    |
@@ -154,7 +154,7 @@ x-api-key: <client_api_key>
 Endpoints with guards require specific permissions:
 
 | Resource           | Read Permission           | Write Permission                                                                      |
-|--------------------|---------------------------|---------------------------------------------------------------------------------------|
+| ------------------ | ------------------------- | ------------------------------------------------------------------------------------- |
 | Vouchers           | `read:vouchers`           | `write:vouchers`                                                                      |
 | Voucher Categories | `read:voucher-categories` | `create:voucher-categories`, `update:voucher-categories`, `delete:voucher-categories` |
 | Quests             | `read:quests`             | `write:quests`                                                                        |
@@ -219,7 +219,7 @@ node dist/apps/loyalty-admin/main.js
 ## ⚙️ Environment Variables
 
 | Variable             | Default | Description                 |
-|----------------------|---------|-----------------------------|
+| -------------------- | ------- | --------------------------- |
 | `PORT_LOYALTY_ADMIN` | `9003`  | Application port            |
 | `DB_HOST`            | -       | Database host               |
 | `DB_PORT`            | `5432`  | Database port               |
@@ -244,7 +244,7 @@ node dist/apps/loyalty-admin/main.js
 
 4. **Entity Paths**: The module uses dynamic entity path resolution via `DatabaseService` for multi-tenant support:
    ```typescript
-   __dirname + '/../../../**/*.entity{.ts,.js}'
+   __dirname + '/../../../**/*.entity{.ts,.js}';
    ```
 
 ---
@@ -252,7 +252,7 @@ node dist/apps/loyalty-admin/main.js
 ## 🔗 Related Libraries
 
 | Library            | Path              | Purpose                           |
-|--------------------|-------------------|-----------------------------------|
+| ------------------ | ----------------- | --------------------------------- |
 | `@core/auth`       | `libs/auth`       | JWT guards, ACL, decorators       |
 | `@core/base`       | `libs/base`       | Base entity, pagination DTOs      |
 | `@core/database`   | `libs/database`   | Database service, client entity   |

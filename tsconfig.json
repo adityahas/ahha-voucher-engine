@@ -41,5 +41,11 @@
       "@core/user": ["libs/user/src"],
       "@core/user/*": ["libs/user/src/*"]
     }
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "apps/frontend-cms",
+    "apps/frontend-consumer"
+  ]
 }

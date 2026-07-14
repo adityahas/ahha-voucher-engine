@@ -15,7 +15,10 @@ export class VoucherValidityService {
     this.voucherRepository = dataSource.getRepository(VoucherEntity);
   }
 
-  async create(voucherId: string, createDto: CreateVoucherValidityDto): Promise<VoucherValidityEntity> {
+  async create(
+    voucherId: string,
+    createDto: CreateVoucherValidityDto,
+  ): Promise<VoucherValidityEntity> {
     const voucher = await this.voucherRepository.findOne({
       where: { code: voucherId },
     });
@@ -53,13 +56,19 @@ export class VoucherValidityService {
     });
 
     if (!validity) {
-      throw new NotFoundException(`VoucherValidity with ID ${id} acting on Voucher ${voucherId} not found`);
+      throw new NotFoundException(
+        `VoucherValidity with ID ${id} acting on Voucher ${voucherId} not found`,
+      );
     }
 
     return validity;
   }
 
-  async update(voucherId: string, id: number, updateDto: UpdateVoucherValidityDto): Promise<VoucherValidityEntity> {
+  async update(
+    voucherId: string,
+    id: number,
+    updateDto: UpdateVoucherValidityDto,
+  ): Promise<VoucherValidityEntity> {
     const validity = await this.findOne(voucherId, id);
     Object.assign(validity, updateDto);
     return this.validityRepository.save(validity);
@@ -70,4 +79,3 @@ export class VoucherValidityService {
     await this.validityRepository.remove(validity);
   }
 }
-

@@ -1,0 +1,89 @@
+name: PR Review via Paperclip
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches: [main, staging]
+
+jobs:
+  paperclip-review:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create or update Paperclip review issue
+        id: paperclip
+        env:
+          PAPERCLIP_API_URL: ${{ vars.PAPERCLIP_API_URL }}
+          PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_API_KEY }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR_BASE="${{ github.event.pull_request.base.ref }}"
+          PR_HEAD="${{ github.event.pull_request.head.ref }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_DIFF_URL="${{ github.event.pull_request.diff_url }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          ISSUE_TITLE="[PR #${PR_NUMBER}] ${PR_TITLE}"
+          ISSUE_BODY=$(cat <<EOF
+          ## PR Review Request
+
+          **Author:** @${PR_AUTHOR}
+          **Branch:** ${PR_HEAD} → ${PR_BASE}
+          **PR URL:** ${PR_URL}
+          **Diff:** ${PR_DIFF_URL}
+
+          ### Description
+          ${PR_BODY}
+
+          ---
+          *Automated review request via Paperclip. A CTO agent will review this PR.*
+          EOF
+          )
+
+          RESPONSE=$(curl -s -X POST "${PAPERCLIP_API_URL}/api/issues" \
+            -H "Authorization: Bearer ${PAPERCLIP_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg title "$ISSUE_TITLE" \
+              --arg body "$ISSUE_BODY" \
+              --arg externalId "pr-${PR_NUMBER}" \
+              '{title: $title, body: $body, externalId: $externalId, priority: "medium", labels: ["pr-review"]}')")
+
+          echo "Paperclip response: $RESPONSE"
+          ISSUE_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
+
+          if [ -n "$ISSUE_ID" ]; then
+            echo "Created Paperclip issue: $ISSUE_ID"
+            echo "issue_id=$ISSUE_ID" >> "$GITHUB_OUTPUT"
+            echo "paperclip_url=${PAPERCLIP_API_URL}/issues/${ISSUE_ID}" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Failed to create Paperclip issue"
+          fi
+
+      - name: Post PR comment with review status
+        if: steps.paperclip.outputs.issue_id != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueId = '${{ steps.paperclip.outputs.issue_id }}';
+            const paperclipUrl = '${{ steps.paperclip.outputs.paperclip_url }}';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                '## Paperclip Review Started',
+                '',
+                'A CTO agent review has been requested via Paperclip.',
+                '',
+                '- **Paperclip Issue:** ' + paperclipUrl,
+                '- **Status:** Pending review',
+                '',
+                'The agent will review this PR and provide feedback. You will be notified when the review is complete.',
+              ].join('\n'),
+            });

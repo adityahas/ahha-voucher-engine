@@ -11,7 +11,7 @@ vouchers, view their claimed vouchers, and claim rewards. It supports multi-tena
 isolation.
 
 | Attribute      | Value                          |
-|----------------|--------------------------------|
+| -------------- | ------------------------------ |
 | **Port**       | 9005 (`PORT_LOYALTY_CONSUMER`) |
 | **Base Path**  | `/loyalty`                     |
 | **Swagger UI** | `http://localhost:9005/api`    |
@@ -51,7 +51,7 @@ Authorization: Bearer {jwt}  (for protected endpoints)
 Voucher discovery and retrieval for consumers.
 
 | Method | Endpoint               | Auth | Description                                         |
-|--------|------------------------|------|-----------------------------------------------------|
+| ------ | ---------------------- | ---- | --------------------------------------------------- |
 | GET    | `/loyalty/vouchers`    | JWT  | Get eligible vouchers based on user_id and bindings |
 | GET    | `/loyalty/vouchers/my` | JWT  | Get user's claimed vouchers (paginated)             |
 
@@ -86,9 +86,9 @@ Voucher discovery and retrieval for consumers.
 
 ```typescript
 {
-  code: string;         // Voucher code
-  description: string;  // Voucher description
-  image: string;        // Voucher image URL
+  code: string; // Voucher code
+  description: string; // Voucher description
+  image: string; // Voucher image URL
 }
 ```
 
@@ -99,7 +99,7 @@ Voucher discovery and retrieval for consumers.
 Reward discovery and claiming with strategy pattern for different reward types.
 
 | Method | Endpoint                    | Auth | Description                |
-|--------|-----------------------------|------|----------------------------|
+| ------ | --------------------------- | ---- | -------------------------- |
 | GET    | `/rewards`                  | JWT  | List all available rewards |
 | POST   | `/rewards/claim/:reward_id` | JWT  | Claim a reward             |
 
@@ -218,7 +218,7 @@ node dist/apps/loyalty-consumer/main.js
 ## ⚙️ Environment Variables
 
 | Variable                | Default | Description                 |
-|-------------------------|---------|-----------------------------|
+| ----------------------- | ------- | --------------------------- |
 | `PORT_LOYALTY_CONSUMER` | `9005`  | Application port            |
 | `DB_HOST`               | -       | Database host               |
 | `DB_PORT`               | `5432`  | Database port               |
@@ -269,7 +269,7 @@ To add new reward types:
 ## 🔗 Related Libraries
 
 | Library            | Path              | Purpose                           |
-|--------------------|-------------------|-----------------------------------|
+| ------------------ | ----------------- | --------------------------------- |
 | `@core/auth`       | `libs/auth`       | JWT guards (ConsumerJwtGuard)     |
 | `@core/base`       | `libs/base`       | Base controller, pagination DTOs  |
 | `@core/database`   | `libs/database`   | Database service, client entity   |

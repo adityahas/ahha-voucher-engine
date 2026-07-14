@@ -22,32 +22,41 @@ Ahha Voucher Engine adalah sistem backend berbasis NestJS dan TypeORM yang diran
 Sistem ini mendukung model **database-per-tenant**. Setiap `Client` memiliki konfigurasi database sendiri (host, port, username, password, nama DB) yang disimpan dalam tabel `clients`. Saat request masuk, subdomain diekstrak dan dipakai untuk menentukan koneksi database aktif.
 
 #### 🔁 Middleware:
+
 - `SubdomainMiddleware` menangkap subdomain dan menyimpannya dalam objek request.
 - `CredentialMiddleware` menyisipkan koneksi database yang sesuai.
 
 ### 2. Modul Utama
 
 #### 📦 Voucher
+
 Entitas utama yang mengatur:
+
 - `code`, `description`, `quota`
 - `categories`, `validities`, `bindings`, `target_users`
 
 #### 🧷 Voucher Category
+
 Kategori seperti `food`, `electronics`, dll. Dihubungkan via relasi ManyToMany ke voucher.
 
 #### ⏳ Voucher Validity
+
 Rentang tanggal dan waktu voucher berlaku.
 
 #### 🔗 Voucher Binding
+
 Binding voucher ke produk/brand/store tertentu menggunakan `bind_type` dan `bind_value`.
 
 #### 👥 Target Users
+
 Daftar user yang boleh menggunakan voucher.
 
 #### 📤 Voucher Claim
+
 Riwayat klaim voucher oleh user.
 
 #### ✅ Voucher Usage
+
 Riwayat pemakaian voucher dalam transaksi.
 
 ---
@@ -55,6 +64,7 @@ Riwayat pemakaian voucher dalam transaksi.
 ## 🔐 Autentikasi & Admin
 
 ### Admin
+
 - Didaftarkan per client.
 - Login menggunakan email dan password (bcrypt).
 - Mendapatkan token JWT untuk autentikasi.
@@ -76,6 +86,7 @@ Riwayat pemakaian voucher dalam transaksi.
 ## 🌱 Seeder
 
 Tersedia seeder untuk:
+
 - `clients`: konfigurasi multitenant
 - `admins`: akun login awal
 - Seeder bisa dijalankan via `yarn seed`
@@ -119,46 +130,46 @@ Tersedia seeder untuk:
 3. Setup PostgreSQL dan buat database utama
 4. Setup nginx untuk multi domain
 5. Ini contoh konfigurasi nginx:
-    ```
-    worker_processes 1;
-    
-    events {
-    worker_connections 1024;
-    }
-    
-    http {
-    include       mime.types;
-    default_type  application/octet-stream;
-    
-        sendfile        on;
-        keepalive_timeout  65;
-    
-        server {
-            listen 80;
-            server_name ~^(?<client>[^.]+)\.ahha-be\.local$;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    
-            location /users {
-                proxy_pass http://localhost:9004;
-            }
-            location /admin {
-                proxy_pass http://localhost:9002;
-            }
-            location /loyalty-admin {
-                proxy_pass http://localhost:9003;
-            }
-            location /loyalty {
-                proxy_pass http://localhost:9005;
-            }
-    
-            # Tambahkan CORS headers jika perlu
-            add_header Access-Control-Allow-Origin *;
-            add_header Access-Control-Allow-Headers DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,notif-token,fcm-id,Language,Channel;
-        }
-    } 
-    ```
+   ```
+   worker_processes 1;
+
+   events {
+   worker_connections 1024;
+   }
+
+   http {
+   include       mime.types;
+   default_type  application/octet-stream;
+
+       sendfile        on;
+       keepalive_timeout  65;
+
+       server {
+           listen 80;
+           server_name ~^(?<client>[^.]+)\.ahha-be\.local$;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+           location /users {
+               proxy_pass http://localhost:9004;
+           }
+           location /admin {
+               proxy_pass http://localhost:9002;
+           }
+           location /loyalty-admin {
+               proxy_pass http://localhost:9003;
+           }
+           location /loyalty {
+               proxy_pass http://localhost:9005;
+           }
+
+           # Tambahkan CORS headers jika perlu
+           add_header Access-Control-Allow-Origin *;
+           add_header Access-Control-Allow-Headers DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,notif-token,fcm-id,Language,Channel;
+       }
+   }
+   ```
 6. Load konfigurasi nginx: `sudo nginx -c /Users/adityahas/nginx-local/nginx.conf`
 7. Reload nginx: `sudo nginx -s reload`
 8. Run app admin: `yarn start:admin --watch`

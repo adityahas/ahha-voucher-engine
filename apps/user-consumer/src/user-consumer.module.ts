@@ -1,4 +1,10 @@
-import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+  Scope,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '@core/auth';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
@@ -15,6 +21,7 @@ import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { UserConsumerController } from './user-consumer.controller';
 import { UserConsumerService } from './user-consumer.service';
 import { EncryptionService } from '@core/encryption';
+import { HealthController } from '@core/base';
 
 dotenv.config();
 
@@ -77,11 +84,14 @@ dotenv.config();
       inject: ['USER_CONSUMER_CONNECTION', EncryptionService, JwtService],
     },
   ],
-  controllers: [UserConsumerController],
+  controllers: [UserConsumerController, HealthController],
   exports: ['USER_CONSUMER_CONNECTION'],
 })
 export class UserConsumerModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
+    consumer
+      .apply(SubdomainMiddleware, CredentialMiddleware)
+      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .forRoutes('*');
   }
 }

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-slate-950: #020617;
@@ -18,5 +18,8 @@ body {
   min-height: 100vh;
   background-color: var(--color-slate-950);
   color: white;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }

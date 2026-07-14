@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Plus, Edit2, Trash2, Link as LinkIcon, AlertCircle, Loader2 } from 'lucide-react';
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Link as LinkIcon,
+  AlertCircle,
+  Loader2,
+} from 'lucide-react';
 import {
   getVoucherBindings,
   createVoucherBinding,
@@ -10,20 +17,30 @@ import {
 import { Button } from './ui/Button';
 import VoucherBindingModal from './VoucherBindingModal';
 import { ConfirmationModal } from './ui/ConfirmationModal';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/Card';
 
 interface VoucherBindingListProps {
   voucherId: string;
 }
 
-export const VoucherBindingList: React.FC<VoucherBindingListProps> = ({ voucherId }) => {
+export const VoucherBindingList: React.FC<VoucherBindingListProps> = ({
+  voucherId,
+}) => {
   const [bindings, setBindings] = useState<VoucherBinding[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBinding, setEditingBinding] = useState<VoucherBinding | null>(null);
+  const [editingBinding, setEditingBinding] = useState<VoucherBinding | null>(
+    null,
+  );
 
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -48,7 +65,9 @@ export const VoucherBindingList: React.FC<VoucherBindingListProps> = ({ voucherI
     }
   }, [fetchBindings, voucherId]);
 
-  const handleCreateOrUpdate = async (bindingPayload: Partial<VoucherBinding>) => {
+  const handleCreateOrUpdate = async (
+    bindingPayload: Partial<VoucherBinding>,
+  ) => {
     if (editingBinding) {
       await updateVoucherBinding(voucherId, editingBinding.id, bindingPayload);
     } else {
@@ -67,7 +86,7 @@ export const VoucherBindingList: React.FC<VoucherBindingListProps> = ({ voucherI
 
   const confirmDelete = async () => {
     if (!bindingToDelete) return;
-    
+
     setError(null);
     setIsDeleting(bindingToDelete);
     try {
@@ -100,7 +119,9 @@ export const VoucherBindingList: React.FC<VoucherBindingListProps> = ({ voucherI
             <LinkIcon className="text-primary-400" size={20} />
             Binding Constraints
           </CardTitle>
-          <CardDescription>Restrict voucher usage by specific rules.</CardDescription>
+          <CardDescription>
+            Restrict voucher usage by specific rules.
+          </CardDescription>
         </div>
         <Button variant="primary" icon={Plus} size="sm" onClick={openAddModal}>
           Add Constraint
@@ -117,16 +138,21 @@ export const VoucherBindingList: React.FC<VoucherBindingListProps> = ({ voucherI
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12 space-y-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
-            <p className="text-sm text-slate-400 font-medium">Loading constraints...</p>
+            <p className="text-sm text-slate-400 font-medium">
+              Loading constraints...
+            </p>
           </div>
         ) : bindings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-slate-700/50">
               <LinkIcon className="h-8 w-8 text-slate-500" />
             </div>
-            <h3 className="text-lg font-bold text-slate-300">No Constraints Defined</h3>
+            <h3 className="text-lg font-bold text-slate-300">
+              No Constraints Defined
+            </h3>
             <p className="text-sm text-slate-500 mt-2 max-w-sm">
-              This voucher currently has global applicability. Add constraints to restrict usage.
+              This voucher currently has global applicability. Add constraints
+              to restrict usage.
             </p>
           </div>
         ) : (
@@ -134,9 +160,15 @@ export const VoucherBindingList: React.FC<VoucherBindingListProps> = ({ voucherI
             <table className="w-full text-left text-sm text-slate-400">
               <thead className="bg-slate-800/40 text-xs uppercase font-bold text-slate-500 tracking-wider">
                 <tr>
-                  <th scope="col" className="px-6 py-4">Constraint Type</th>
-                  <th scope="col" className="px-6 py-4">Value / Target</th>
-                  <th scope="col" className="px-6 py-4 text-right">Actions</th>
+                  <th scope="col" className="px-6 py-4">
+                    Constraint Type
+                  </th>
+                  <th scope="col" className="px-6 py-4">
+                    Value / Target
+                  </th>
+                  <th scope="col" className="px-6 py-4 text-right">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
@@ -171,7 +203,9 @@ export const VoucherBindingList: React.FC<VoucherBindingListProps> = ({ voucherI
                           type="button"
                           onClick={(e) => handleDelete(e, binding.id)}
                           className={`p-2 bg-slate-800/50 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg transition-colors border border-transparent hover:border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed ${
-                            isDeleting === binding.id ? 'bg-red-500/10 text-red-500 border-red-500/20' : ''
+                            isDeleting === binding.id
+                              ? 'bg-red-500/10 text-red-500 border-red-500/20'
+                              : ''
                           }`}
                           title="Delete"
                           disabled={isDeleting !== null}

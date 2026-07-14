@@ -7,7 +7,10 @@ interface ClaimedVoucherCardProps {
   index: number;
 }
 
-export function ClaimedVoucherCard({ claimedVoucher, index }: ClaimedVoucherCardProps) {
+export function ClaimedVoucherCard({
+  claimedVoucher,
+  index,
+}: ClaimedVoucherCardProps) {
   const { voucher, created_at } = claimedVoucher;
   let claimedDate = 'Unknown Date';
   if (created_at) {
@@ -29,20 +32,20 @@ export function ClaimedVoucherCard({ claimedVoucher, index }: ClaimedVoucherCard
       className="glass-panel group relative overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:border-fuchsia-500/50 hover:shadow-2xl hover:shadow-fuchsia-500/20"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/0 via-cyan-500/0 to-transparent transition-all duration-500 group-hover:from-fuchsia-500/10 group-hover:via-cyan-500/10" />
-      
+
       <div className="relative z-10 p-6 flex flex-col h-full justify-between">
         <div>
           <div className="flex justify-between items-start mb-4">
             <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-fuchsia-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-fuchsia-500/20">
               <Ticket className="w-6 h-6 text-white" />
             </div>
-            
+
             <span className="flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20">
               <CalendarClock className="w-3 h-3" />
               Claimed {claimedDate}
             </span>
           </div>
-          
+
           <h3 className="text-xl font-bold text-white mb-1 leading-tight">
             {voucher.name}
           </h3>
@@ -54,17 +57,20 @@ export function ClaimedVoucherCard({ claimedVoucher, index }: ClaimedVoucherCard
               {voucher.voucher_type?.replace('_', ' ') || 'CLAIMABLE'}
             </span>
           </div>
-          
+
           <p className="text-sm text-slate-400 mb-4 line-clamp-2">
             {voucher.description}
           </p>
-          
+
           <div className="space-y-3">
             {voucher.categories?.length > 0 && (
               <div className="flex flex-wrap gap-1.5 items-center pb-2 border-b border-white/5">
                 <Tag className="w-3 h-3 text-slate-500 mr-1" />
                 {voucher.categories.map((cat) => (
-                  <span key={cat.id} className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 text-slate-300 border border-white/10">
+                  <span
+                    key={cat.id}
+                    className="text-[10px] px-2 py-0.5 rounded-md bg-white/5 text-slate-300 border border-white/10"
+                  >
                     {cat.name}
                   </span>
                 ))}
@@ -74,10 +80,10 @@ export function ClaimedVoucherCard({ claimedVoucher, index }: ClaimedVoucherCard
         </div>
 
         <div className="mt-6">
-            {/* Action buttons like 'Use' or 'Copy Code' could go here in the future */}
-            <div className="w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-center text-sm font-medium text-slate-300 cursor-not-allowed">
-               Ready to Use
-            </div>
+          {/* Action buttons like 'Use' or 'Copy Code' could go here in the future */}
+          <div className="w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-center text-sm font-medium text-slate-300 cursor-not-allowed">
+            Ready to Use
+          </div>
         </div>
       </div>
     </motion.div>

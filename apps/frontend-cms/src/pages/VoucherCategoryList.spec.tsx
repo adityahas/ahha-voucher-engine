@@ -37,8 +37,10 @@ describe('VoucherCategoryList', () => {
   ];
 
   it('renders loading state initially', () => {
-    (api.getVoucherCategories as any).mockImplementation(() => new Promise(() => {}));
-    
+    (api.getVoucherCategories as any).mockImplementation(
+      () => new Promise(() => {}),
+    );
+
     render(<VoucherCategoryList />);
     expect(screen.getByText('Loading categories...')).toBeInTheDocument();
   });
@@ -61,7 +63,9 @@ describe('VoucherCategoryList', () => {
     render(<VoucherCategoryList />);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Create Category/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Create Category/i }),
+      ).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByRole('button', { name: /Create Category/i }));
@@ -78,8 +82,10 @@ describe('VoucherCategoryList', () => {
 
     const editButtons = screen.getAllByTitle('Edit');
     fireEvent.click(editButtons[0]);
-    
-    expect(mockNavigate).toHaveBeenCalledWith('/voucher-categories/free-shipping/edit');
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/voucher-categories/free-shipping/edit',
+    );
   });
 
   it('calls deleteVoucherCategory when delete button is clicked and confirmed', async () => {
@@ -98,7 +104,7 @@ describe('VoucherCategoryList', () => {
 
     expect(window.confirm).toHaveBeenCalled();
     expect(api.deleteVoucherCategory).toHaveBeenCalledWith('free-shipping');
-    
+
     // Should re-fetch
     await waitFor(() => {
       expect(api.getVoucherCategories).toHaveBeenCalledTimes(2);

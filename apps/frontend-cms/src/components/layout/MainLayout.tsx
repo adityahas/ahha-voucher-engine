@@ -1,7 +1,15 @@
 import React from 'react';
 import { Outlet, Navigate, NavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth.store';
-import { LayoutDashboard, LogOut, Settings, Users, Ticket, LayoutGrid, Package } from 'lucide-react';
+import {
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Users,
+  Ticket,
+  LayoutGrid,
+  Package,
+} from 'lucide-react';
 
 export const MainLayout: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());

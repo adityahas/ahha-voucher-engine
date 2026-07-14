@@ -57,7 +57,10 @@ export class VoucherController {
   @Patch(':id')
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('write:vouchers')
-  async update(@Param('id') id: string, @Body() updateVoucherDto: UpdateVoucherDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateVoucherDto: UpdateVoucherDto,
+  ) {
     const voucher = await this.voucherService.update(id, updateVoucherDto);
     return plainToInstance(ResponseVoucherDto, voucher);
   }

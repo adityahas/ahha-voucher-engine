@@ -23,11 +23,7 @@ export interface Voucher {
 export interface VoucherBinding {
   id: number;
   bind_type:
-    | 'ROLE'
-    | 'PRODUCT_TYPE'
-    | 'PRODUCT_SKU'
-    | 'PRODUCT_VENDOR'
-    | string;
+    'ROLE' | 'PRODUCT_TYPE' | 'PRODUCT_SKU' | 'PRODUCT_VENDOR' | string;
   bind_value: string;
   created_at?: string;
   updated_at?: string;

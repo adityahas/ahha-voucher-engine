@@ -52,7 +52,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div 
+      <div
         className="bg-slate-900 border border-slate-700 shadow-2xl rounded-3xl p-6 w-full max-w-sm animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >

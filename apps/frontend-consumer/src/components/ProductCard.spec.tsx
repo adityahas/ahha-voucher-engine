@@ -6,7 +6,11 @@ import type { Product } from '../types/product';
 // Mock framer-motion to avoid JSDOM issues
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, className, ...props }: any) => <div className={className} {...props}>{children}</div>,
+    div: ({ children, className, ...props }: any) => (
+      <div className={className} {...props}>
+        {children}
+      </div>
+    ),
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
@@ -27,9 +31,11 @@ describe('ProductCard', () => {
     render(<ProductCard product={mockProduct} />);
 
     expect(screen.getByText('Premium Voucher Pack')).toBeInTheDocument();
-    expect(screen.getByText('A collection of high-value vouchers.')).toBeInTheDocument();
+    expect(
+      screen.getByText('A collection of high-value vouchers.'),
+    ).toBeInTheDocument();
     expect(screen.getByText(/IDR 150,000/)).toBeInTheDocument();
-    
+
     const img = screen.getByRole('img');
     expect(img).toHaveAttribute('src', mockProduct.image);
     expect(img).toHaveAttribute('alt', mockProduct.name);
@@ -38,7 +44,7 @@ describe('ProductCard', () => {
   it('renders fallback icon when image is missing', () => {
     const productWithoutImage = { ...mockProduct, image: undefined };
     const { container } = render(<ProductCard product={productWithoutImage} />);
-    
+
     // Should not have an img tag
     expect(container.querySelector('img')).toBeNull();
     // Should have the SVG icon (ShoppingBag) as placeholder

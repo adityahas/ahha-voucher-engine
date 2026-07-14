@@ -60,7 +60,7 @@ describe('VoucherDetail Component', () => {
   };
 
   const mockUsers = [
-    { id: 'user-123', name: 'John Doe', email: 'john@example.com' }
+    { id: 'user-123', name: 'John Doe', email: 'john@example.com' },
   ];
 
   beforeEach(() => {
@@ -73,7 +73,7 @@ describe('VoucherDetail Component', () => {
         <Routes>
           <Route path="/vouchers/:code" element={<VoucherDetail />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
   it('shows loading state initially', () => {
@@ -97,7 +97,9 @@ describe('VoucherDetail Component', () => {
   });
 
   it('shows error UI when API fails', async () => {
-    (getVoucherByCode as any).mockRejectedValueOnce(new Error('Voucher Engine Timeout'));
+    (getVoucherByCode as any).mockRejectedValueOnce(
+      new Error('Voucher Engine Timeout'),
+    );
     renderComponent('INVALID');
 
     await waitFor(() => {
@@ -107,7 +109,10 @@ describe('VoucherDetail Component', () => {
   });
 
   it('renders DEPLETED status when quota is 0', async () => {
-    (getVoucherByCode as any).mockResolvedValueOnce({ ...mockVoucher, quota: 0 });
+    (getVoucherByCode as any).mockResolvedValueOnce({
+      ...mockVoucher,
+      quota: 0,
+    });
     renderComponent();
 
     await waitFor(() => {
@@ -144,11 +149,16 @@ describe('VoucherDetail Component', () => {
   });
 
   it('shows fallback when no users are targeted', async () => {
-    (getVoucherByCode as any).mockResolvedValueOnce({ ...mockVoucher, target_users: [] });
+    (getVoucherByCode as any).mockResolvedValueOnce({
+      ...mockVoucher,
+      target_users: [],
+    });
     renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText(/No specific users targeted/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/No specific users targeted/i),
+      ).toBeInTheDocument();
     });
   });
 });

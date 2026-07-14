@@ -3,6 +3,7 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
+  RequestMethod,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '@core/auth';
@@ -17,6 +18,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { AdminEntity } from './entities/admin.entity';
+import { HealthController } from '@core/base';
 
 dotenv.config();
 
@@ -45,12 +47,15 @@ dotenv.config();
     DatabaseModule,
     TypeOrmModule.forFeature([AdminEntity]),
   ],
-  controllers: [AdminController],
+  controllers: [AdminController, HealthController],
   providers: [AdminService, JwtStrategy],
   exports: [AdminService],
 })
 export class AdminModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
+    consumer
+      .apply(SubdomainMiddleware, CredentialMiddleware)
+      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .forRoutes('*');
   }
 }

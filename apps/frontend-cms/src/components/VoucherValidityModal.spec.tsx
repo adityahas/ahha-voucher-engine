@@ -20,39 +20,49 @@ describe('VoucherValidityModal Component', () => {
   });
 
   it('SHOULD not render when isOpen is false', () => {
-    const { container } = render(<VoucherValidityModal {...defaultProps} isOpen={false} />);
+    const { container } = render(
+      <VoucherValidityModal {...defaultProps} isOpen={false} />,
+    );
     expect(container.firstChild).toBeNull();
   });
 
   it('SHOULD render create mode correctly with default values', () => {
     render(<VoucherValidityModal {...defaultProps} />);
-    
+
     expect(screen.getByText('Add Schedule')).toBeInTheDocument();
-    
+
     // Check default values
-    const typeSelect: HTMLSelectElement = screen.getByLabelText(/Schedule Type/i) as HTMLSelectElement;
+    const typeSelect: HTMLSelectElement = screen.getByLabelText(
+      /Schedule Type/i,
+    ) as HTMLSelectElement;
     expect(typeSelect.value).toBe('daily');
-    
-    const startTimeInput: HTMLInputElement = screen.getByLabelText(/Start Time/i) as HTMLInputElement;
+
+    const startTimeInput: HTMLInputElement = screen.getByLabelText(
+      /Start Time/i,
+    ) as HTMLInputElement;
     expect(startTimeInput.value).toBe('00:00:00');
-    
-    const endTimeInput: HTMLInputElement = screen.getByLabelText(/End Time/i) as HTMLInputElement;
+
+    const endTimeInput: HTMLInputElement = screen.getByLabelText(
+      /End Time/i,
+    ) as HTMLInputElement;
     expect(endTimeInput.value).toBe('23:59:59');
   });
 
   it('SHOULD show validation error if start date is empty', async () => {
     render(<VoucherValidityModal {...defaultProps} />);
-    
+
     const saveButton = screen.getByRole('button', { name: /Save Schedule/i });
     fireEvent.click(saveButton);
-    
-    expect(await screen.findByText('Start Date is required')).toBeInTheDocument();
+
+    expect(
+      await screen.findByText('Start Date is required'),
+    ).toBeInTheDocument();
   });
 
   it('SHOULD call onSave with formatted payload on successful submit', async () => {
     mockOnSave.mockResolvedValueOnce(undefined);
     render(<VoucherValidityModal {...defaultProps} />);
-    
+
     const startDateInput = screen.getByLabelText(/Start Date/i);
     fireEvent.change(startDateInput, { target: { value: '2024-10-10' } });
 
@@ -84,16 +94,22 @@ describe('VoucherValidityModal Component', () => {
       end_time: '18:00:00',
     };
     render(<VoucherValidityModal {...defaultProps} validity={mockValidity} />);
-    
+
     expect(screen.getByText('Edit Schedule')).toBeInTheDocument();
-    
-    const typeSelect: HTMLSelectElement = screen.getByLabelText(/Schedule Type/i) as HTMLSelectElement;
+
+    const typeSelect: HTMLSelectElement = screen.getByLabelText(
+      /Schedule Type/i,
+    ) as HTMLSelectElement;
     expect(typeSelect.value).toBe('birthday');
-    
-    const startDateInput: HTMLInputElement = screen.getByLabelText(/Start Date/i) as HTMLInputElement;
+
+    const startDateInput: HTMLInputElement = screen.getByLabelText(
+      /Start Date/i,
+    ) as HTMLInputElement;
     expect(startDateInput.value).toBe('2025-01-01');
-    
-    const startTimeInput: HTMLInputElement = screen.getByLabelText(/Start Time/i) as HTMLInputElement;
+
+    const startTimeInput: HTMLInputElement = screen.getByLabelText(
+      /Start Time/i,
+    ) as HTMLInputElement;
     expect(startTimeInput.value).toBe('09:00:00');
   });
 });

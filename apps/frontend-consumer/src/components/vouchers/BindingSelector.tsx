@@ -27,14 +27,21 @@ export function BindingSelector({ onFind, isLoading }: BindingSelectorProps) {
 
   const handleAdd = () => {
     if (!currentValue.trim()) return;
-    
+
     // Check for duplicates
-    if (bindings.some(b => b.bind_type === currentType && b.bind_value === currentValue)) {
-        setCurrentValue('');
-        return;
+    if (
+      bindings.some(
+        (b) => b.bind_type === currentType && b.bind_value === currentValue,
+      )
+    ) {
+      setCurrentValue('');
+      return;
     }
 
-    setBindings([...bindings, { bind_type: currentType, bind_value: currentValue }]);
+    setBindings([
+      ...bindings,
+      { bind_type: currentType, bind_value: currentValue },
+    ]);
     setCurrentValue('');
   };
 
@@ -53,7 +60,7 @@ export function BindingSelector({ onFind, isLoading }: BindingSelectorProps) {
       className="glass-panel p-6 mb-10 border border-white/10 bg-slate-900/40 relative overflow-hidden"
     >
       <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
-      
+
       <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
         <Search className="w-5 h-5 text-cyan-400" />
         Voucher Finder
@@ -99,7 +106,9 @@ export function BindingSelector({ onFind, isLoading }: BindingSelectorProps) {
           ))}
         </AnimatePresence>
         {bindings.length === 0 && (
-          <p className="text-sm text-slate-500 italic py-1">No filters added yet. Fetching all eligible vouchers.</p>
+          <p className="text-sm text-slate-500 italic py-1">
+            No filters added yet. Fetching all eligible vouchers.
+          </p>
         )}
       </div>
 
@@ -109,10 +118,19 @@ export function BindingSelector({ onFind, isLoading }: BindingSelectorProps) {
           disabled={isLoading}
           className="flex-1 bg-gradient-to-r from-cyan-600 to-fuchsia-600 hover:from-cyan-500 hover:to-fuchsia-500 text-white border-none shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all gap-2"
         >
-          {isLoading ? <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}><Search className="w-4 h-4" /></motion.div> : <Search className="w-4 h-4" />}
+          {isLoading ? (
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1 }}
+            >
+              <Search className="w-4 h-4" />
+            </motion.div>
+          ) : (
+            <Search className="w-4 h-4" />
+          )}
           Find Eligible Vouchers
         </Button>
-        
+
         {bindings.length > 0 && (
           <Button
             onClick={handleReset}

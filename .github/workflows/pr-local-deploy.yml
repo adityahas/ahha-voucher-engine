@@ -1,0 +1,82 @@
+name: Local Deploy on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main, staging]
+
+jobs:
+  local-deploy:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set deployment tag
+        id: tag
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "tag=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "branch=${{ github.event.pull_request.base.ref }}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to staging environment
+        if: vars.STAGING_HOST != '' || vars.DEPLOY_HOST != ''
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ vars.STAGING_HOST || vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ vars.DEPLOY_PATH || '/opt/ahha-staging' }}
+            echo "Deploying PR #${{ github.event.pull_request.number }} (${{ steps.tag.outputs.tag }})"
+            echo "Branch: ${{ steps.tag.outputs.branch }}"
+            echo "Merged by: ${{ github.event.pull_request.merged_by.login }}"
+
+            echo "TAG=${{ steps.tag.outputs.tag }}" > .env.tag
+            echo "BRANCH=${{ steps.tag.outputs.branch }}" >> .env.tag
+
+            docker compose -f docker-compose.yml --env-file .env --env-file .env.tag pull
+            docker compose -f docker-compose.yml --env-file .env --env-file .env.tag up -d --remove-orphans
+
+            echo "Deploy complete. Services running:"
+            docker compose -f docker-compose.yml ps
+
+      - name: Report deploy to Paperclip
+        if: vars.PAPERCLIP_API_URL != ''
+        env:
+          PAPERCLIP_API_URL: ${{ vars.PAPERCLIP_API_URL }}
+          PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_API_KEY }}
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_AUTHOR="${{ github.event.pull_request.merged_by.login }}"
+          DEPLOY_TAG="${{ steps.tag.outputs.tag }}"
+          DEPLOY_BRANCH="${{ steps.tag.outputs.branch }}"
+
+          curl -s -X POST "${PAPERCLIP_API_URL}/api/issues/pr-${PR_NUMBER}/comments" \
+            -H "Authorization: Bearer ${PAPERCLIP_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg body "## Deployed to staging\n- **PR:** #${PR_NUMBER}\n- **Commit:** ${DEPLOY_TAG}\n- **Branch:** ${DEPLOY_BRANCH}\n- **Merged by:** @${PR_AUTHOR}")"
+
+      - name: Notify PR merge status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = '${{ github.event.pull_request.number }}';
+            const tag = '${{ steps.tag.outputs.tag }}';
+            const branch = '${{ steps.tag.outputs.branch }}';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                '## Deployed to Staging',
+                '',
+                'PR #' + prNumber + ' has been merged and deployed to the staging environment.',
+                '',
+                '- **Commit:** `' + tag + '`',
+                '- **Branch:** `' + branch + '`',
+                '- **Merged by:** @' + context.payload.pull_request.merged_by.login,
+              ].join('\n'),
+            });

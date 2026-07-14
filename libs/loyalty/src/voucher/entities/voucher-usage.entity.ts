@@ -1,4 +1,10 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { VoucherEntity } from './voucher.entity';
 import { BaseEntity } from '@core/base/entities/base.entity';
 import { LoyaltyUserEntity } from '../../entities/loyalty-user.entity';

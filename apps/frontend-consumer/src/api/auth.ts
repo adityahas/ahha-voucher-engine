@@ -1,6 +1,7 @@
 import { useAuthStore } from '../store/auth.store';
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local'; // Pointing to user-consumer api gateway
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://client1.ahha-be.local'; // Pointing to user-consumer api gateway
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const { apiKey } = useAuthStore.getState();

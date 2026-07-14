@@ -1,8 +1,13 @@
-import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+  Scope,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule, DatabaseService } from '@core/database';
 import { AuthModule } from '@core/auth';
-import { ProductEntity } from '@core/product/entities/product.entity';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { DataSource } from 'typeorm';
@@ -11,6 +16,7 @@ import { ClientEntity } from '@core/database/entities/client.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as dotenv from 'dotenv';
 import { ProductConsumerController } from './product-consumer.controller';
+import { HealthController } from '@core/base';
 
 dotenv.config();
 
@@ -48,11 +54,14 @@ dotenv.config();
       inject: [REQUEST, DatabaseService],
     },
   ],
-  controllers: [ProductConsumerController],
+  controllers: [ProductConsumerController, HealthController],
   exports: ['PRODUCT_CONSUMER_CONNECTION'],
 })
 export class ProductConsumerModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
+    consumer
+      .apply(SubdomainMiddleware, CredentialMiddleware)
+      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .forRoutes('*');
   }
 }

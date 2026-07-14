@@ -29,73 +29,73 @@ describe('CategoryChipsInput', () => {
 
   it('renders correctly with label and initial values', () => {
     render(
-      <CategoryChipsInput 
-        values={['Initial']} 
-        onChange={mockOnChange} 
+      <CategoryChipsInput
+        values={['Initial']}
+        onChange={mockOnChange}
         label="Test Label"
-      />
+      />,
     );
-    
+
     expect(screen.getByText('Test Label')).toBeInTheDocument();
     expect(screen.getByText('Initial')).toBeInTheDocument();
   });
 
   it('adds a new chip on Enter', () => {
     render(<CategoryChipsInput values={[]} onChange={mockOnChange} />);
-    
+
     const input = screen.getByPlaceholderText(/Type and press Enter/i);
     fireEvent.change(input, { target: { value: 'New Category' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
-    
+
     expect(mockOnChange).toHaveBeenCalledWith(['New Category']);
   });
 
   it('removes a chip when clicking x', () => {
     render(<CategoryChipsInput values={['Target']} onChange={mockOnChange} />);
-    
+
     const removeButton = screen.getByRole('button', { name: /Remove Target/i });
     fireEvent.click(removeButton);
-    
+
     expect(mockOnChange).toHaveBeenCalledWith([]);
   });
 
   it('shows suggestions when typing', async () => {
     render(<CategoryChipsInput values={[]} onChange={mockOnChange} />);
-    
+
     const input = screen.getByPlaceholderText(/Type and press Enter/i);
     fireEvent.change(input, { target: { value: 'Elec' } });
-    
+
     await waitFor(() => {
       expect(screen.getByText('Electronics')).toBeInTheDocument();
     });
-    
+
     expect(screen.queryByText('Groceries')).not.toBeInTheDocument();
   });
 
   it('adds category when clicking suggestion', async () => {
     render(<CategoryChipsInput values={[]} onChange={mockOnChange} />);
-    
+
     const input = screen.getByPlaceholderText(/Type and press Enter/i);
     fireEvent.change(input, { target: { value: 'Elec' } });
-    
+
     const suggestion = await screen.findByText('Electronics');
     fireEvent.click(suggestion);
-    
+
     expect(mockOnChange).toHaveBeenCalledWith(['Electronics']);
   });
 
   it('closes dropdown on Escape key', async () => {
     render(<CategoryChipsInput values={[]} onChange={mockOnChange} />);
-    
+
     const input = screen.getByPlaceholderText(/Type and press Enter/i);
     fireEvent.change(input, { target: { value: 'Elec' } });
-    
+
     await waitFor(() => {
       expect(screen.getByText('Electronics')).toBeInTheDocument();
     });
-    
+
     fireEvent.keyDown(input, { key: 'Escape', code: 'Escape' });
-    
+
     await waitFor(() => {
       expect(screen.queryByText('Electronics')).not.toBeInTheDocument();
     });

@@ -8,7 +8,11 @@ interface FeedbackOverlayProps {
   onClose?: () => void;
 }
 
-export const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ status, message, onClose }) => {
+export const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({
+  status,
+  message,
+  onClose,
+}) => {
   if (status === 'idle') return null;
 
   return (

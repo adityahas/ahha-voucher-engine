@@ -7,7 +7,10 @@ import {
   CardTitle,
 } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { getVoucherCategoryBySlug, VoucherCategory } from '../api/voucher-categories';
+import {
+  getVoucherCategoryBySlug,
+  VoucherCategory,
+} from '../api/voucher-categories';
 import {
   ArrowLeft,
   Loader2,
@@ -61,9 +64,14 @@ export const VoucherCategoryDetail: React.FC = () => {
           <h3 className="text-xl font-bold text-red-300 mb-2">
             Failed to load category
           </h3>
-          <p className="text-red-200/80 mb-6">{error || 'Category not found'}</p>
+          <p className="text-red-200/80 mb-6">
+            {error || 'Category not found'}
+          </p>
           <div className="flex gap-4">
-            <Button variant="outline" onClick={() => navigate('/voucher-categories')}>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/voucher-categories')}
+            >
               Back to List
             </Button>
             <Button variant="primary" onClick={fetchCategory}>
@@ -109,44 +117,55 @@ export const VoucherCategoryDetail: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1 space-y-6">
-           <Card className="border-slate-800/50 bg-slate-900/40 backdrop-blur-xl overflow-hidden">
-             <div className="h-48 w-full bg-slate-800 border-b border-slate-800/50 relative">
-               {category.image ? (
-                 <img 
-                   src={category.image} 
-                   alt={category.name} 
-                   className="w-full h-full object-cover"
-                   onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=Image+Error';
-                   }}
-                 />
-               ) : (
-                 <div className="flex items-center justify-center w-full h-full">
-                   <LayoutGrid className="w-16 h-16 text-slate-700" />
-                 </div>
-               )}
-               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent pointer-events-none" />
-             </div>
-             <CardHeader className="pt-4">
-               <CardTitle className="text-base text-slate-200">Category Identity</CardTitle>
-             </CardHeader>
-             <CardContent className="space-y-4">
-               <div>
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Created</label>
-                  <p className="text-slate-300 text-sm flex items-center gap-2 mt-1">
-                    <Calendar className="w-4 h-4 text-slate-500" />
-                    {category.created_at ? new Date(category.created_at).toLocaleDateString() : 'N/A'}
-                  </p>
-               </div>
-               <div>
-                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Modified</label>
-                  <p className="text-slate-300 text-sm flex items-center gap-2 mt-1">
-                    <Calendar className="w-4 h-4 text-slate-500" />
-                    {category.updated_at ? new Date(category.updated_at).toLocaleDateString() : 'N/A'}
-                  </p>
-               </div>
-             </CardContent>
-           </Card>
+          <Card className="border-slate-800/50 bg-slate-900/40 backdrop-blur-xl overflow-hidden">
+            <div className="h-48 w-full bg-slate-800 border-b border-slate-800/50 relative">
+              {category.image ? (
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      'https://placehold.co/400x300?text=Image+Error';
+                  }}
+                />
+              ) : (
+                <div className="flex items-center justify-center w-full h-full">
+                  <LayoutGrid className="w-16 h-16 text-slate-700" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent pointer-events-none" />
+            </div>
+            <CardHeader className="pt-4">
+              <CardTitle className="text-base text-slate-200">
+                Category Identity
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Created
+                </label>
+                <p className="text-slate-300 text-sm flex items-center gap-2 mt-1">
+                  <Calendar className="w-4 h-4 text-slate-500" />
+                  {category.created_at
+                    ? new Date(category.created_at).toLocaleDateString()
+                    : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Last Modified
+                </label>
+                <p className="text-slate-300 text-sm flex items-center gap-2 mt-1">
+                  <Calendar className="w-4 h-4 text-slate-500" />
+                  {category.updated_at
+                    ? new Date(category.updated_at).toLocaleDateString()
+                    : 'N/A'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="md:col-span-2 space-y-6">
@@ -164,7 +183,9 @@ export const VoucherCategoryDetail: React.FC = () => {
                     {category.description}
                   </p>
                 ) : (
-                  <p className="text-slate-500 italic">No description provided for this category.</p>
+                  <p className="text-slate-500 italic">
+                    No description provided for this category.
+                  </p>
                 )}
               </div>
             </CardContent>

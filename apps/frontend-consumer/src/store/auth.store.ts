@@ -20,11 +20,12 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       apiKey: null,
-      setAuth: (token, user, apiKey) => set({ token, user, apiKey: apiKey || null }),
+      setAuth: (token, user, apiKey) =>
+        set({ token, user, apiKey: apiKey || null }),
       clearAuth: () => set({ token: null, user: null, apiKey: null }),
     }),
     {
       name: 'consumer-auth-storage',
-    }
-  )
+    },
+  ),
 );

@@ -20,7 +20,7 @@ export class SalesOrder extends BaseEntity {
   @Column({ type: 'uuid' })
   retailer_id: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   total_amount: number;
 
   @Column({ type: 'varchar', default: 'pending' })

@@ -11,7 +11,7 @@
 ### Overview
 
 The project deploys as a **Docker Compose stack on a single VPS host**, with container images built and pushed to *
-*GitHub Container Registry (GHCR)** via GitHub Actions.
+_GitHub Container Registry (GHCR)_* via GitHub Actions.
 
 ```
 Developer Push (main)  →  CI (GitHub Actions)  →  Build & Push Docker Images (GHCR)
@@ -24,7 +24,7 @@ Developer Push (main)  →  CI (GitHub Actions)  →  Build & Push Docker Images
 ### Components Deployed
 
 | Component                 | Container Count | Image Repository                                              | Runtime                                      |
-|---------------------------|-----------------|---------------------------------------------------------------|----------------------------------------------|
+| ------------------------- | --------------- | ------------------------------------------------------------- | -------------------------------------------- |
 | **PostgreSQL**            | 1               | `postgres:16-alpine` (upstream)                               | Managed via compose, no custom image         |
 | **Redis**                 | 1               | `redis:7-alpine` (upstream)                                   | Managed via compose, no custom image         |
 | **Backend services**      | 8               | `ghcr.io/{org}/ahha-backend:{tag}` (single image, multi-role) | Same image, differentiated by `SERVICE_NAME` |
@@ -40,9 +40,9 @@ Developer Push (main)  →  CI (GitHub Actions)  →  Build & Push Docker Images
 
 - **Triggers:** Push/PR to `main`, `staging`
 - **Jobs:**
-    - `backend`: `yarn install → yarn lint → yarn build → yarn test → yarn test:e2e`
-    - `frontend-cms`: `npm ci → npm lint → vite build`
-    - `frontend-consumer`: `npm ci → npm lint → vite build`
+  - `backend`: `yarn install → yarn lint → yarn build → yarn test → yarn test:e2e`
+  - `frontend-cms`: `npm ci → npm lint → vite build`
+  - `frontend-consumer`: `npm ci → npm lint → vite build`
 - **Note:** Frontend tests are not executed in CI — only builds are verified. Add `npm test` (vitest) to both frontend
   jobs.
 
@@ -50,10 +50,10 @@ Developer Push (main)  →  CI (GitHub Actions)  →  Build & Push Docker Images
 
 - **Triggers:** Push to `main`, manual `workflow_dispatch`
 - **Jobs:**
-    1. `build-and-push`: Builds 3 Docker images (backend, cms, consumer) with multi-stage caching, pushes to GHCR. Tags:
-       git SHA, branch, semver.
-    2. `deploy`: SSHs into `$DEPLOY_HOST`, pulls images from GHCR, runs `docker compose up -d` with prod compose file,
-       prunes old images.
+  1. `build-and-push`: Builds 3 Docker images (backend, cms, consumer) with multi-stage caching, pushes to GHCR. Tags:
+     git SHA, branch, semver.
+  2. `deploy`: SSHs into `$DEPLOY_HOST`, pulls images from GHCR, runs `docker compose up -d` with prod compose file,
+     prunes old images.
 - **Auth:** GHCR uses `${{ secrets.GITHUB_TOKEN }}` (repo-scoped). VPS SSH uses `DEPLOY_SSH_KEY`.
 - **Environment protection:** Deployment requires the `production` environment approval gate.
 
@@ -179,7 +179,7 @@ routing. The current deploy workflow does not automate this.
 ### Immediate (Sprint-Ready)
 
 | Priority | Action                                                 | Effort | Rationale                                                                                                                            |
-|----------|--------------------------------------------------------|--------|--------------------------------------------------------------------------------------------------------------------------------------|
+| -------- | ------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | **P0**   | Add `npm test` (vitest) to frontend CI jobs            | 5 min  | Tests exist but aren't gated. Regressions are invisible.                                                                             |
 | **P0**   | Move secrets to GitHub Secrets (not Variables)         | 10 min | `JWT_SECRET`, `CLIENT_DB_SECRET`, `DB_PASSWORD` are visible to all maintainers.                                                      |
 | **P1**   | Add DB backup cron/sidecar to docker-compose.prod.yml  | 2 hrs  | `pg_dump` sidecar with rotation to S3/GCS or volume mount.                                                                           |
@@ -193,7 +193,7 @@ routing. The current deploy workflow does not automate this.
 ### Near-Term (Next 1-2 Months)
 
 | Priority | Action                                                                 | Effort   | Rationale                                                                                                                 |
-|----------|------------------------------------------------------------------------|----------|---------------------------------------------------------------------------------------------------------------------------|
+| -------- | ---------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
 | **P1**   | Add centralized logging (e.g., Loki + Grafana, or a managed service)   | 1 day    | JSON-file driver + SSH grep doesn't scale for production debugging.                                                       |
 | **P1**   | Add monitoring & alerting (Prometheus + Grafana, or Datadog/New Relic) | 1-2 days | Need visibility into error rates, latency, resource usage, and DB connection pool health.                                 |
 | **P1**   | Set up a managed database (AWS RDS, GCP Cloud SQL, or Supabase)        | 1 day    | Eliminates the SPOF of a single VPS-hosted Postgres. Provides automated backups, point-in-time recovery, and replication. |
@@ -204,7 +204,7 @@ routing. The current deploy workflow does not automate this.
 ### Mid-Term (3-6 Months)
 
 | Priority                             | Action                                        | Rationale                                                                                                                                                               |
-|--------------------------------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------------------------ | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **P1**                               | Migrate to a container orchestration platform | When revenue and reliability demands exceed what a single VPS can provide.                                                                                              |
 | **Option A: Docker Swarm**           | 2-3 days                                      | Smallest incremental step from compose. Same compose files, adds rolling updates, service replication, overlay networking. Good for 2-5 nodes.                          |
 | **Option B: Kamal**                  | 1-2 days                                      | 37signals' deploy tool. Traefik + Docker on any VPS. Zero-downtime, rolling deploys, built-in health checks, SSHKit-based. Fits the current "bare VPS" model perfectly. |
@@ -258,7 +258,7 @@ traffic patterns).
 ## 5. Security Review
 
 | Concern                  | Status                                                                     | Action                                                                            |
-|--------------------------|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| ------------------------ | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | GHCR image scanning      | Not configured                                                             | Enable GitHub's built-in dependency scanning and CodeQL                           |
 | Secrets in images        | None (env vars injected at runtime)                                        | OK                                                                                |
 | Secrets in GHA Variables | `JWT_SECRET`, `DB_PASSWORD`, `CLIENT_DB_SECRET` are in Variables (visible) | Migrate to Secrets                                                                |

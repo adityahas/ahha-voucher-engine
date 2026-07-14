@@ -53,7 +53,7 @@ describe('VoucherBindingList Component', () => {
   it('SHOULD handle delete functionality', async () => {
     (api.getVoucherBindings as any).mockResolvedValue(mockBindings);
     (api.deleteVoucherBinding as any).mockResolvedValue(undefined);
-    
+
     // Mock window.confirm
     const confirmSpy = vi.spyOn(window, 'confirm');
     confirmSpy.mockImplementation(() => true);
@@ -68,12 +68,14 @@ describe('VoucherBindingList Component', () => {
     fireEvent.click(deleteButtons[0]); // Delete first binding
 
     await waitFor(() => {
-      expect(confirmSpy).toHaveBeenCalledWith('Are you sure you want to delete this constraint?');
+      expect(confirmSpy).toHaveBeenCalledWith(
+        'Are you sure you want to delete this constraint?',
+      );
       expect(api.deleteVoucherBinding).toHaveBeenCalledWith(mockVoucherId, 1);
       // It should also re-fetch the bindings
       expect(api.getVoucherBindings).toHaveBeenCalledTimes(2);
     });
-    
+
     confirmSpy.mockRestore();
   });
 
@@ -89,6 +91,8 @@ describe('VoucherBindingList Component', () => {
     fireEvent.click(addButton);
 
     // Modal should appear
-    expect(screen.getByRole('heading', { name: 'Add Constraint' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Add Constraint' }),
+    ).toBeInTheDocument();
   });
 });
