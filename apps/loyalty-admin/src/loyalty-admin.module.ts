@@ -23,9 +23,7 @@ import { DataSource } from 'typeorm';
 import { Request } from 'express';
 import { REQUEST } from '@nestjs/core';
 import { LoyaltyAdminController } from './loyalty-admin.controller';
-import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { ClientEntity } from '@core/database/entities/client.entity';
-import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { RewardItemSourceModule } from './reward-item-source/reward-item-source.module';
 import { VoucherCategoryModule } from './voucher-category/voucher-category.module';
 import { HealthController } from '@core/base';
@@ -53,8 +51,6 @@ dotenv.config();
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1w' },
     }),
-    // DatabaseModule,
-    TypeOrmModule.forFeature([LoyaltyUserEntity, RewardItemEntity]),
     AuthModule,
     DatabaseModule,
     VoucherModule,
