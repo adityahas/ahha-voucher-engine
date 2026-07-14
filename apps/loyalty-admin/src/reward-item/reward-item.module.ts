@@ -1,13 +1,22 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef, Scope } from '@nestjs/common';
 import { RewardItemService } from './reward-item.service';
 import { RewardItemController } from './reward-item.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
+import { DataSource } from 'typeorm';
+import { LoyaltyAdminModule } from '../loyalty-admin.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RewardItemEntity])],
+  imports: [forwardRef(() => LoyaltyAdminModule)],
   controllers: [RewardItemController],
-  providers: [RewardItemService],
+  providers: [
+    {
+      provide: RewardItemService,
+      scope: Scope.REQUEST,
+      useFactory: async (dataSource: DataSource) => {
+        return new RewardItemService(dataSource);
+      },
+      inject: ['LOYALTY_CONNECTION'],
+    },
+  ],
   exports: [RewardItemService],
 })
 export class RewardItemModule {}
