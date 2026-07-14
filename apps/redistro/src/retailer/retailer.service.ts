@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { RetailerEntity } from './entities/retailer.entity';
 import { CreateRetailerDto } from './dto/create-retailer.dto';
 import { UpdateRetailerDto } from './dto/update-retailer.dto';
 
 @Injectable()
 export class RetailerService {
-  constructor(
-    @InjectRepository(RetailerEntity)
-    private retailerRepository: Repository<RetailerEntity>,
-  ) {}
+  private retailerRepository: Repository<RetailerEntity>;
+
+  constructor(dataSource: DataSource) {
+    this.retailerRepository = dataSource.getRepository(RetailerEntity);
+  }
 
   create(createRetailerDto: CreateRetailerDto): Promise<RetailerEntity> {
     return this.retailerRepository.save(createRetailerDto);
