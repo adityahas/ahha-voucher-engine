@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { InventoryStock } from './entities/inventory-stock.entity';
 import { SalesOrder } from './entities/sales-order.entity';
 import { SalesOrderItem } from './entities/sales-order-item.entity';
@@ -19,18 +18,19 @@ import { UpdateSalesVisitDto } from './dto/update-sales-visit.dto';
 
 @Injectable()
 export class RedistroService {
-  constructor(
-    @InjectRepository(InventoryStock)
-    private inventoryStockRepository: Repository<InventoryStock>,
-    @InjectRepository(SalesOrder)
-    private salesOrderRepository: Repository<SalesOrder>,
-    @InjectRepository(SalesOrderItem)
-    private salesOrderItemRepository: Repository<SalesOrderItem>,
-    @InjectRepository(Delivery)
-    private deliveryRepository: Repository<Delivery>,
-    @InjectRepository(SalesVisit)
-    private salesVisitRepository: Repository<SalesVisit>,
-  ) {}
+  private inventoryStockRepository: Repository<InventoryStock>;
+  private salesOrderRepository: Repository<SalesOrder>;
+  private salesOrderItemRepository: Repository<SalesOrderItem>;
+  private deliveryRepository: Repository<Delivery>;
+  private salesVisitRepository: Repository<SalesVisit>;
+
+  constructor(dataSource: DataSource) {
+    this.inventoryStockRepository = dataSource.getRepository(InventoryStock);
+    this.salesOrderRepository = dataSource.getRepository(SalesOrder);
+    this.salesOrderItemRepository = dataSource.getRepository(SalesOrderItem);
+    this.deliveryRepository = dataSource.getRepository(Delivery);
+    this.salesVisitRepository = dataSource.getRepository(SalesVisit);
+  }
 
   createInventoryStock(
     createInventoryStockDto: CreateInventoryStockDto,

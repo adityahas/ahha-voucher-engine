@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { WarehouseEntity } from './entities/warehouse.entity';
 import { CreateWarehouseDto } from './dto/create-warehouse.dto';
 import { UpdateWarehouseDto } from './dto/update-warehouse.dto';
 
 @Injectable()
 export class WarehouseService {
-  constructor(
-    @InjectRepository(WarehouseEntity)
-    private warehouseRepository: Repository<WarehouseEntity>,
-  ) {}
+  private warehouseRepository: Repository<WarehouseEntity>;
+
+  constructor(dataSource: DataSource) {
+    this.warehouseRepository = dataSource.getRepository(WarehouseEntity);
+  }
 
   create(createWarehouseDto: CreateWarehouseDto): Promise<WarehouseEntity> {
     return this.warehouseRepository.save(createWarehouseDto);

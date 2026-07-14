@@ -23,11 +23,6 @@ import { RedistroService } from './redistro.service';
 import { RedistroController } from './redistro.controller';
 import { RetailerModule } from './retailer/retailer.module';
 import { WarehouseModule } from './warehouse/warehouse.module';
-import { InventoryStock } from './entities/inventory-stock.entity';
-import { SalesOrder } from './entities/sales-order.entity';
-import { SalesOrderItem } from './entities/sales-order-item.entity';
-import { Delivery } from './entities/delivery.entity';
-import { SalesVisit } from './entities/sales-visit.entity';
 import { HealthController } from '@core/base';
 
 dotenv.config();
@@ -48,13 +43,6 @@ dotenv.config();
       autoLoadEntities: false,
       entities: [ClientEntity],
     }),
-    TypeOrmModule.forFeature([
-      InventoryStock,
-      SalesOrder,
-      SalesOrderItem,
-      Delivery,
-      SalesVisit,
-    ]),
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
@@ -67,7 +55,14 @@ dotenv.config();
   ],
   controllers: [RedistroController, HealthController],
   providers: [
-    RedistroService,
+    {
+      provide: RedistroService,
+      scope: Scope.REQUEST,
+      useFactory: async (dataSource: DataSource) => {
+        return new RedistroService(dataSource);
+      },
+      inject: ['REDISTRO_CONNECTION'],
+    },
     JwtStrategy,
     {
       provide: 'REDISTRO_CONNECTION',
