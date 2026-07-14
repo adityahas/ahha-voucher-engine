@@ -21,7 +21,9 @@ describe('VoucherBindingModal Component', () => {
   });
 
   it('SHOULD not render when isOpen is false', () => {
-    const { container } = render(<VoucherBindingModal {...defaultProps} isOpen={false} />);
+    const { container } = render(
+      <VoucherBindingModal {...defaultProps} isOpen={false} />,
+    );
     expect(container.firstChild).toBeNull();
   });
 
@@ -39,7 +41,7 @@ describe('VoucherBindingModal Component', () => {
       bind_value: 'TEST-SKU',
     };
     render(<VoucherBindingModal {...defaultProps} binding={mockBinding} />);
-    
+
     expect(screen.getByText('Edit Constraint')).toBeInTheDocument();
     expect(screen.getByDisplayValue('TEST-SKU')).toBeInTheDocument();
     expect(screen.getByDisplayValue('PRODUCT SKU')).toBeInTheDocument();
@@ -47,24 +49,26 @@ describe('VoucherBindingModal Component', () => {
 
   it('SHOULD show validation error if binding value is empty', async () => {
     render(<VoucherBindingModal {...defaultProps} />);
-    
+
     const saveButton = screen.getByRole('button', { name: /Save Constraint/i });
     fireEvent.click(saveButton);
-    
-    expect(await screen.findByText('Binding Value is required')).toBeInTheDocument();
+
+    expect(
+      await screen.findByText('Binding Value is required'),
+    ).toBeInTheDocument();
     expect(mockOnSave).not.toHaveBeenCalled();
   });
 
   it('SHOULD call onSave with correct payload on successful submit', async () => {
     mockOnSave.mockResolvedValueOnce(undefined);
     render(<VoucherBindingModal {...defaultProps} />);
-    
+
     const valueInput = screen.getByPlaceholderText(/e.g., admin, electronics/i);
     fireEvent.change(valueInput, { target: { value: 'NEW-ROLE' } });
-    
+
     const saveButton = screen.getByRole('button', { name: /Save Constraint/i });
     fireEvent.click(saveButton);
-    
+
     await waitFor(() => {
       expect(mockOnSave).toHaveBeenCalledWith({
         bind_type: 'role',

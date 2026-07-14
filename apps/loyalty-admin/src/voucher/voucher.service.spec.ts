@@ -1,17 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VoucherService } from './voucher.service';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
-import { VoucherCategoryEntity } from '@core/loyalty/voucher/entities/voucher-category.entity';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 
 describe('VoucherService', () => {
   let service: VoucherService;
-  let voucherRepository: jest.Mocked<Repository<VoucherEntity>>;
-  let userRepository: jest.Mocked<Repository<LoyaltyUserEntity>>;
-  let voucherCategoryRepository: jest.Mocked<Repository<VoucherCategoryEntity>>;
-  let dataSource: DataSource;
 
   const mockQueryBuilder = {
     where: jest.fn().mockReturnThis(),
@@ -60,12 +55,6 @@ describe('VoucherService', () => {
     }).compile();
 
     service = module.get<VoucherService>(VoucherService);
-    voucherRepository = mockDataSource.getRepository(VoucherEntity);
-    userRepository = mockDataSource.getRepository(LoyaltyUserEntity);
-    voucherCategoryRepository = mockDataSource.getRepository(
-      VoucherCategoryEntity,
-    );
-    dataSource = module.get<DataSource>(DataSource);
   });
 
   it('should be defined', () => {
@@ -180,12 +169,17 @@ describe('VoucherService', () => {
       };
 
       const mockVoucher = { code, description: 'Old Description' } as any;
-      const mockUsers = [{ core_user_id: 'user-1' }, { core_user_id: 'user-2' }];
+      const mockUsers = [
+        { core_user_id: 'user-1' },
+        { core_user_id: 'user-2' },
+      ];
       const mockCategories = [{ slug: 'cat-1' }];
 
       mockVoucherRepository.findOne.mockResolvedValueOnce(mockVoucher);
       mockUserRepository.findBy.mockResolvedValueOnce(mockUsers);
-      mockVoucherCategoryRepository.findBy.mockResolvedValueOnce(mockCategories);
+      mockVoucherCategoryRepository.findBy.mockResolvedValueOnce(
+        mockCategories,
+      );
       mockVoucherRepository.save.mockImplementation((v) => Promise.resolve(v));
 
       const result = await service.update(code, updateDto as any);
@@ -196,7 +190,7 @@ describe('VoucherService', () => {
       });
       expect(mockUserRepository.findBy).toHaveBeenCalled();
       expect(mockVoucherCategoryRepository.findBy).toHaveBeenCalled();
-      
+
       // Verify that relations are assigned as entities, not raw arrays
       expect(result.target_users).toEqual(mockUsers);
       expect(result.categories).toEqual(mockCategories);

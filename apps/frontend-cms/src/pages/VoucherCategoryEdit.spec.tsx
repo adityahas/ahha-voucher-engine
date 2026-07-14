@@ -30,8 +30,10 @@ describe('VoucherCategoryEdit', () => {
   };
 
   it('renders loading state initially', () => {
-    (api.getVoucherCategoryBySlug as any).mockImplementation(() => new Promise(() => {}));
-    
+    (api.getVoucherCategoryBySlug as any).mockImplementation(
+      () => new Promise(() => {}),
+    );
+
     render(<VoucherCategoryEdit />);
     expect(screen.getByText('Loading details...')).toBeInTheDocument();
   });
@@ -42,11 +44,19 @@ describe('VoucherCategoryEdit', () => {
     render(<VoucherCategoryEdit />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Display Name/i)).toHaveValue('Free Shipping Vouchers');
-      expect(screen.getByLabelText(/Description/i)).toHaveValue('Old Description');
-      expect(screen.getByLabelText(/Image URL/i)).toHaveValue('https://example.com/old.png');
+      expect(screen.getByLabelText(/Display Name/i)).toHaveValue(
+        'Free Shipping Vouchers',
+      );
+      expect(screen.getByLabelText(/Description/i)).toHaveValue(
+        'Old Description',
+      );
+      expect(screen.getByLabelText(/Image URL/i)).toHaveValue(
+        'https://example.com/old.png',
+      );
       expect(screen.getByLabelText(/Unique Slug/i)).toBeDisabled();
-      expect(screen.getByLabelText(/Unique Slug/i)).toHaveValue('free-shipping');
+      expect(screen.getByLabelText(/Unique Slug/i)).toHaveValue(
+        'free-shipping',
+      );
     });
   });
 
@@ -57,7 +67,9 @@ describe('VoucherCategoryEdit', () => {
     render(<VoucherCategoryEdit />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Display Name/i)).toHaveValue('Free Shipping Vouchers');
+      expect(screen.getByLabelText(/Display Name/i)).toHaveValue(
+        'Free Shipping Vouchers',
+      );
     });
 
     fireEvent.change(screen.getByLabelText(/Display Name/i), {
@@ -77,13 +89,18 @@ describe('VoucherCategoryEdit', () => {
     // Check success state
     expect(await screen.findByText('Category Updated!')).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/voucher-categories');
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith('/voucher-categories');
+      },
+      { timeout: 2000 },
+    );
   });
 
   it('displays error message when fetch fails', async () => {
-    (api.getVoucherCategoryBySlug as any).mockRejectedValue(new Error('Category not found'));
+    (api.getVoucherCategoryBySlug as any).mockRejectedValue(
+      new Error('Category not found'),
+    );
 
     render(<VoucherCategoryEdit />);
 

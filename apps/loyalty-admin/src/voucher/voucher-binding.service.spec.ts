@@ -11,7 +11,11 @@ describe('VoucherBindingService', () => {
   let voucherRepository: jest.Mocked<Repository<VoucherEntity>>;
 
   const mockVoucher = { id: 1, code: 'VOUCHER101' } as unknown as VoucherEntity;
-  const mockBinding = { id: 1, bind_type: 'role', bind_value: 'admin' } as unknown as VoucherBindingEntity;
+  const mockBinding = {
+    id: 1,
+    bind_type: 'role',
+    bind_value: 'admin',
+  } as unknown as VoucherBindingEntity;
 
   beforeEach(async () => {
     repository = {
@@ -121,7 +125,7 @@ describe('VoucherBindingService', () => {
       repository.findOne.mockResolvedValue(mockBinding);
       repository.remove.mockResolvedValue(undefined as any);
 
-      await service.remove(1);
+      await service.remove('VOUCHER101', 1);
 
       expect(repository.remove).toHaveBeenCalledWith(mockBinding);
     });

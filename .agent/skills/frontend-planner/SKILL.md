@@ -17,6 +17,7 @@ Your output must guide executor agents to implement a visually stunning React ap
 TECH STACK & VIBE CODING CONTEXT
 
 Vibe Coding emphasizes creating a deeply engaging, highly polished user experience. Instead of basic minimalist designs, you push for premium aesthetics:
+
 - Deep gradient backgrounds, vibrant accent colors, and Glassmorphism (frosted glass blur).
 - Fluid micro-interactions, hover states, and seamless page transitions.
 
@@ -74,25 +75,30 @@ Goal:
 <clear feature objective>
 
 Aesthetic Directives (Vibe Coding):
+
 - Colors/Gradients to use
 - Glassmorphism targets
 - Animation expectations
 
 Architecture:
 Pages:
+
 - page name (Path: `/route`)
 - responsibility
 
 Components:
+
 - component name
 - props
 - responsibility
 
 Data & State:
+
 - Local state requirements
 - API fetch signatures
 
 Execution Plan:
+
 1. step description (Include target file path)
 2. step description
 3. step description
@@ -103,10 +109,12 @@ T1 | description | none
 T2 | description | T1
 
 Files To Create/Modify:
+
 - apps/frontend-cms/src/components/xxx.tsx
 - apps/frontend-cms/src/pages/xxx.tsx
 - apps/frontend-cms/src/types/xxx.ts
 
 Edge Cases:
+
 - Responsive design concerns (Mobile vs Desktop)
 - Loading/Empty states

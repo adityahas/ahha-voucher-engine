@@ -10,7 +10,7 @@ import { CheckoutView } from './pages/CheckoutView';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((state) => state.token);
-  
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -20,26 +20,26 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   // Wait for hydration if using persist middleware in production
-  
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginView />} />
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
             <ProtectedRoute>
               <VoucherDashboardView />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/my-vouchers" 
+        <Route
+          path="/my-vouchers"
           element={
             <ProtectedRoute>
               <MyVouchersView />
             </ProtectedRoute>
-          } 
+          }
         />
         <Route
           path="/vouchers/:code"

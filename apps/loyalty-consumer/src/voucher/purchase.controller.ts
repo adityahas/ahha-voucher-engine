@@ -22,11 +22,15 @@ export class PurchaseController {
   constructor(
     @Inject('VOUCHER_SERVICE') private readonly voucherService: VoucherService,
     private readonly orderService: OrderService,
-    @Inject('LOYALTY_CONSUMER_CONNECTION') private readonly dataSource: DataSource,
+    @Inject('LOYALTY_CONSUMER_CONNECTION')
+    private readonly dataSource: DataSource,
   ) {}
 
   @Post()
-  async purchase(@Req() req: any, @Body() dto: CreatePurchaseDto): Promise<OrderEntity> {
+  async purchase(
+    @Req() req: any,
+    @Body() dto: CreatePurchaseDto,
+  ): Promise<OrderEntity> {
     const userId = req.user.core_user_id;
 
     return this.dataSource.transaction(async (manager) => {
@@ -53,15 +57,17 @@ export class PurchaseController {
           relations: ['categories'],
         });
 
-        const categoryNames = productWithCategories?.categories?.map((c) => c.name) || [];
+        const categoryNames =
+          productWithCategories?.categories?.map((c) => c.name) || [];
 
-        const calculation = await this.voucherService.validateAndCalculateDiscount(
-          dto.voucher_code,
-          subtotal,
-          userId,
-          product.id,
-          categoryNames,
-        );
+        const calculation =
+          await this.voucherService.validateAndCalculateDiscount(
+            dto.voucher_code,
+            subtotal,
+            userId,
+            product.id,
+            categoryNames,
+          );
 
         if (!calculation.isValid) {
           throw new BadRequestException(calculation.message);

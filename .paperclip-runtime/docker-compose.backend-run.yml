@@ -1,0 +1,115 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: P4ssw0rd!
+      POSTGRES_DB: ahha_admin_db
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d ahha_admin_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  admin:
+    image: ahha-voucher-engine-admin:latest
+    ports:
+      - '9002:9002'
+    environment: &backend_env
+      NODE_ENV: production
+      SERVICE_NAME: admin
+      PORT_ADMIN: '9002'
+      DB_USERNAME: postgres
+      DB_PASSWORD: P4ssw0rd!
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ahha_admin_db
+      DB_SYNC: 'false'
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: 9cc4da5ba5f1313590b00dabecdb4299
+      JWT_SECRET: zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=
+      GEMINI_MODEL: gemini-2.5-flash
+    depends_on: &backend_deps
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  loyalty-admin:
+    image: ahha-voucher-engine-loyalty-admin:latest
+    ports:
+      - '9003:9003'
+    environment:
+      <<: *backend_env
+      SERVICE_NAME: loyalty-admin
+      PORT_LOYALTY_ADMIN: '9003'
+    depends_on: *backend_deps
+
+  user-admin:
+    image: ahha-voucher-engine-user-admin:latest
+    ports:
+      - '9004:9004'
+    environment:
+      <<: *backend_env
+      SERVICE_NAME: user-admin
+      PORT_USER_ADMIN: '9004'
+    depends_on: *backend_deps
+
+  loyalty-consumer:
+    image: ahha-voucher-engine-loyalty-consumer:latest
+    ports:
+      - '9005:9005'
+    environment:
+      <<: *backend_env
+      SERVICE_NAME: loyalty-consumer
+      PORT_LOYALTY_CONSUMER: '9005'
+    depends_on: *backend_deps
+
+  user-consumer:
+    image: ahha-voucher-engine-user-consumer:latest
+    ports:
+      - '9006:9006'
+    environment:
+      <<: *backend_env
+      SERVICE_NAME: user-consumer
+      PORT_USER_CONSUMER: '9006'
+    depends_on: *backend_deps
+
+  product-admin:
+    image: ahha-voucher-engine-product-admin:latest
+    ports:
+      - '9007:9007'
+    environment:
+      <<: *backend_env
+      SERVICE_NAME: product-admin
+      PORT_PRODUCT_ADMIN: '9007'
+    depends_on: *backend_deps
+
+  product-consumer:
+    image: ahha-voucher-engine-product-consumer:latest
+    ports:
+      - '9008:9008'
+    environment:
+      <<: *backend_env
+      SERVICE_NAME: product-consumer
+      PORT_PRODUCT_CONSUMER: '9008'
+    depends_on: *backend_deps
+
+  redistro:
+    image: ahha-voucher-engine-redistro:latest
+    ports:
+      - '9009:9009'
+    environment:
+      <<: *backend_env
+      SERVICE_NAME: redistro
+      PORT_REDISTRO: '9009'
+    depends_on: *backend_deps

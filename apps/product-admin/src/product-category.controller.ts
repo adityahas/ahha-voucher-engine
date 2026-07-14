@@ -18,7 +18,9 @@ import { Permissions } from '@core/auth/decorators/permissions.decorator';
 @Controller('product-categories')
 @UseGuards(AdminJwtGuard, AclGuard)
 export class ProductCategoryController {
-  constructor(private readonly productCategoryService: ProductCategoryService) {}
+  constructor(
+    private readonly productCategoryService: ProductCategoryService,
+  ) {}
 
   @Post()
   @Permissions('write:products')

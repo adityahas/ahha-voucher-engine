@@ -12,7 +12,10 @@ import { CreateVoucherCategoryDto } from './create-voucher-category.dto';
 import { CreateVoucherValidityDto } from './create-voucher-validity.dto';
 import { CreateVoucherBindingDto } from './create-voucher-binding.dto';
 import { IsUUID, IsEnum, IsNumber } from 'class-validator';
-import { VoucherType, DiscountType } from '@core/loyalty/voucher/entities/voucher.entity';
+import {
+  VoucherType,
+  DiscountType,
+} from '@core/loyalty/voucher/entities/voucher.entity';
 
 export class CreateVoucherDto {
   @IsEnum(VoucherType)

@@ -1,10 +1,10 @@
-import type { 
-  Voucher, 
-  VoucherBinding, 
-  PaginatedResponse, 
+import type {
+  Voucher,
+  VoucherBinding,
+  PaginatedResponse,
   ClaimedVoucherInfo,
   CalculateDiscountRequest,
-  CalculateDiscountResponse
+  CalculateDiscountResponse,
 } from '../types/voucher';
 import { useAuthStore } from '../store/auth.store';
 
@@ -53,14 +53,17 @@ export const claimVoucher = async (
 
   const { token, apiKey } = useAuthStore.getState();
 
-  const response = await fetch(`${LOYALTY_API_URL}/loyalty/vouchers/${voucherCode}/claim`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token || ''}`,
-      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+  const response = await fetch(
+    `${LOYALTY_API_URL}/loyalty/vouchers/${voucherCode}/claim`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token || ''}`,
+        ...(apiKey ? { 'x-api-key': apiKey } : {}),
+      },
     },
-  });
+  );
 
   const data = await response.json();
 
@@ -80,14 +83,17 @@ export const getClaimedVouchers = async (
 
   const { token, apiKey } = useAuthStore.getState();
 
-  const response = await fetch(`${LOYALTY_API_URL}/loyalty/vouchers/my?page=${page}&size=${size}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token || ''}`,
-      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+  const response = await fetch(
+    `${LOYALTY_API_URL}/loyalty/vouchers/my?page=${page}&size=${size}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token || ''}`,
+        ...(apiKey ? { 'x-api-key': apiKey } : {}),
+      },
     },
-  });
+  );
 
   const data = await response.json();
 
@@ -106,15 +112,18 @@ export const calculateDiscount = async (
 
   const { token, apiKey } = useAuthStore.getState();
 
-  const response = await fetch(`${LOYALTY_API_URL}/loyalty/vouchers/calculate-discount`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token || ''}`,
-      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+  const response = await fetch(
+    `${LOYALTY_API_URL}/loyalty/vouchers/calculate-discount`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token || ''}`,
+        ...(apiKey ? { 'x-api-key': apiKey } : {}),
+      },
+      body: JSON.stringify(request),
     },
-    body: JSON.stringify(request),
-  });
+  );
 
   const data = await response.json();
 

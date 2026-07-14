@@ -25,6 +25,7 @@ Encryption: AES-256-CBC (crypto) + bcrypt
 Style: SOLID, request-scoped dependency injection, domain-driven design
 
 Architecture Details:
+
 - The workspace is split into sub-applications like `admin`, `loyalty-admin`, `loyalty-consumer`, `user-admin`, etc. Shared code lives in `libs/`.
 - Multi-Tenancy: The system extracts subdomains via `SubdomainMiddleware`, validates the client and `x-api-key` via `CredentialMiddleware`, and dynamically resolves tenant database connections using the `DatabaseService` (credentials stored AES-encrypted in the Master DB).
 - Repositories for tenant-specific entities must ALWAYS be request-scoped (`Scope.REQUEST`) and resolved dynamically using the exact `database_name` on the `Request.client` object. Global injection of repositories for tenant entities is prohibited.
@@ -77,35 +78,42 @@ Goal:
 <clear project objective>
 
 Requirements:
+
 - functional requirements
 - non functional requirements
 
 Domain Model:
+
 - entities (Specify Master DB or Tenant DB)
 - relationships
 
 Architecture:
 Modules (Specify path e.g., apps/admin/src/..., libs/loyalty/src/...):
+
 - module name
 - responsibility
 
 Entities:
+
 - entity
 - fields
 - relations
 - database target (Master/Tenant)
 
 Services:
+
 - service name
 - responsibility
 - injection scope (Default/Request)
 
 Controllers:
+
 - endpoint
 - method
 - required guards/permissions
 
 Execution Plan:
+
 1. step description
 2. step description
 3. step description
@@ -116,9 +124,11 @@ T1 | description | none
 T2 | description | T1
 
 Files To Create/Modify:
+
 - apps/loyalty-admin/src/...
 - libs/loyalty/src/...
 
 Edge Cases:
+
 - multi-tenancy validation concerns
 - security/encryption edge cases

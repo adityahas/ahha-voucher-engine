@@ -19,10 +19,7 @@ async function bootstrap() {
     .setTitle('AHHA Product Consumer API')
     .setDescription('Consumer-facing product catalog API')
     .setVersion('1.0')
-    .addApiKey(
-      { type: 'apiKey', name: 'x-api-key', in: 'header' },
-      'x-api-key',
-    )
+    .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'x-api-key')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

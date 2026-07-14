@@ -1,16 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PurchaseController } from './purchase.controller';
-import { VoucherService } from './voucher.service';
-import { OrderService } from '@core/product/order.service';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { NotFoundException } from '@nestjs/common';
 import { ProductEntity } from '@core/product/entities/product.entity';
 
 describe('PurchaseController', () => {
   let controller: PurchaseController;
-  let voucherService: VoucherService;
-  let orderService: OrderService;
   let dataSource: DataSource;
 
   const mockProduct = {
@@ -62,8 +58,6 @@ describe('PurchaseController', () => {
     }).compile();
 
     controller = module.get<PurchaseController>(PurchaseController);
-    voucherService = module.get<VoucherService>('VOUCHER_SERVICE');
-    orderService = module.get<OrderService>(OrderService);
     dataSource = module.get<DataSource>('LOYALTY_CONSUMER_CONNECTION');
   });
 
@@ -88,8 +82,15 @@ describe('PurchaseController', () => {
 
       // Assert
       expect(dataSource.transaction).toHaveBeenCalled();
-      expect(mockEntityManager.findOne).toHaveBeenCalledWith(ProductEntity, expect.any(Object));
-      expect(mockVoucherService.useVoucher).toHaveBeenCalledWith('user-id', 'VOU-10', mockEntityManager);
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(
+        ProductEntity,
+        expect.any(Object),
+      );
+      expect(mockVoucherService.useVoucher).toHaveBeenCalledWith(
+        'user-id',
+        'VOU-10',
+        mockEntityManager,
+      );
       expect(mockOrderService.create).toHaveBeenCalled();
       expect(result).toEqual(mockOrder);
     });
@@ -112,7 +113,9 @@ describe('PurchaseController', () => {
       mockEntityManager.findOne.mockResolvedValueOnce(null);
 
       // Act & Assert
-      await expect(controller.purchase(mockReq, purchaseDto)).rejects.toThrow(NotFoundException);
+      await expect(controller.purchase(mockReq, purchaseDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

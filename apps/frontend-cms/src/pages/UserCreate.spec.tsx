@@ -19,7 +19,7 @@ describe('UserCreate Component', () => {
     render(
       <MemoryRouter>
         <UserCreate />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
   it('renders all form fields', () => {
@@ -27,16 +27,26 @@ describe('UserCreate Component', () => {
     expect(screen.getByLabelText(/Full Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Secure Password/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Mark account as active immediately/i)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/Mark account as active immediately/i),
+    ).toBeInTheDocument();
   });
 
   it('shows error message when creation fails', async () => {
-    (createUser as any).mockRejectedValueOnce(new Error('Invalid email domain'));
+    (createUser as any).mockRejectedValueOnce(
+      new Error('Invalid email domain'),
+    );
     renderComponent();
 
-    fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Test User' } });
-    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@invalid.com' } });
-    fireEvent.change(screen.getByLabelText(/Secure Password/i), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByLabelText(/Full Name/i), {
+      target: { value: 'Test User' },
+    });
+    fireEvent.change(screen.getByLabelText(/Email Address/i), {
+      target: { value: 'test@invalid.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/Secure Password/i), {
+      target: { value: 'password123' },
+    });
 
     fireEvent.click(screen.getByText(/Provision Account/i));
 
@@ -49,15 +59,23 @@ describe('UserCreate Component', () => {
     (createUser as any).mockResolvedValueOnce({ id: '123' });
     renderComponent();
 
-    fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'New Admin' } });
-    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'admin@workspace.com' } });
-    fireEvent.change(screen.getByLabelText(/Secure Password/i), { target: { value: 'secure-pass' } });
+    fireEvent.change(screen.getByLabelText(/Full Name/i), {
+      target: { value: 'New Admin' },
+    });
+    fireEvent.change(screen.getByLabelText(/Email Address/i), {
+      target: { value: 'admin@workspace.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/Secure Password/i), {
+      target: { value: 'secure-pass' },
+    });
 
     fireEvent.click(screen.getByText(/Provision Account/i));
 
     await waitFor(() => {
       expect(screen.getByText(/User Created!/i)).toBeInTheDocument();
-      expect(screen.getByText(/account has been successfully provisioned/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/account has been successfully provisioned/i),
+      ).toBeInTheDocument();
     });
 
     expect(createUser).toHaveBeenCalledWith({

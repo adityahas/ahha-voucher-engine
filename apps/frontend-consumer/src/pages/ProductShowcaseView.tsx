@@ -11,9 +11,9 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 export const ProductShowcaseView: React.FC = () => {
@@ -54,24 +54,32 @@ export const ProductShowcaseView: React.FC = () => {
           >
             <h1 className="text-4xl font-black text-white mb-2 flex items-center gap-3">
               <Package className="text-cyan-500" />
-              Product <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">Showcase</span>
+              Product{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">
+                Showcase
+              </span>
             </h1>
-            <p className="text-slate-400">Exclusive catalog of items for our valued consumers.</p>
+            <p className="text-slate-400">
+              Exclusive catalog of items for our valued consumers.
+            </p>
           </motion.div>
 
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={fetchProducts}
               className="p-3 rounded-xl glass-panel hover:bg-white/5 text-slate-400 transition-colors"
               title="Refresh Catalog"
             >
-              <RefreshCw className={loading ? "animate-spin" : ""} size={20} />
+              <RefreshCw className={loading ? 'animate-spin' : ''} size={20} />
             </button>
             <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search products..." 
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors"
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder="Search products..."
                 className="pl-10 pr-4 py-2.5 rounded-xl glass-panel bg-slate-900/40 focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all w-full md:w-64"
               />
             </div>
@@ -90,7 +98,10 @@ export const ProductShowcaseView: React.FC = () => {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="glass-panel h-[350px] rounded-2xl animate-pulse bg-slate-800/20" />
+                <div
+                  key={i}
+                  className="glass-panel h-[350px] rounded-2xl animate-pulse bg-slate-800/20"
+                />
               ))}
             </motion.div>
           ) : error ? (
@@ -103,7 +114,7 @@ export const ProductShowcaseView: React.FC = () => {
               <div className="p-6 rounded-full bg-red-500/10 text-red-400 mb-6 font-mono text-lg border border-red-500/20">
                 {error}
               </div>
-              <button 
+              <button
                 onClick={fetchProducts}
                 className="px-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all font-bold"
               >
@@ -119,7 +130,9 @@ export const ProductShowcaseView: React.FC = () => {
             >
               <LayoutGrid size={64} className="mb-6 opacity-20" />
               <p className="text-xl">Our shelves are empty at the moment.</p>
-              <p className="text-sm italic">Check back later for new arrivals.</p>
+              <p className="text-sm italic">
+                Check back later for new arrivals.
+              </p>
             </motion.div>
           ) : (
             <motion.div
@@ -130,9 +143,9 @@ export const ProductShowcaseView: React.FC = () => {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             >
               {products.map((product) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
+                <ProductCard
+                  key={product.id}
+                  product={product}
                   onBuy={(p) => navigate(`/checkout/${p.id}`)}
                 />
               ))}

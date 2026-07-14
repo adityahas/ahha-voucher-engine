@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Delete,
   Param,
   Body,
@@ -88,9 +87,7 @@ export class VoucherCategoryController {
   @ApiOperation({ summary: 'Delete voucher category' })
   @UseGuards(AdminJwtGuard, AclGuard)
   @Permissions('write:voucher-categories')
-  async remove(
-    @Param('slug') slug: string,
-  ): Promise<{ success: boolean }> {
+  async remove(@Param('slug') slug: string): Promise<{ success: boolean }> {
     await this.voucherCategoryService.remove(slug);
     return { success: true };
   }

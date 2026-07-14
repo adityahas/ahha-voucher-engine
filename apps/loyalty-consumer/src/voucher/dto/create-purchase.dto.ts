@@ -1,4 +1,11 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePurchaseDto {
@@ -12,7 +19,10 @@ export class CreatePurchaseDto {
   @Min(1)
   quantity: number;
 
-  @ApiProperty({ description: 'Optional voucher code to apply', required: false })
+  @ApiProperty({
+    description: 'Optional voucher code to apply',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   voucher_code?: string;

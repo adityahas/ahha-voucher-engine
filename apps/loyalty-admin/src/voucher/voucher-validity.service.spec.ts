@@ -2,13 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { VoucherValidityService } from './voucher-validity.service';
 import { DataSource } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { VoucherValidityEntity, VoucherValidityType } from '@core/loyalty/voucher/entities/voucher-validity.entity';
+import {
+  VoucherValidityEntity,
+  VoucherValidityType,
+} from '@core/loyalty/voucher/entities/voucher-validity.entity';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { CreateVoucherValidityDto } from './dto/create-voucher-validity.dto';
 
 describe('VoucherValidityService', () => {
   let service: VoucherValidityService;
-  let dataSource: DataSource;
   let mockValidityRepository: jest.Mocked<any>;
   let mockVoucherRepository: jest.Mocked<any>;
 
@@ -63,7 +65,6 @@ describe('VoucherValidityService', () => {
     }).compile();
 
     service = module.get<VoucherValidityService>(VoucherValidityService);
-    dataSource = module.get<DataSource>(DataSource);
 
     // Overwrite the initialized repositories with our mocks for assertions
     (service as any).validityRepository = mockValidityRepository;
@@ -154,9 +155,9 @@ describe('VoucherValidityService', () => {
     it('should throw NotFoundException if validity is not found', async () => {
       mockValidityRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne(mockVoucherId, mockValidityId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.findOne(mockVoucherId, mockValidityId),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -164,11 +165,15 @@ describe('VoucherValidityService', () => {
     it('should update and return a validity', async () => {
       const updateDto = { type: VoucherValidityType.ONE_TIME };
       mockValidityRepository.findOne.mockResolvedValue(mockValidity);
-      
+
       const updatedEntity = { ...mockValidity, ...updateDto };
       mockValidityRepository.save.mockResolvedValue(updatedEntity);
 
-      const result = await service.update(mockVoucherId, mockValidityId, updateDto);
+      const result = await service.update(
+        mockVoucherId,
+        mockValidityId,
+        updateDto,
+      );
 
       expect(mockValidityRepository.findOne).toHaveBeenCalledWith({
         where: { id: mockValidityId, voucher: { code: mockVoucherId } },

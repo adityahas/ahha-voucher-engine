@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, staging ]
+    branches: [main, staging]
   pull_request:
-    branches: [ main, staging ]
+    branches: [main, staging]
 
 jobs:
   backend:
@@ -19,6 +19,7 @@ jobs:
           node-version: 22
           cache: yarn
       - run: yarn install --frozen-lockfile
+      - run: yarn type-check
       - run: yarn lint
       - run: yarn build
       - run: yarn test
@@ -37,9 +38,10 @@ jobs:
           cache: npm
           cache-dependency-path: apps/frontend-cms/package-lock.json
       - run: npm ci
+      - run: npm run type-check
       - run: npm run lint
       - run: npm test
-      - run: npx vite build
+      - run: npm run build
 
   frontend-consumer:
     runs-on: ubuntu-latest
@@ -54,6 +56,7 @@ jobs:
           cache: npm
           cache-dependency-path: apps/frontend-consumer/package-lock.json
       - run: npm ci
+      - run: npm run type-check
       - run: npm run lint
       - run: npm test
       - run: npm run build

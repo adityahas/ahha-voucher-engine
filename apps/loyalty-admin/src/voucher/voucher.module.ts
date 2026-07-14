@@ -58,7 +58,11 @@ import { VoucherValidityController } from './voucher-validity.controller';
       inject: ['LOYALTY_CONNECTION'],
     },
   ],
-  controllers: [VoucherController, VoucherBindingController, VoucherValidityController],
+  controllers: [
+    VoucherController,
+    VoucherBindingController,
+    VoucherValidityController,
+  ],
   exports: [],
 })
 export class VoucherModule {}

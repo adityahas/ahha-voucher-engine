@@ -15,37 +15,41 @@ interface ProductCardProps {
   className?: string;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onBuy, className }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  onBuy,
+  className,
+}) => {
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ 
+      whileHover={{
         y: -5,
         scale: 1.02,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
       className={cn(
-        "glass-panel relative overflow-hidden group flex flex-col h-full rounded-2xl transition-all duration-300",
-        "hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]",
-        className
+        'glass-panel relative overflow-hidden group flex flex-col h-full rounded-2xl transition-all duration-300',
+        'hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]',
+        className,
       )}
     >
       {/* Product Image Area */}
       <div className="relative aspect-video w-full overflow-hidden bg-slate-800/50">
         {product.image ? (
-          <img 
-            src={product.image} 
-            alt={product.name} 
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyan-500/20 to-fuchsia-500/20">
             <ShoppingBag className="w-12 h-12 text-slate-400 opacity-50" />
           </div>
         )}
-        
+
         {/* Price Badge */}
         <div className="absolute top-3 right-3 glass-panel px-3 py-1 rounded-full text-sm font-bold border-cyan-500/30 text-cyan-400">
           IDR {product.price.toLocaleString()}
@@ -58,7 +62,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onBuy, classN
           {product.name}
         </h3>
         <p className="text-slate-400 text-sm mb-6 flex-grow line-clamp-3">
-          {product.description || "No description available for this premium item."}
+          {product.description ||
+            'No description available for this premium item.'}
         </p>
 
         <button

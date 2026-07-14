@@ -31,10 +31,14 @@ describe('VoucherCategoryDetail', () => {
   };
 
   it('renders loading state initially', () => {
-    (api.getVoucherCategoryBySlug as any).mockImplementation(() => new Promise(() => {}));
-    
+    (api.getVoucherCategoryBySlug as any).mockImplementation(
+      () => new Promise(() => {}),
+    );
+
     render(<VoucherCategoryDetail />);
-    expect(screen.getByText('Loading category metadata...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Loading category metadata...'),
+    ).toBeInTheDocument();
   });
 
   it('loads category details successfully', async () => {
@@ -45,9 +49,11 @@ describe('VoucherCategoryDetail', () => {
     await waitFor(() => {
       expect(screen.getByText('Special Discount')).toBeInTheDocument();
       expect(screen.getByText('discount')).toBeInTheDocument();
-      expect(screen.getByText('This is a detailed description.')).toBeInTheDocument();
+      expect(
+        screen.getByText('This is a detailed description.'),
+      ).toBeInTheDocument();
     });
-    
+
     // Check dates rendered correctly
     const crDate = new Date('2023-10-01T00:00:00Z').toLocaleDateString();
     expect(screen.getByText(crDate)).toBeInTheDocument();
@@ -62,12 +68,16 @@ describe('VoucherCategoryDetail', () => {
     });
 
     fireEvent.click(screen.getByRole('button', { name: /Edit Category/i }));
-    
-    expect(mockNavigate).toHaveBeenCalledWith('/voucher-categories/discount/edit');
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/voucher-categories/discount/edit',
+    );
   });
 
   it('displays error and allows retry when API fails', async () => {
-    (api.getVoucherCategoryBySlug as any).mockRejectedValueOnce(new Error('Connection error'));
+    (api.getVoucherCategoryBySlug as any).mockRejectedValueOnce(
+      new Error('Connection error'),
+    );
 
     render(<VoucherCategoryDetail />);
 
@@ -78,11 +88,11 @@ describe('VoucherCategoryDetail', () => {
 
     // Retry
     (api.getVoucherCategoryBySlug as any).mockResolvedValueOnce(mockCategory);
-    
+
     fireEvent.click(screen.getByRole('button', { name: /Try Again/i }));
-    
+
     await waitFor(() => {
-       expect(screen.getByText('Special Discount')).toBeInTheDocument();
+      expect(screen.getByText('Special Discount')).toBeInTheDocument();
     });
   });
 });

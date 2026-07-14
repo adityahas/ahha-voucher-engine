@@ -20,7 +20,9 @@ export const CategoryChipsInput: React.FC<CategoryChipsInputProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<ProductCategory[]>([]);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<ProductCategory[]>([]);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<
+    ProductCategory[]
+  >([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -43,9 +45,9 @@ export const CategoryChipsInput: React.FC<CategoryChipsInputProps> = ({
   useEffect(() => {
     if (inputValue.trim()) {
       const filtered = suggestions.filter(
-        (cat) => 
-          cat.name.toLowerCase().includes(inputValue.toLowerCase()) && 
-          !values.includes(cat.name)
+        (cat) =>
+          cat.name.toLowerCase().includes(inputValue.toLowerCase()) &&
+          !values.includes(cat.name),
       );
       setFilteredSuggestions(filtered);
       setIsDropdownOpen(filtered.length > 0);
@@ -57,7 +59,10 @@ export const CategoryChipsInput: React.FC<CategoryChipsInputProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -95,7 +100,7 @@ export const CategoryChipsInput: React.FC<CategoryChipsInputProps> = ({
           {label}
         </label>
       )}
-      
+
       <div className="relative group/input">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           {isLoading ? (
@@ -108,7 +113,11 @@ export const CategoryChipsInput: React.FC<CategoryChipsInputProps> = ({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={() => inputValue.trim() && filteredSuggestions.length > 0 && setIsDropdownOpen(true)}
+          onFocus={() =>
+            inputValue.trim() &&
+            filteredSuggestions.length > 0 &&
+            setIsDropdownOpen(true)
+          }
           placeholder={placeholder}
           className="bg-slate-800/50 border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10"
         />
@@ -148,7 +157,7 @@ export const CategoryChipsInput: React.FC<CategoryChipsInputProps> = ({
             />
           ))}
         </AnimatePresence>
-        
+
         {values.length === 0 && !isLoading && (
           <p className="text-xs text-slate-500 italic mt-1 ml-1 animate-in fade-in duration-700">
             No categories assigned. Type above to add or select.

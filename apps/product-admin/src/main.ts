@@ -5,7 +5,7 @@ import { ProductAdminModule } from './product-admin.module';
 async function bootstrap() {
   const app = await NestFactory.create(ProductAdminModule);
   app.setGlobalPrefix('product-admin');
-  
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

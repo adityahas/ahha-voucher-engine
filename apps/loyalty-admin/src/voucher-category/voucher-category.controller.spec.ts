@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VoucherCategoryController } from './voucher-category.controller';
 import { VoucherCategoryService } from './voucher-category.service';
+import { AclService } from '@core/auth/acl.service';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 
 describe('VoucherCategoryController', () => {
@@ -12,9 +13,15 @@ describe('VoucherCategoryController', () => {
       controllers: [VoucherCategoryController],
       providers: [
         {
-          provide: VoucherCategoryService,
+          provide: 'VOUCHER_CATEGORY_SERVICE',
           useValue: {
             findAll: jest.fn(),
+          },
+        },
+        {
+          provide: AclService,
+          useValue: {
+            can: jest.fn().mockReturnValue(true),
           },
         },
       ],
@@ -23,7 +30,7 @@ describe('VoucherCategoryController', () => {
     controller = module.get<VoucherCategoryController>(
       VoucherCategoryController,
     );
-    service = module.get(VoucherCategoryService);
+    service = module.get('VOUCHER_CATEGORY_SERVICE');
   });
 
   it('should be defined', () => {
@@ -32,7 +39,7 @@ describe('VoucherCategoryController', () => {
 
   describe('findAll', () => {
     it('should return a list of voucher categories', async () => {
-      const paginationDto: BasePaginationDto = { page: 1, limit: 10 };
+      const paginationDto = { page: 1, size: 10 } as BasePaginationDto;
       const mockResult = {
         data: [
           {
@@ -44,8 +51,8 @@ describe('VoucherCategoryController', () => {
         ],
         total: 1,
         page: 1,
-        limit: 10,
-      };
+        size: 10,
+      } as any;
       service.findAll.mockResolvedValue(mockResult);
 
       expect(await controller.findAll(paginationDto)).toEqual(mockResult);

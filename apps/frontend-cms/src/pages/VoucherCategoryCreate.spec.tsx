@@ -37,7 +37,9 @@ describe('VoucherCategoryCreate', () => {
 
   it('renders form structure correctly', () => {
     render(<VoucherCategoryCreate />);
-    expect(screen.getByRole('heading', { name: /Create Category/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Create Category/i }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/Display Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Unique Slug/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
@@ -46,20 +48,24 @@ describe('VoucherCategoryCreate', () => {
 
   it('handles user input', () => {
     render(<VoucherCategoryCreate />);
-    
+
     fillForm();
 
     expect(screen.getByLabelText(/Display Name/i)).toHaveValue('Free Shipping');
     expect(screen.getByLabelText(/Unique Slug/i)).toHaveValue('free-shipping');
-    expect(screen.getByLabelText(/Description/i)).toHaveValue('A test description');
-    expect(screen.getByLabelText(/Image URL/i)).toHaveValue('https://example.com/img.png');
+    expect(screen.getByLabelText(/Description/i)).toHaveValue(
+      'A test description',
+    );
+    expect(screen.getByLabelText(/Image URL/i)).toHaveValue(
+      'https://example.com/img.png',
+    );
   });
 
   it('submits form successfully and redirects after delay', async () => {
     (api.createVoucherCategory as any).mockResolvedValue({ id: 1 });
 
     render(<VoucherCategoryCreate />);
-    
+
     fillForm();
 
     fireEvent.click(screen.getByRole('button', { name: /Create Category/i }));
@@ -76,16 +82,21 @@ describe('VoucherCategoryCreate', () => {
     // Check success state
     expect(await screen.findByText('Category Created!')).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/voucher-categories');
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith('/voucher-categories');
+      },
+      { timeout: 2000 },
+    );
   });
 
   it('displays error message when API fails', async () => {
-    (api.createVoucherCategory as any).mockRejectedValue(new Error('Validation failed'));
+    (api.createVoucherCategory as any).mockRejectedValue(
+      new Error('Validation failed'),
+    );
 
     render(<VoucherCategoryCreate />);
-    
+
     fillForm();
 
     fireEvent.click(screen.getByRole('button', { name: /Create Category/i }));

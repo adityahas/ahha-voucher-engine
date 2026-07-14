@@ -1,6 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
-import { VoucherEntity, DiscountType } from '@core/loyalty/voucher/entities/voucher.entity';
+import {
+  VoucherEntity,
+  DiscountType,
+} from '@core/loyalty/voucher/entities/voucher.entity';
 import { DataSource, Repository, EntityManager } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
@@ -28,7 +35,8 @@ export class VoucherService {
   async findEligibleVouchers(
     searchCriteria: GetEligibleVoucherDto,
   ): Promise<VoucherResponseDto[]> {
-    const queryBuilder = this.voucherRepository.createQueryBuilder('voucher')
+    const queryBuilder = this.voucherRepository
+      .createQueryBuilder('voucher')
       .leftJoinAndSelect('voucher.categories', 'category');
 
     let whereClauseAdded = false;
@@ -117,7 +125,9 @@ export class VoucherService {
       });
 
       if (!voucher) {
-        throw new NotFoundException('Voucher not found or currently unavailable');
+        throw new NotFoundException(
+          'Voucher not found or currently unavailable',
+        );
       }
 
       if (voucher.quota <= 0) {
@@ -261,12 +271,13 @@ export class VoucherService {
     // 4. Check Bindings (Product/Category)
     if (voucher.bindings.length > 0) {
       const isBound = voucher.bindings.some((b) => {
-        if (b.bind_type === 'product' && productId && b.bind_value === productId)
-          return true;
         if (
-          b.bind_type === 'category' &&
-          categoryNames.includes(b.bind_value)
+          b.bind_type === 'product' &&
+          productId &&
+          b.bind_value === productId
         )
+          return true;
+        if (b.bind_type === 'category' && categoryNames.includes(b.bind_value))
           return true;
         return false;
       });

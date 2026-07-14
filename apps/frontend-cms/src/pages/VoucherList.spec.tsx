@@ -46,7 +46,7 @@ describe('VoucherList Component', () => {
         <Routes>
           <Route path="/vouchers" element={<VoucherList />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
   it('shows loading state initially', () => {
@@ -61,7 +61,9 @@ describe('VoucherList Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText('WELCOME2025')).toBeInTheDocument();
-      expect(screen.getByText('Welcome discount for new users')).toBeInTheDocument();
+      expect(
+        screen.getByText('Welcome discount for new users'),
+      ).toBeInTheDocument();
       expect(screen.getByText('SOLDOUT')).toBeInTheDocument();
       expect(screen.getByText('Available')).toBeInTheDocument();
       expect(screen.getByText('Sold Out')).toBeInTheDocument();
@@ -70,7 +72,9 @@ describe('VoucherList Component', () => {
   });
 
   it('shows error message on API failure', async () => {
-    (getVouchers as any).mockRejectedValueOnce(new Error('Internal Server Error'));
+    (getVouchers as any).mockRejectedValueOnce(
+      new Error('Internal Server Error'),
+    );
     renderComponent();
 
     await waitFor(() => {

@@ -51,7 +51,9 @@ export default function VoucherDetailView() {
       try {
         const found = await findEligibleVoucherByCode(code);
         if (!found) {
-          throw new Error('This voucher is not currently available to your account.');
+          throw new Error(
+            'This voucher is not currently available to your account.',
+          );
         }
         if (isMounted) {
           setVoucher(found);
@@ -103,9 +105,7 @@ export default function VoucherDetailView() {
           : prev,
       );
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to claim voucher.',
-      );
+      setError(err instanceof Error ? err.message : 'Failed to claim voucher.');
     } finally {
       setIsClaiming(false);
     }
@@ -155,7 +155,10 @@ export default function VoucherDetailView() {
               <p className="mx-auto mb-6 max-w-lg text-sm text-slate-300">
                 {error || 'Unable to locate this voucher detail.'}
               </p>
-              <Button className="bg-white/10 hover:bg-white/20" onClick={() => navigate('/')}>
+              <Button
+                className="bg-white/10 hover:bg-white/20"
+                onClick={() => navigate('/')}
+              >
                 Browse Eligible Rewards
               </Button>
             </motion.div>
@@ -199,7 +202,9 @@ export default function VoucherDetailView() {
 
               <div className="grid gap-6 p-8 md:grid-cols-2 md:p-10">
                 <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                  <h2 className="mb-3 text-lg font-semibold text-white">Categories</h2>
+                  <h2 className="mb-3 text-lg font-semibold text-white">
+                    Categories
+                  </h2>
                   {voucher.categories?.length ? (
                     <div className="flex flex-wrap gap-2">
                       {voucher.categories.map((category) => (
@@ -213,12 +218,16 @@ export default function VoucherDetailView() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400">No categories assigned.</p>
+                    <p className="text-sm text-slate-400">
+                      No categories assigned.
+                    </p>
                   )}
                 </section>
 
                 <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                  <h2 className="mb-3 text-lg font-semibold text-white">Eligible Bindings</h2>
+                  <h2 className="mb-3 text-lg font-semibold text-white">
+                    Eligible Bindings
+                  </h2>
                   {voucher.bindings?.length ? (
                     <ul className="space-y-2">
                       {voucher.bindings.map((binding, index) => (

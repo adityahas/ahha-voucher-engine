@@ -27,7 +27,7 @@ export function ConsumerLayout({ children }: ConsumerLayoutProps) {
               Ahha Rewards
             </span>
           </div>
-          
+
           <div className="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10">
             <NavLink
               to="/"
@@ -86,46 +86,50 @@ export function ConsumerLayout({ children }: ConsumerLayoutProps) {
         </div>
       </nav>
 
-      <main className="relative z-10 w-full">
-        {children}
-      </main>
+      <main className="relative z-10 w-full">{children}</main>
 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-panel border-t border-white/5 bg-slate-950/80 pb-safe">
         <div className="flex items-center justify-around p-2">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
-                  isActive ? 'text-cyan-400 bg-cyan-500/10' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
-                }`
-              }
-            >
-              <Search className="w-5 h-5" />
-              <span className="text-[10px] font-medium">Explore</span>
-            </NavLink>
-            <NavLink
-              to="/my-vouchers"
-              className={({ isActive }) =>
-                `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
-                  isActive ? 'text-fuchsia-400 bg-fuchsia-500/10' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
-                }`
-              }
-            >
-              <List className="w-5 h-5" />
-              <span className="text-[10px] font-medium">My Vouchers</span>
-            </NavLink>
-            <NavLink
-              to="/products"
-              className={({ isActive }) =>
-                `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
-                  isActive ? 'text-amber-400 bg-amber-500/10' : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
-                }`
-              }
-            >
-              <Package className="w-5 h-5" />
-              <span className="text-[10px] font-medium">Catalog</span>
-            </NavLink>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
+                isActive
+                  ? 'text-cyan-400 bg-cyan-500/10'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
+              }`
+            }
+          >
+            <Search className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Explore</span>
+          </NavLink>
+          <NavLink
+            to="/my-vouchers"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
+                isActive
+                  ? 'text-fuchsia-400 bg-fuchsia-500/10'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
+              }`
+            }
+          >
+            <List className="w-5 h-5" />
+            <span className="text-[10px] font-medium">My Vouchers</span>
+          </NavLink>
+          <NavLink
+            to="/products"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
+                isActive
+                  ? 'text-amber-400 bg-amber-500/10'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
+              }`
+            }
+          >
+            <Package className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Catalog</span>
+          </NavLink>
         </div>
       </div>
     </div>

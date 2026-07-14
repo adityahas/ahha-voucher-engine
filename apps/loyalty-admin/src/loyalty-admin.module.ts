@@ -3,6 +3,7 @@ import {
   Module,
   NestModule,
   OnApplicationBootstrap,
+  RequestMethod,
   Scope,
 } from '@nestjs/common';
 import * as dotenv from 'dotenv';
@@ -27,6 +28,7 @@ import { ClientEntity } from '@core/database/entities/client.entity';
 import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { RewardItemSourceModule } from './reward-item-source/reward-item-source.module';
 import { VoucherCategoryModule } from './voucher-category/voucher-category.module';
+import { HealthController } from '@core/base';
 
 dotenv.config();
 
@@ -60,7 +62,7 @@ dotenv.config();
     RewardItemModule,
     RewardItemSourceModule,
   ],
-  controllers: [LoyaltyAdminController],
+  controllers: [LoyaltyAdminController, HealthController],
   providers: [
     LoyaltyAdminService,
     JwtStrategy,
@@ -91,6 +93,9 @@ export class LoyaltyAdminModule implements NestModule, OnApplicationBootstrap {
   }
 
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
+    consumer
+      .apply(SubdomainMiddleware, CredentialMiddleware)
+      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .forRoutes('*');
   }
 }

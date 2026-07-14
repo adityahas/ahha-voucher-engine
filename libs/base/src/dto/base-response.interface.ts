@@ -4,8 +4,9 @@ export interface BaseResponseInterface {
   readonly data?: any;
 }
 
-export interface BasePaginationResponseInterface<T>
-  extends BaseResponseInterface {
+export interface BasePaginationResponseInterface<
+  T,
+> extends BaseResponseInterface {
   readonly pagination: {
     readonly page: number;
     readonly total: number;

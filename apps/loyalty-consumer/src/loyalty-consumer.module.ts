@@ -1,4 +1,10 @@
-import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+  Scope,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '@core/auth';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
@@ -16,6 +22,7 @@ import { LoyaltyConsumerController } from './loyalty-consumer.controller';
 import { LoyaltyConsumerService } from './loyalty-consumer.service';
 import { VoucherModule } from './voucher/voucher.module';
 import { RewardModule } from './reward/reward.module';
+import { HealthController } from '@core/base';
 
 dotenv.config();
 
@@ -64,11 +71,14 @@ dotenv.config();
       inject: [REQUEST, DatabaseService],
     },
   ],
-  controllers: [LoyaltyConsumerController],
+  controllers: [LoyaltyConsumerController, HealthController],
   exports: ['LOYALTY_CONSUMER_CONNECTION'],
 })
 export class LoyaltyConsumerModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
+    consumer
+      .apply(SubdomainMiddleware, CredentialMiddleware)
+      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .forRoutes('*');
   }
 }

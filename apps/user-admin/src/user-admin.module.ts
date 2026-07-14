@@ -1,4 +1,10 @@
-import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+  Scope,
+} from '@nestjs/common';
 import { UserAdminController } from './user-admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '@core/user/entities/user.entity';
@@ -15,6 +21,7 @@ import { ClientEntity } from '@core/database/entities/client.entity';
 import { jwtConstants } from '@core/auth/constants';
 import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
+import { HealthController } from '@core/base';
 
 dotenv.config();
 
@@ -69,11 +76,14 @@ dotenv.config();
       inject: ['USER_ADMIN_CONNECTION'],
     },
   ],
-  controllers: [UserAdminController],
+  controllers: [UserAdminController, HealthController],
   exports: ['USER_ADMIN_CONNECTION'],
 })
 export class UserAdminModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
+    consumer
+      .apply(SubdomainMiddleware, CredentialMiddleware)
+      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .forRoutes('*');
   }
 }

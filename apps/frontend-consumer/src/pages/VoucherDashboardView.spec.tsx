@@ -24,9 +24,7 @@ vi.mock('../components/vouchers/BindingSelector', () => ({
     <button
       type="button"
       data-testid="binding-find"
-      onClick={() =>
-        onFind([{ bind_type: 'brand', bind_value: 'AHHA_BRAND' }])
-      }
+      onClick={() => onFind([{ bind_type: 'brand', bind_value: 'AHHA_BRAND' }])}
     >
       Trigger Binding Find
     </button>
@@ -63,7 +61,9 @@ describe('VoucherDashboardView', () => {
     await waitFor(() => {
       expect(mockedFindEligibleVouchers).toHaveBeenCalledWith([]);
     });
-    expect(await screen.findByTestId('voucher-card')).toHaveTextContent('DISC10');
+    expect(await screen.findByTestId('voucher-card')).toHaveTextContent(
+      'DISC10',
+    );
   });
 
   it('renders empty state when no vouchers are returned', async () => {

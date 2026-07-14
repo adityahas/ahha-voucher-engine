@@ -19,9 +19,7 @@ export default function MyVouchersView() {
       setVouchers(response.data);
     } catch (err: unknown) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to load claimed vouchers.',
+        err instanceof Error ? err.message : 'Failed to load claimed vouchers.',
       );
     } finally {
       setIsLoading(false);
@@ -89,10 +87,10 @@ export default function MyVouchersView() {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20 md:pb-0" // Add padding for mobile nav if needed
             >
               {vouchers.map((claimed, index) => (
-                <ClaimedVoucherCard 
-                  key={claimed.id} 
-                  claimedVoucher={claimed} 
-                  index={index} 
+                <ClaimedVoucherCard
+                  key={claimed.id}
+                  claimedVoucher={claimed}
+                  index={index}
                 />
               ))}
             </motion.div>
@@ -110,7 +108,8 @@ export default function MyVouchersView() {
                 No Claimed Vouchers
               </h3>
               <p className="text-slate-400 max-w-sm">
-                You haven't claimed any vouchers yet. Head back to Explore Rewards to find amazing offers!
+                You haven't claimed any vouchers yet. Head back to Explore
+                Rewards to find amazing offers!
               </p>
             </motion.div>
           )}

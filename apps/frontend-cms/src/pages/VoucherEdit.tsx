@@ -93,7 +93,10 @@ export const VoucherEdit: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'quota' || name === 'discount_value' ? parseFloat(value) || 0 : value,
+      [name]:
+        name === 'quota' || name === 'discount_value'
+          ? parseFloat(value) || 0
+          : value,
     }));
   };
 
@@ -270,7 +273,7 @@ export const VoucherEdit: React.FC = () => {
                       Reward Calculation
                     </h3>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label
@@ -286,13 +289,16 @@ export const VoucherEdit: React.FC = () => {
                         onChange={(e) =>
                           setFormData((prev) => ({
                             ...prev,
-                            discount_type: e.target.value as 'PERCENTAGE' | 'FIXED_AMOUNT',
+                            discount_type: e.target.value as
+                              'PERCENTAGE' | 'FIXED_AMOUNT',
                           }))
                         }
                         className="w-full h-12 rounded-xl bg-slate-900/50 border border-slate-700/50 focus:border-indigo-500/50 transition-all duration-300 px-4 text-sm text-slate-100 appearance-none focus:outline-none"
                       >
                         <option value="PERCENTAGE">PERCENTAGE (%)</option>
-                        <option value="FIXED_AMOUNT">FIXED AMOUNT (Value)</option>
+                        <option value="FIXED_AMOUNT">
+                          FIXED AMOUNT (Value)
+                        </option>
                       </select>
                     </div>
 
@@ -301,14 +307,22 @@ export const VoucherEdit: React.FC = () => {
                         htmlFor="discount_value"
                         className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1"
                       >
-                        {formData.discount_type === 'PERCENTAGE' ? 'Discount Percentage (%)' : 'Discount Amount'}
+                        {formData.discount_type === 'PERCENTAGE'
+                          ? 'Discount Percentage (%)'
+                          : 'Discount Amount'}
                       </label>
                       <Input
                         id="discount_value"
                         name="discount_value"
                         type="number"
-                        step={formData.discount_type === 'PERCENTAGE' ? '1' : '0.01'}
-                        placeholder={formData.discount_type === 'PERCENTAGE' ? '10' : '5.00'}
+                        step={
+                          formData.discount_type === 'PERCENTAGE' ? '1' : '0.01'
+                        }
+                        placeholder={
+                          formData.discount_type === 'PERCENTAGE'
+                            ? '10'
+                            : '5.00'
+                        }
                         value={formData.discount_value}
                         onChange={handleChange}
                         required

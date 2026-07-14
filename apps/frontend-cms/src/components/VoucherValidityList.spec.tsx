@@ -76,13 +76,15 @@ describe('VoucherValidityList Component', () => {
     const addButton = screen.getByRole('button', { name: /Add Schedule/i });
     fireEvent.click(addButton);
 
-    expect(screen.getByRole('heading', { name: 'Add Schedule' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Add Schedule' }),
+    ).toBeInTheDocument();
   });
 
   it('SHOULD handle delete confirmation correctly', async () => {
     (api.getVoucherValidities as any).mockResolvedValue(mockValidities);
     (api.deleteVoucherValidity as any).mockResolvedValue(undefined);
-    
+
     const confirmSpy = vi.spyOn(window, 'confirm');
     confirmSpy.mockImplementation(() => true);
 
@@ -96,11 +98,13 @@ describe('VoucherValidityList Component', () => {
     fireEvent.click(deleteButtons[0]);
 
     await waitFor(() => {
-      expect(confirmSpy).toHaveBeenCalledWith('Are you sure you want to delete this schedule?');
+      expect(confirmSpy).toHaveBeenCalledWith(
+        'Are you sure you want to delete this schedule?',
+      );
       expect(api.deleteVoucherValidity).toHaveBeenCalledWith(mockVoucherId, 1);
       expect(api.getVoucherValidities).toHaveBeenCalledTimes(2);
     });
-    
+
     confirmSpy.mockRestore();
   });
 });

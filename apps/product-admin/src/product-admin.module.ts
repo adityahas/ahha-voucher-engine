@@ -4,6 +4,7 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
+  RequestMethod,
   Scope,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -23,6 +24,7 @@ import { ClientEntity } from '@core/database/entities/client.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '@core/auth/constants';
 import { JwtStrategy } from '@core/auth/jwt.strategy';
+import { HealthController } from '@core/base';
 
 dotenv.config();
 
@@ -68,7 +70,11 @@ dotenv.config();
       inject: [REQUEST, DatabaseService],
     },
   ],
-  controllers: [ProductAdminController, ProductCategoryController],
+  controllers: [
+    ProductAdminController,
+    ProductCategoryController,
+    HealthController,
+  ],
   exports: [
     ProductAdminService,
     ProductCategoryService,
@@ -77,6 +83,9 @@ dotenv.config();
 })
 export class ProductAdminModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SubdomainMiddleware, CredentialMiddleware).forRoutes('*');
+    consumer
+      .apply(SubdomainMiddleware, CredentialMiddleware)
+      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .forRoutes('*');
   }
 }

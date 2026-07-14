@@ -8,8 +8,14 @@ import type { Product } from '../types/product';
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, className, ...props }: any) => <div className={className} {...props}>{children}</div>,
-    h1: ({ children, className }: any) => <h1 className={className}>{children}</h1>,
+    div: ({ children, className, ...props }: any) => (
+      <div className={className} {...props}>
+        {children}
+      </div>
+    ),
+    h1: ({ children, className }: any) => (
+      <h1 className={className}>{children}</h1>
+    ),
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
@@ -19,7 +25,7 @@ const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
-    ...actual as any,
+    ...(actual as any),
     useNavigate: () => mockNavigate,
   };
 });
@@ -55,11 +61,12 @@ describe('ProductShowcaseView', () => {
     vi.clearAllMocks();
   });
 
-  const renderComponent = () => render(
-    <MemoryRouter>
-      <ProductShowcaseView />
-    </MemoryRouter>
-  );
+  const renderComponent = () =>
+    render(
+      <MemoryRouter>
+        <ProductShowcaseView />
+      </MemoryRouter>,
+    );
 
   it('renders loading skeletons on initial load', async () => {
     (productsApi.getProducts as any).mockReturnValue(new Promise(() => {}));
@@ -85,7 +92,9 @@ describe('ProductShowcaseView', () => {
   });
 
   it('renders error message when API fails', async () => {
-    (productsApi.getProducts as any).mockRejectedValue(new Error('Backend Offline'));
+    (productsApi.getProducts as any).mockRejectedValue(
+      new Error('Backend Offline'),
+    );
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText('Backend Offline')).toBeInTheDocument();
