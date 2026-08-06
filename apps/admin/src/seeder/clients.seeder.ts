@@ -58,7 +58,7 @@ export const clientsSeeder = [
     database_username: process.env.DB_USERNAME || 'postgres',
     database_password: process.env.DB_PASSWORD || 'P4ssw0rd!',
     database_port: process.env.DB_PORT || '5432',
-    database_host: process.env.DB_HOST || 'host.docker.internal',
+    database_host: process.env.DB_HOST || 'postgres',
   },
   {
     subdomain: 'client2',
@@ -67,6 +67,6 @@ export const clientsSeeder = [
     database_username: process.env.DB_USERNAME || 'postgres',
     database_password: process.env.DB_PASSWORD || 'P4ssw0rd!',
     database_port: process.env.DB_PORT || '5432',
-    database_host: process.env.DB_HOST || 'host.docker.internal',
+    database_host: process.env.DB_HOST || 'postgres',
   },
 ];

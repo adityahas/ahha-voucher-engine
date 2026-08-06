@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
+    container_name: postgres
     environment:
       POSTGRES_USER: ${DB_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
@@ -50,7 +51,7 @@ services:
       PORT_ADMIN: '9002'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
@@ -86,7 +87,7 @@ services:
       PORT_LOYALTY_ADMIN: '9003'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
@@ -122,7 +123,7 @@ services:
       PORT_USER_ADMIN: '9004'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
@@ -158,7 +159,7 @@ services:
       PORT_LOYALTY_CONSUMER: '9005'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
@@ -194,7 +195,7 @@ services:
       PORT_USER_CONSUMER: '9006'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
@@ -230,7 +231,7 @@ services:
       PORT_PRODUCT_ADMIN: '9007'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
@@ -266,7 +267,7 @@ services:
       PORT_PRODUCT_CONSUMER: '9008'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
@@ -302,7 +303,7 @@ services:
       PORT_REDISTRO: '9009'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
