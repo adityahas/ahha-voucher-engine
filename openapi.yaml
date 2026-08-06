@@ -1727,6 +1727,7 @@ components:
         - daily
         - birthday
         - weekly
+        - custom_day_weekly
         - monthly
         - one_time
       description: Type of voucher validity period

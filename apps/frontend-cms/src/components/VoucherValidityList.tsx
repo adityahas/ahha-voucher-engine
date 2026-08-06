@@ -189,9 +189,24 @@ export const VoucherValidityList: React.FC<VoucherValidityListProps> = ({
                     className="hover:bg-slate-800/30 transition-colors group"
                   >
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-500/10 text-primary-400 border border-primary-500/20">
-                        {validity.type.toUpperCase().replace('_', ' ')}
-                      </span>
+                      <div className="flex flex-col gap-1 items-start">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-500/10 text-primary-400 border border-primary-500/20">
+                          {validity.type.toUpperCase().replaceAll('_', ' ')}
+                        </span>
+                        {validity.valid_days &&
+                          validity.valid_days.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {validity.valid_days.map((day) => (
+                                <span
+                                  key={day}
+                                  className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase"
+                                >
+                                  {day}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-slate-300">
                       <div className="flex flex-col">

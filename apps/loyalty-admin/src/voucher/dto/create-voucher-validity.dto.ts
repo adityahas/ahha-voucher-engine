@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsEnum,
   IsISO8601,
   IsNotEmpty,
@@ -28,4 +29,9 @@ export class CreateVoucherValidityDto {
   @IsNotEmpty()
   @IsString()
   end_time: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  valid_days?: string[];
 }

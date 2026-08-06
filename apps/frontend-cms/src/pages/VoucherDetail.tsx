@@ -13,10 +13,16 @@ import { getUsers, User } from '../api/users';
 import { VoucherBindingList } from '../components/VoucherBindingList';
 import { VoucherValidityList } from '../components/VoucherValidityList';
 import {
+  DiscountType,
+  formatDiscountType,
+  getDiscountSymbol,
+} from '../lib/discount-type';
+import {
   AlertCircle,
   ArrowLeft,
   Calendar,
   Clock,
+  CreditCard,
   Database,
   Hash,
   Loader2,
@@ -215,7 +221,7 @@ export const VoucherDetail: React.FC = () => {
                         Discount Type
                       </span>
                       <div className="text-lg font-bold text-slate-200 uppercase">
-                        {voucher.discount_type || 'NOT CONFIGURED'}
+                        {formatDiscountType(voucher.discount_type)}
                       </div>
                     </div>
                     <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-1">
@@ -223,9 +229,9 @@ export const VoucherDetail: React.FC = () => {
                         Value
                       </span>
                       <div className="text-2xl font-black text-emerald-400">
-                        {voucher.discount_type === 'PERCENTAGE'
+                        {voucher.discount_type === DiscountType.PERCENTAGE
                           ? `${voucher.discount_value}%`
-                          : `$${(voucher.discount_value || 0).toLocaleString()}`}
+                          : `Rp ${(voucher.discount_value || 0).toLocaleString('id-ID')}`}
                       </div>
                     </div>
                   </div>

@@ -11,6 +11,11 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { getVoucherByCode, updateVoucher, VoucherType } from '../api/vouchers';
 import {
+  DiscountType,
+  DISCOUNT_TYPE_MAP,
+  formatDiscountType,
+} from '../lib/discount-type';
+import {
   getVoucherCategories,
   VoucherCategory,
 } from '../api/voucher-categories';
@@ -20,6 +25,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Database,
+  Hash,
   Image as ImageIcon,
   Loader2,
   Plus,
@@ -38,7 +44,7 @@ export const VoucherEdit: React.FC = () => {
     description: '',
     quota: 0,
     image: '',
-    discount_type: 'PERCENTAGE' as 'PERCENTAGE' | 'FIXED_AMOUNT',
+    discount_type: DiscountType.PERCENTAGE,
     discount_value: 0,
     categories: [] as string[],
     allow_combine_categories: [] as string[],
@@ -74,7 +80,7 @@ export const VoucherEdit: React.FC = () => {
           allow_combine_categories:
             voucherData.allow_combine_categories?.map((c) => c.slug) || [],
           discount_type: voucherData.discount_type || 'PERCENTAGE',
-          discount_value: voucherData.discount_value || 0,
+          discount_value: Number(voucherData.discount_value) || 0,
           target_users:
             voucherData.target_users?.map((u) => u.core_user_id) || [],
         });
@@ -95,7 +101,11 @@ export const VoucherEdit: React.FC = () => {
       ...prev,
       [name]:
         name === 'quota' || name === 'discount_value'
-          ? parseFloat(value) || 0
+          ? value === ''
+            ? ''
+            : isNaN(Number(value))
+              ? prev[name as keyof typeof prev]
+              : value
           : value,
     }));
   };
@@ -122,6 +132,8 @@ export const VoucherEdit: React.FC = () => {
     try {
       const payload = {
         ...formData,
+        quota: Number(formData.quota) || 0,
+        discount_value: Number(formData.discount_value) || 0,
         categories: formData.categories.map((slug) => ({ slug })),
         allow_combine_categories: formData.allow_combine_categories.map(
           (slug) => ({ slug }),
@@ -289,16 +301,16 @@ export const VoucherEdit: React.FC = () => {
                         onChange={(e) =>
                           setFormData((prev) => ({
                             ...prev,
-                            discount_type: e.target.value as
-                              'PERCENTAGE' | 'FIXED_AMOUNT',
+                            discount_type: e.target.value as DiscountType,
                           }))
                         }
                         className="w-full h-12 rounded-xl bg-slate-900/50 border border-slate-700/50 focus:border-indigo-500/50 transition-all duration-300 px-4 text-sm text-slate-100 appearance-none focus:outline-none"
                       >
-                        <option value="PERCENTAGE">PERCENTAGE (%)</option>
-                        <option value="FIXED_AMOUNT">
-                          FIXED AMOUNT (Value)
-                        </option>
+                        {Object.values(DiscountType).map((type) => (
+                          <option key={type} value={type}>
+                            {DISCOUNT_TYPE_MAP[type].label.id}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -307,22 +319,16 @@ export const VoucherEdit: React.FC = () => {
                         htmlFor="discount_value"
                         className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1"
                       >
-                        {formData.discount_type === 'PERCENTAGE'
+                        {formData.discount_type === DiscountType.PERCENTAGE
                           ? 'Discount Percentage (%)'
-                          : 'Discount Amount'}
+                          : 'Discount Amount (Rp)'}
                       </label>
                       <Input
                         id="discount_value"
                         name="discount_value"
                         type="number"
-                        step={
-                          formData.discount_type === 'PERCENTAGE' ? '1' : '0.01'
-                        }
-                        placeholder={
-                          formData.discount_type === 'PERCENTAGE'
-                            ? '10'
-                            : '5.00'
-                        }
+                        step="any"
+                        placeholder="0"
                         value={formData.discount_value}
                         onChange={handleChange}
                         required
