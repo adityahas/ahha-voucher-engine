@@ -1,0 +1,357 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      POSTGRES_DB: ${DB_NAME:-ahha_admin_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-ahha_admin_db}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redisdata:/data
+
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn nest start admin --watch
+    profiles: ['backend', 'admin', 'all']
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - ./package.json:/app/package.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: admin
+      PORT_ADMIN: '9002'
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-true}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    ports:
+      - '9002:9002'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  loyalty-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn nest start loyalty-admin --watch
+    profiles: ['backend', 'admin', 'all']
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - ./package.json:/app/package.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: loyalty-admin
+      PORT_LOYALTY_ADMIN: '9003'
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-true}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    ports:
+      - '9003:9003'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  user-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn nest start user-admin --watch
+    profiles: ['backend', 'admin', 'all']
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - ./package.json:/app/package.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: user-admin
+      PORT_USER_ADMIN: '9004'
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-true}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    ports:
+      - '9004:9004'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  loyalty-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn nest start loyalty-consumer --watch
+    profiles: ['backend', 'consumer', 'all']
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - ./package.json:/app/package.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: loyalty-consumer
+      PORT_LOYALTY_CONSUMER: '9005'
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-true}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    ports:
+      - '9005:9005'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  user-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn nest start user-consumer --watch
+    profiles: ['backend', 'consumer', 'all']
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - ./package.json:/app/package.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: user-consumer
+      PORT_USER_CONSUMER: '9006'
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-true}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    ports:
+      - '9006:9006'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  product-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn nest start product-admin --watch
+    profiles: ['backend', 'admin', 'all']
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - ./package.json:/app/package.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: product-admin
+      PORT_PRODUCT_ADMIN: '9007'
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-true}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    ports:
+      - '9007:9007'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  product-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn nest start product-consumer --watch
+    profiles: ['backend', 'consumer', 'all']
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - ./package.json:/app/package.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: product-consumer
+      PORT_PRODUCT_CONSUMER: '9008'
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-true}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    ports:
+      - '9008:9008'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  redistro:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: yarn nest start redistro --watch
+    profiles: ['backend', 'all']
+    volumes:
+      - ./apps:/app/apps
+      - ./libs:/app/libs
+      - ./package.json:/app/package.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      SERVICE_NAME: redistro
+      PORT_REDISTRO: '9009'
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:-ahha_admin_db}
+      DB_SYNC: ${DB_SYNC:-true}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
+      JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    ports:
+      - '9009:9009'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend-cms:
+    build:
+      context: .
+      dockerfile: Dockerfile.cms
+    command: yarn --cwd apps/frontend-cms dev --host 0.0.0.0
+    profiles: ['frontend', 'admin', 'all']
+    volumes:
+      - ./apps/frontend-cms:/app/apps/frontend-cms
+      - /app/apps/frontend-cms/node_modules
+    ports:
+      - '5173:5173'
+    depends_on:
+      - admin
+      - loyalty-admin
+      - product-admin
+      - user-admin
+
+  frontend-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    command: yarn --cwd apps/frontend-consumer dev --host 0.0.0.0
+    profiles: ['frontend', 'consumer', 'all']
+    volumes:
+      - ./apps/frontend-consumer:/app/apps/frontend-consumer
+      - /app/apps/frontend-consumer/node_modules
+    ports:
+      - '5174:5174'
+    depends_on:
+      - loyalty-consumer
+      - product-consumer
+      - user-consumer
+
+volumes:
+  pgdata:
+  redisdata:
