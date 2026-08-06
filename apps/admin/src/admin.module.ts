@@ -19,6 +19,9 @@ import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { AdminEntity } from './entities/admin.entity';
 import { HealthController } from '@core/base';
+import { ClientSettingsEntity } from '@core/database/entities/client-settings.entity';
+import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
+import { SettingsController } from './settings/settings.controller';
 
 dotenv.config();
 
@@ -45,10 +48,10 @@ dotenv.config();
     }),
     forwardRef(() => AuthModule),
     DatabaseModule,
-    TypeOrmModule.forFeature([AdminEntity]),
+    TypeOrmModule.forFeature([AdminEntity, ClientSettingsEntity]),
   ],
-  controllers: [AdminController, HealthController],
-  providers: [AdminService, JwtStrategy],
+  controllers: [AdminController, HealthController, SettingsController],
+  providers: [AdminService, JwtStrategy, ClientSettingsService],
   exports: [AdminService],
 })
 export class AdminModule implements NestModule {

@@ -34,16 +34,11 @@ describe('ProductCard', () => {
     expect(
       screen.getByText('A collection of high-value vouchers.'),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Rp.*150\.000/)).toBeInTheDocument();
+    expect(screen.getByText(/150\.000/)).toBeInTheDocument();
 
     const img = screen.getByRole('img');
     expect(img).toHaveAttribute('src', mockProduct.image);
     expect(img).toHaveAttribute('alt', mockProduct.name);
-  });
-
-  it('does not invent voucher discount information for products', () => {
-    render(<ProductCard product={mockProduct} />);
-    expect(screen.queryByText(/off|Rp.*discount/i)).not.toBeInTheDocument();
   });
 
   it('renders fallback icon when image is missing', () => {

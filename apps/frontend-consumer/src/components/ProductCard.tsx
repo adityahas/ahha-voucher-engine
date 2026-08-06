@@ -4,10 +4,8 @@ import { ShoppingCart, ShoppingBag } from 'lucide-react';
 import type { Product } from '../types/product';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import {
-  formatCurrency,
-  useCurrencySettings,
-} from '../context/currency-settings';
+import { useCurrencySettings } from '../context/CurrencyContext';
+import { formatCurrency } from '../lib/currency-format';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,7 +22,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onBuy,
   className,
 }) => {
-  const settings = useCurrencySettings();
+  const currencySettings = useCurrencySettings();
+
   return (
     <motion.div
       layout
@@ -57,7 +56,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Price Badge */}
         <div className="absolute top-3 right-3 glass-panel px-3 py-1 rounded-full text-sm font-bold border-cyan-500/30 text-cyan-400">
-          {formatCurrency(product.price, settings)}
+          {formatCurrency(product.price, currencySettings)}
         </div>
       </div>
 

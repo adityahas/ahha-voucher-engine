@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/auth.store';
 import LoginView from './pages/LoginView';
@@ -7,7 +7,12 @@ import MyVouchersView from './pages/MyVouchersView';
 import VoucherDetailView from './pages/VoucherDetailView';
 import { ProductShowcaseView } from './pages/ProductShowcaseView';
 import { CheckoutView } from './pages/CheckoutView';
-import { CurrencySettingsProvider } from './context/currency-settings';
+import { getCurrencySettings } from './api/settings';
+import { CurrencyProvider } from './context/CurrencyContext';
+import {
+  DEFAULT_CURRENCY_SETTINGS,
+  type CurrencySettings,
+} from './types/currency-settings';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((state) => state.token);
@@ -20,10 +25,24 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-  // Wait for hydration if using persist middleware in production
+  const [currencySettings, setCurrencySettings] = useState<CurrencySettings>(
+    DEFAULT_CURRENCY_SETTINGS,
+  );
+  const [settingsError, setSettingsError] = useState(false);
+
+  useEffect(() => {
+    getCurrencySettings()
+      .then(setCurrencySettings)
+      .catch(() => setSettingsError(true));
+  }, []);
 
   return (
-    <CurrencySettingsProvider>
+    <CurrencyProvider settings={currencySettings}>
+      {settingsError && (
+        <div className="fixed right-4 top-4 z-50 rounded-lg bg-amber-500/90 px-4 py-2 text-sm text-black shadow-lg">
+          Using default currency formatting
+        </div>
+      )}
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginView />} />
@@ -67,11 +86,10 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
-    </CurrencySettingsProvider>
+    </CurrencyProvider>
   );
 }
 

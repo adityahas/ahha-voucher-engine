@@ -144,8 +144,8 @@ describe('CheckoutView Automation Suite', () => {
         screen.getByText(/Voucher Applied Successfully!/i),
       ).toBeInTheDocument();
       expect(screen.getByText('Voucher Savings')).toBeInTheDocument();
-      expect(screen.getByText(/-Rp 20/)).toBeInTheDocument();
-      expect(screen.getByText(/Rp.*80/)).toBeInTheDocument(); // Final Total
+      expect(screen.getByText(/-Rp\s*20/)).toBeInTheDocument();
+      expect(screen.getByText(/Rp\s*80/)).toBeInTheDocument(); // Final Total
     });
   });
 

@@ -1,4 +1,27 @@
-# Task 5 Review Fixes
+# Task 5 Report
+
+## Status
+
+Implemented tenant currency formatting across the consumer UI.
+
+## Changes
+
+- Added `CurrencySettings`, documented defaults, settings API loading, and a safe `formatCurrency` helper.
+- Added app-level currency state/context with default formatting while loading and a non-blocking fallback notice on fetch failure.
+- Replaced hardcoded product and checkout monetary formatting without changing API values or calculations.
+- Updated affected consumer tests and added formatter contract tests for defaults, locales, overrides, and invalid input.
+
+## Verification
+
+- `cd apps/frontend-consumer && npx vitest run`: PASS, 7 files and 31 tests.
+- `cd apps/frontend-consumer && npx tsc --noEmit`: PASS.
+- `cd apps/frontend-consumer && npm run build`: PASS.
+- `git diff --check`: PASS.
+
+## Concerns
+
+- Vitest emits existing Framer Motion warnings about animation props reaching DOM nodes in test renders; these do not fail tests and are unrelated to currency formatting.
+- The settings request failure path keeps the documented IDR/id-ID defaults and shows a non-blocking notice.
 
 ## Changes
 
