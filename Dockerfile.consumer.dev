@@ -1,0 +1,9 @@
+FROM node:22-alpine
+WORKDIR /app/apps/frontend-consumer
+
+COPY apps/frontend-consumer/package.json apps/frontend-consumer/package-lock.json* apps/frontend-consumer/yarn.lock* ./
+RUN yarn install || npm install
+
+COPY apps/frontend-consumer ./
+
+CMD ["yarn", "dev", "--host", "0.0.0.0", "--port", "5174"]

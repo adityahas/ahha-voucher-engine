@@ -5,6 +5,21 @@ import { AdminEntity } from '../entities/admin.entity';
 import { Role } from '@core/auth/roles.enum';
 
 export async function seedAdmins(dataSource: DataSource) {
+  await dataSource.query(`CREATE EXTENSION IF NOT EXISTS "pgcrypto";`);
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS admins (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      name VARCHAR NOT NULL,
+      email VARCHAR UNIQUE NOT NULL,
+      password VARCHAR NOT NULL,
+      role VARCHAR NOT NULL DEFAULT 'admin',
+      client_database_name VARCHAR REFERENCES clients(database_name),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+      deleted_at TIMESTAMPTZ
+    );
+  `);
+
   const adminRepo = dataSource.getRepository(AdminEntity);
 
   for (const adminData of adminsSeeder) {

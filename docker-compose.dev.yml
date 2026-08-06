@@ -34,7 +34,7 @@ services:
   admin:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: yarn nest start admin --watch
     profiles: ['backend', 'admin', 'all']
     volumes:
@@ -70,7 +70,7 @@ services:
   loyalty-admin:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: yarn nest start loyalty-admin --watch
     profiles: ['backend', 'admin', 'all']
     volumes:
@@ -106,7 +106,7 @@ services:
   user-admin:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: yarn nest start user-admin --watch
     profiles: ['backend', 'admin', 'all']
     volumes:
@@ -142,7 +142,7 @@ services:
   loyalty-consumer:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: yarn nest start loyalty-consumer --watch
     profiles: ['backend', 'consumer', 'all']
     volumes:
@@ -178,7 +178,7 @@ services:
   user-consumer:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: yarn nest start user-consumer --watch
     profiles: ['backend', 'consumer', 'all']
     volumes:
@@ -214,7 +214,7 @@ services:
   product-admin:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: yarn nest start product-admin --watch
     profiles: ['backend', 'admin', 'all']
     volumes:
@@ -250,7 +250,7 @@ services:
   product-consumer:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: yarn nest start product-consumer --watch
     profiles: ['backend', 'consumer', 'all']
     volumes:
@@ -286,7 +286,7 @@ services:
   redistro:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     command: yarn nest start redistro --watch
     profiles: ['backend', 'all']
     volumes:
@@ -322,35 +322,37 @@ services:
   frontend-cms:
     build:
       context: .
-      dockerfile: Dockerfile.cms
-    command: yarn --cwd apps/frontend-cms dev --host 0.0.0.0
+      dockerfile: Dockerfile.cms.dev
+    command: yarn dev --host 0.0.0.0 --force
     profiles: ['frontend', 'admin', 'all']
     volumes:
       - ./apps/frontend-cms:/app/apps/frontend-cms
       - /app/apps/frontend-cms/node_modules
     ports:
       - '5173:5173'
-    depends_on:
-      - admin
-      - loyalty-admin
-      - product-admin
-      - user-admin
 
   frontend-consumer:
     build:
       context: .
-      dockerfile: Dockerfile.consumer
-    command: yarn --cwd apps/frontend-consumer dev --host 0.0.0.0
+      dockerfile: Dockerfile.consumer.dev
+    command: yarn dev --host 0.0.0.0 --port 5174 --force
     profiles: ['frontend', 'consumer', 'all']
     volumes:
       - ./apps/frontend-consumer:/app/apps/frontend-consumer
       - /app/apps/frontend-consumer/node_modules
     ports:
       - '5174:5174'
+
+  api-gateway:
+    image: nginx:alpine
+    profiles: ['infra', 'backend', 'admin', 'consumer', 'frontend', 'all']
+    ports:
+      - '8080:80'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - loyalty-consumer
-      - product-consumer
-      - user-consumer
+      - postgres
+      - redis
 
 volumes:
   pgdata:

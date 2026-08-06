@@ -3,7 +3,7 @@ import type { Product } from '../types/product';
 
 export const getProducts = async (): Promise<Product[]> => {
   const BASE_URL =
-    import.meta?.env?.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
+    import.meta?.env?.VITE_API_BASE_URL || 'http://localhost:8080';
 
   // Based on nginx.conf, we use /product prefix to route to port 9008
   // NestJS controller for consumer is at /products
@@ -16,7 +16,8 @@ export const getProducts = async (): Promise<Product[]> => {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token || ''}`,
-      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+      'x-api-key': apiKey || 'client1-api-key',
+      'x-tenant-override': 'client1',
     },
   });
 
@@ -30,7 +31,7 @@ export const getProducts = async (): Promise<Product[]> => {
 
 export const getProductById = async (id: string): Promise<Product> => {
   const BASE_URL =
-    import.meta?.env?.VITE_API_BASE_URL || 'http://client1.ahha-be.local';
+    import.meta?.env?.VITE_API_BASE_URL || 'http://localhost:8080';
   const url = `${BASE_URL}/product/products/${id}`;
 
   const { token, apiKey } = useAuthStore.getState();
@@ -40,7 +41,8 @@ export const getProductById = async (id: string): Promise<Product> => {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token || ''}`,
-      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+      'x-api-key': apiKey || 'client1-api-key',
+      'x-tenant-override': 'client1',
     },
   });
 

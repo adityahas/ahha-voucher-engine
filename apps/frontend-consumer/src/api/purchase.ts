@@ -8,7 +8,9 @@ export interface CreatePurchaseDto {
 
 export const executePurchase = async (dto: CreatePurchaseDto): Promise<any> => {
   const LOYALTY_API_URL =
-    import.meta?.env?.VITE_LOYALTY_API_URL || 'http://client1.ahha-be.local';
+    import.meta?.env?.VITE_LOYALTY_API_URL ||
+    import.meta?.env?.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const { token, apiKey } = useAuthStore.getState();
 
@@ -17,7 +19,8 @@ export const executePurchase = async (dto: CreatePurchaseDto): Promise<any> => {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token || ''}`,
-      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+      'x-api-key': apiKey || 'client1-api-key',
+      'x-tenant-override': 'client1',
     },
     body: JSON.stringify(dto),
   });

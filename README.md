@@ -125,53 +125,60 @@ Tersedia seeder untuk:
 
 ## 🎬 How to run
 
-1. Clone repo
-2. Install dependencies: `yarn install`
-3. Setup PostgreSQL dan buat database utama
-4. Setup nginx untuk multi domain
-5. Ini contoh konfigurasi nginx:
-   ```
-   worker_processes 1;
+### ⚡ Quick Start (Docker Compose Dev Launcher)
 
-   events {
-   worker_connections 1024;
-   }
+Run all microservices, frontends, Postgres, and Redis with live hot-reloading:
 
-   http {
-   include       mime.types;
-   default_type  application/octet-stream;
+```bash
+yarn dev
+# or
+make dev
+```
 
-       sendfile        on;
-       keepalive_timeout  65;
+#### Selective Service Launching
 
-       server {
-           listen 80;
-           server_name ~^(?<client>[^.]+)\.ahha-be\.local$;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+| Environment / Profile  | Command (Yarn)      | Command (Make)      | Description                                            |
+| :--------------------- | :------------------ | :------------------ | :----------------------------------------------------- |
+| **Full Stack**         | `yarn dev`          | `make dev`          | Launches all 10 microservices & frontends + DB + Redis |
+| **Backend Only**       | `yarn dev:backend`  | `make dev-backend`  | Launches all 8 NestJS microservices + DB + Redis       |
+| **Frontends Only**     | `yarn dev:frontend` | `make dev-frontend` | Launches CMS (5173) and Storefront (5174)              |
+| **Admin Ecosystem**    | `yarn dev:admin`    | `make dev-admin`    | Launches Admin APIs + CMS Admin Frontend               |
+| **Consumer Ecosystem** | `yarn dev:consumer` | `make dev-consumer` | Launches Consumer APIs + Storefront Frontend           |
+| **Infra Only**         | `yarn dev:infra`    | `make dev-infra`    | Launches Postgres (5432) and Redis (6379) only         |
 
-           location /users {
-               proxy_pass http://localhost:9004;
-           }
-           location /admin {
-               proxy_pass http://localhost:9002;
-           }
-           location /loyalty-admin {
-               proxy_pass http://localhost:9003;
-           }
-           location /loyalty {
-               proxy_pass http://localhost:9005;
-           }
+#### Stop Dev Services
 
-           # Tambahkan CORS headers jika perlu
-           add_header Access-Control-Allow-Origin *;
-           add_header Access-Control-Allow-Headers DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,notif-token,fcm-id,Language,Channel;
-       }
-   }
-   ```
-6. Load konfigurasi nginx: `sudo nginx -c /Users/adityahas/nginx-local/nginx.conf`
-7. Reload nginx: `sudo nginx -s reload`
-8. Run app admin: `yarn start:admin --watch`
-9. Run app loyalty-admin: `yarn start:loyalty-admin --watch`
-10. Run app loyalty-consumer: `yarn start:loyalty-consumer --watch`
+```bash
+yarn dev:down
+# or
+make dev-down
+```
+
+---
+
+### 🌐 Service Ports Summary
+
+- **CMS Admin Panel**: `http://localhost:5173`
+- **Consumer Storefront**: `http://localhost:5174`
+- **Admin API**: `http://localhost:9002`
+- **Loyalty Admin API**: `http://localhost:9003`
+- **User Admin API**: `http://localhost:9004`
+- **Loyalty Consumer API**: `http://localhost:9005`
+- **User Consumer API**: `http://localhost:9006`
+- **Product Admin API**: `http://localhost:9007`
+- **Product Consumer API**: `http://localhost:9008`
+- **Redistro API**: `http://localhost:9009`
+
+---
+
+### 🛠️ Manual / Native Setup (Optional)
+
+1. Install dependencies: `yarn install`
+2. Run database & redis: `make dev-infra`
+3. Run seed: `yarn seed`
+4. Run individual microservice natively:
+   - `yarn start:admin --watch`
+   - `yarn start:loyalty-admin --watch`
+   - `yarn start:loyalty-consumer --watch`
+   - `yarn nest start product-admin --watch`
+   - `yarn nest start product-consumer --watch`

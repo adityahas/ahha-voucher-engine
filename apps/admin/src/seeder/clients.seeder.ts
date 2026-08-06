@@ -3,6 +3,21 @@ import { ClientEntity } from '@core/database/entities/client.entity';
 import { EncryptionService } from '@core/encryption';
 
 export async function seedClients(dataSource: DataSource) {
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS clients (
+      database_name VARCHAR PRIMARY KEY,
+      subdomain VARCHAR UNIQUE NOT NULL,
+      api_key VARCHAR NOT NULL,
+      database_username VARCHAR NOT NULL,
+      database_password VARCHAR NOT NULL,
+      database_port VARCHAR NOT NULL,
+      database_host VARCHAR NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+      deleted_at TIMESTAMPTZ
+    );
+  `);
+
   const clientRepo = dataSource.getRepository(ClientEntity);
   const encryptionService = new EncryptionService();
 
@@ -40,18 +55,18 @@ export const clientsSeeder = [
     subdomain: 'client1',
     api_key: 'client1-api-key',
     database_name: 'ahha_client1_db',
-    database_username: 'postgres',
-    database_password: 'P4ssw0rd!',
-    database_port: '5432',
-    database_host: 'localhost',
+    database_username: process.env.DB_USERNAME || 'postgres',
+    database_password: process.env.DB_PASSWORD || 'P4ssw0rd!',
+    database_port: process.env.DB_PORT || '5432',
+    database_host: process.env.DB_HOST || 'postgres',
   },
   {
     subdomain: 'client2',
     api_key: 'client2-api-key',
     database_name: 'ahha_client2_db',
-    database_username: 'postgres',
-    database_password: 'P4ssw0rd!',
-    database_port: '5432',
-    database_host: 'localhost',
+    database_username: process.env.DB_USERNAME || 'postgres',
+    database_password: process.env.DB_PASSWORD || 'P4ssw0rd!',
+    database_port: process.env.DB_PORT || '5432',
+    database_host: process.env.DB_HOST || 'postgres',
   },
 ];

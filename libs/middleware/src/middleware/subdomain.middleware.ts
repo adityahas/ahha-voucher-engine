@@ -12,19 +12,26 @@ export class SubdomainMiddleware implements NestMiddleware {
   constructor(private readonly dataSource: DataSource) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    const host = req.headers.host; // e.g., "client1.example.com"
-    const subdomain = host.split('.')[0]; // Extract subdomain, e.g., "client1"
+    const host = req.headers.host || '';
+    const override =
+      (req.headers['x-tenant-override'] as string) ||
+      (req.headers['x-subdomain'] as string);
 
-    console.log('host', host);
-    console.log('subdomain', subdomain);
+    const extracted = host.split(':')[0].split('.')[0];
+    const subdomain =
+      override ||
+      (extracted === 'localhost' ||
+      extracted === '127' ||
+      extracted === 'api-gateway'
+        ? 'client1'
+        : extracted);
 
-    //TODO: Probably need to implement redis caching here
     const client = await this.dataSource
       .getRepository(ClientEntity)
       .findOne({ where: { subdomain } });
 
     if (!client) {
-      throw new UnauthorizedException('Invalid subdomain.');
+      throw new UnauthorizedException(`Invalid subdomain: ${subdomain}`);
     }
 
     req['client'] = client;
