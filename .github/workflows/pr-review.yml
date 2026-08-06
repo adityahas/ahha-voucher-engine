@@ -1,89 +1,90 @@
-name: PR Review via Paperclip
+name: PR Review
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
-    branches: [main, staging]
+    types: [opened, reopened, ready_for_review]
 
 jobs:
-  paperclip-review:
+  review-trigger:
+    name: Trigger Review
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create or update Paperclip review issue
-        id: paperclip
-        env:
-          PAPERCLIP_API_URL: ${{ vars.PAPERCLIP_API_URL }}
-          PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_API_KEY }}
+      - name: Collect PR metadata
+        id: pr
         run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
-          PR_BASE="${{ github.event.pull_request.base.ref }}"
-          PR_HEAD="${{ github.event.pull_request.head.ref }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_DIFF_URL="${{ github.event.pull_request.diff_url }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
+          echo "title=${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
+          echo "author=${{ github.event.pull_request.user.login }}" >> $GITHUB_OUTPUT
+          echo "branch=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+          echo "base=${{ github.base_ref }}" >> $GITHUB_OUTPUT
+          echo "draft=${{ github.event.pull_request.draft }}" >> $GITHUB_OUTPUT
+          echo "url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
 
-          ISSUE_TITLE="[PR #${PR_NUMBER}] ${PR_TITLE}"
-          ISSUE_BODY=$(cat <<EOF
-          ## PR Review Request
-
-          **Author:** @${PR_AUTHOR}
-          **Branch:** ${PR_HEAD} → ${PR_BASE}
-          **PR URL:** ${PR_URL}
-          **Diff:** ${PR_DIFF_URL}
-
-          ### Description
-          ${PR_BODY}
-
-          ---
-          *Automated review request via Paperclip. A CTO agent will review this PR.*
-          EOF
-          )
-
-          RESPONSE=$(curl -s -X POST "${PAPERCLIP_API_URL}/api/issues" \
-            -H "Authorization: Bearer ${PAPERCLIP_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d "$(jq -n \
-              --arg title "$ISSUE_TITLE" \
-              --arg body "$ISSUE_BODY" \
-              --arg externalId "pr-${PR_NUMBER}" \
-              '{title: $title, body: $body, externalId: $externalId, priority: "medium", labels: ["pr-review"]}')")
-
-          echo "Paperclip response: $RESPONSE"
-          ISSUE_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
-
-          if [ -n "$ISSUE_ID" ]; then
-            echo "Created Paperclip issue: $ISSUE_ID"
-            echo "issue_id=$ISSUE_ID" >> "$GITHUB_OUTPUT"
-            echo "paperclip_url=${PAPERCLIP_API_URL}/issues/${ISSUE_ID}" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::Failed to create Paperclip issue"
-          fi
-
-      - name: Post PR comment with review status
-        if: steps.paperclip.outputs.issue_id != ''
+      - name: Annotate review checklist
         uses: actions/github-script@v7
         with:
           script: |
-            const issueId = '${{ steps.paperclip.outputs.issue_id }}';
-            const paperclipUrl = '${{ steps.paperclip.outputs.paperclip_url }}';
+            const checklists = {
+              architecture: [
+                'Database-per-tenant isolation maintained',
+                'Middleware ordering preserved (SubdomainMiddleware → CredentialMiddleware)',
+                'Path aliases used correctly (@core/auth, @core/database, etc.)',
+                'Decimal(12,2) for monetary precision',
+                'Transactional voucher usage when tied to purchase/order'
+              ],
+              code_quality: [
+                'Format check passes: `yarn format:check`',
+                'Lint passes: `yarn lint`',
+                'Type check passes: `yarn type-check`',
+                'No console.log or debug artifacts',
+                'DTOs use proper validation decorators',
+                'Repository pattern followed (DataSource from request context)',
+              ],
+              security: [
+                'JWT guards on admin and consumer endpoints',
+                'ACL permissions checked for admin operations',
+                'AES encryption for sensitive data',
+                'No secrets or credentials in code',
+                'CORS properly configured',
+              ],
+              testing: [
+                'New services/controllers have corresponding .spec.ts files',
+                'E2E tests for critical paths (voucher claiming, purchase)',
+                'Frontend changes have Vitest tests',
+              ],
+            };
+
+            const body = `## PR Review: ${{ steps.pr.outputs.title }}
+
+            **Author:** ${{ steps.pr.outputs.author }}
+            **Branch:** \`${{ steps.pr.outputs.branch }}\` → \`${{ steps.pr.outputs.base }}\`
+            **Draft:** ${{ steps.pr.outputs.draft }}
+
+            CI workflow will automatically run the full test suite. Review the results below.
+
+            ### Review Checklist
+
+            #### :building_construction: Architecture
+            ${checklists.architecture.map(item => `- [ ] ${item}`).join('\n')}
+
+            #### :broom: Code Quality
+            ${checklists.code_quality.map(item => `- [ ] ${item}`).join('\n')}
+
+            #### :lock: Security
+            ${checklists.security.map(item => `- [ ] ${item}`).join('\n')}
+
+            #### :test_tube: Testing
+            ${checklists.testing.map(item => `- [ ] ${item}`).join('\n')}
+            `;
 
             await github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: [
-                '## Paperclip Review Started',
-                '',
-                'A CTO agent review has been requested via Paperclip.',
-                '',
-                '- **Paperclip Issue:** ' + paperclipUrl,
-                '- **Status:** Pending review',
-                '',
-                'The agent will review this PR and provide feedback. You will be notified when the review is complete.',
-              ].join('\n'),
+              body: body,
             });
+
+      - name: Link CI run
+        run: |
+          echo "CI workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

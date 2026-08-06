@@ -600,6 +600,7 @@ yarn format                       # Run Prettier on all source files
 yarn test                         # Run unit tests
 yarn test:watch                   # Run tests in watch mode
 yarn test:cov                     # Run tests with coverage
+yarn test:ci                      # Run tests with JUnit reporter (CI)
 yarn test:e2e                     # Run end-to-end tests
 
 # Frontend Testing (Vitest)
@@ -1038,6 +1039,9 @@ On merge to `main`, the `pr-local-deploy.yml` workflow triggers:
 | Consumer Router      | `apps/frontend-consumer/src/App.tsx`                                |
 | Checkout UI          | `apps/frontend-consumer/src/pages/CheckoutView.tsx`                 |
 | CMS Voucher CRUD     | `apps/frontend-cms/src/pages/VoucherCreate.tsx`, `VoucherEdit.tsx`  |
+| CI Pipeline          | `.github/workflows/ci.yml`                                          |
 | PR Review Workflow   | `.github/workflows/pr-review.yml`                                   |
 | Local Deploy         | `.github/workflows/pr-local-deploy.yml`                             |
+| E2E Tests            | `e2e/` directory (Playwright)                                       |
+| PR Template          | `.github/pull_request_template.md`                                  |
 | Paperclip Setup      | `docs/paperclip-integration.md`                                     |

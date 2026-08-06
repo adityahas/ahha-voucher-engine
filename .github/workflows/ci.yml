@@ -1,17 +1,31 @@
 name: CI
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main, staging]
-  pull_request:
-    branches: [main, staging]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  backend:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,43 +34,221 @@ jobs:
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn type-check
-      - run: yarn lint
+
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ahha_admin_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - name: Run Jest tests
+        run: yarn test:ci
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: ahha_admin_db
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          CLIENT_DB_SECRET: 9cc4da5ba5f1313590b00dabecdb4299
+          JWT_SECRET: test-jwt-secret-for-ci-only
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: |
+            junit.xml
+            coverage/
+          retention-days: 7
+
+  frontend-test:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [frontend-cms, frontend-consumer]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        working-directory: apps/${{ matrix.app }}
+        run: yarn install --frozen-lockfile
+      - name: Run Vitest
+        working-directory: apps/${{ matrix.app }}
+        run: npx vitest run --reporter=default --reporter=junit --outputFile.junit=../../junit-${{ matrix.app }}.xml
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-test-results
+          path: |
+            junit-${{ matrix.app }}.xml
+            apps/${{ matrix.app }}/coverage/
+          retention-days: 7
+
+  build:
+    name: Build
+    needs: [lint, type-check, backend-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --frozen-lockfile
       - run: yarn build
-      - run: yarn test
-      - run: yarn test:e2e || echo "No e2e tests found, skipping"
 
-  frontend-cms:
+  e2e-test:
+    name: E2E Tests
+    needs: [build]
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/frontend-cms
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ahha_admin_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: apps/frontend-cms/package-lock.json
-      - run: npm ci
-      - run: npm run type-check
-      - run: npm run lint
-      - run: npm test
-      - run: npm run build
+          cache: yarn
+      - run: yarn install --frozen-lockfile
 
-  frontend-consumer:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/frontend-consumer
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Install Playwright
+        working-directory: e2e
+        run: |
+          yarn install --frozen-lockfile
+          npx playwright install --with-deps chromium
+
+      - name: Seed database
+        run: node dist/apps/admin/src/seeder/main.seeder.js
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: ahha_admin_db
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          CLIENT_DB_SECRET: 9cc4da5ba5f1313590b00dabecdb4299
+          JWT_SECRET: test-jwt-secret-for-ci-only
+
+      - name: Start backend services
+        run: |
+          export DB_HOST=localhost DB_PORT=5432 DB_USERNAME=postgres DB_PASSWORD=postgres
+          export DB_NAME=ahha_admin_db REDIS_HOST=localhost REDIS_PORT=6379
+          export CLIENT_DB_SECRET=9cc4da5ba5f1313590b00dabecdb4299
+          export JWT_SECRET=test-jwt-secret-for-ci-only
+
+          node dist/apps/admin/main.js &
+          node dist/apps/loyalty-admin/main.js &
+          node dist/apps/loyalty-consumer/main.js &
+          node dist/apps/product-consumer/main.js &
+          sleep 5
+
+      - name: Run Playwright E2E tests
+        working-directory: e2e
+        run: npx playwright test
+        env:
+          API_BASE_URL: http://localhost:9002
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: apps/frontend-consumer/package-lock.json
-      - run: npm ci
-      - run: npm run type-check
-      - run: npm run lint
-      - run: npm test
-      - run: npm run build
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7
+
+  pr-comment:
+    name: PR Summary Comment
+    needs: [lint, type-check, backend-test, frontend-test, build, e2e-test]
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment CI results on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const jobs = [
+              { name: 'lint', result: '${{ needs.lint.result }}' },
+              { name: 'type-check', result: '${{ needs.type-check.result }}' },
+              { name: 'backend-test', result: '${{ needs.backend-test.result }}' },
+              { name: 'frontend-test', result: '${{ needs.frontend-test.result }}' },
+              { name: 'build', result: '${{ needs.build.result }}' },
+              { name: 'e2e-test', result: '${{ needs.e2e-test.result }}' },
+            ];
+
+            const icon = (r) => r === 'success' ? ':white_check_mark:' : r === 'skipped' ? ':white_circle:' : ':x:';
+
+            let body = '## CI Results\n\n';
+            body += '| Job | Status |\n';
+            body += '|-----|--------|\n';
+            jobs.forEach(j => body += `| ${j.name} | ${icon(j.result)} ${j.result} |\n`);
+            body += '\n';
+            body += `<details><summary>:test_tube: Artifacts</summary>\n\n`;
+            body += `- [View run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n`;
+            body += `</details>\n`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
