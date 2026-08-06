@@ -38,9 +38,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       {/* Product Image Area */}
       <div className="relative aspect-video w-full overflow-hidden bg-slate-800/50">
-        {product.image ? (
+        {product.image || product.image_url ? (
           <img
-            src={product.image}
+            src={product.image || product.image_url}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
