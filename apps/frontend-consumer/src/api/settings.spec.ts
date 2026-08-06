@@ -2,7 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getCurrencySettings } from './settings';
 
 vi.mock('../store/auth.store', () => ({
-  useAuthStore: { getState: () => ({ apiKey: 'runtime-api-key' }) },
+  useAuthStore: {
+    getState: () => ({ token: 'runtime-token', apiKey: 'runtime-api-key' }),
+  },
 }));
 
 describe('getCurrencySettings', () => {
@@ -33,6 +35,7 @@ describe('getCurrencySettings', () => {
       expect.objectContaining({
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer runtime-token',
           'x-api-key': 'runtime-api-key',
           'x-tenant-override': 'runtime-tenant',
         },

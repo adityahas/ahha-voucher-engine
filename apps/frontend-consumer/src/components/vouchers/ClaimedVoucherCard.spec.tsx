@@ -32,4 +32,22 @@ describe('ClaimedVoucherCard', () => {
 
     expect(screen.getByText('10% off')).toBeInTheDocument();
   });
+
+  it('renders fixed discounts with the tenant currency', () => {
+    render(
+      <ClaimedVoucherCard
+        claimedVoucher={{
+          ...claimedVoucher,
+          voucher: {
+            ...claimedVoucher.voucher,
+            discount_type: 'FIXED_AMOUNT',
+            discount_value: 25000,
+          },
+        }}
+        index={0}
+      />,
+    );
+
+    expect(screen.getByText(/25\.000/)).toBeInTheDocument();
+  });
 });
