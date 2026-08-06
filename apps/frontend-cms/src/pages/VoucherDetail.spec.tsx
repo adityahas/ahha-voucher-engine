@@ -40,6 +40,7 @@ vi.mock('lucide-react', () => ({
   Trash2: (props: any) => <div {...props} />,
   Link: (props: any) => <div {...props} />,
   Users: (props: any) => <div data-testid="users-icon" {...props} />,
+  CreditCard: (props: any) => <div data-testid="credit-card-icon" {...props} />,
 }));
 
 import { getVoucherByCode } from '../api/vouchers';
@@ -60,7 +61,7 @@ describe('VoucherDetail Component', () => {
   };
 
   const mockUsers = [
-    { id: 'user-123', name: 'John Doe', email: 'john@example.com' },
+    { id: 'core-456', name: 'John Doe', email: 'john@example.com' },
   ];
 
   beforeEach(() => {

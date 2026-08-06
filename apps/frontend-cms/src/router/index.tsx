@@ -19,6 +19,7 @@ import { ProductList } from '../pages/ProductList';
 import { ProductDetail } from '../pages/ProductDetail';
 import { ProductCreate } from '../pages/ProductCreate';
 import { ProductEdit } from '../pages/ProductEdit';
+import { ErrorElement } from '../components/ErrorElement';
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <AuthLayout />,
+    errorElement: <ErrorElement />,
     children: [
       {
         path: '/login',
@@ -37,6 +39,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <MainLayout />,
+    errorElement: <ErrorElement />,
     children: [
       {
         path: '/dashboard',

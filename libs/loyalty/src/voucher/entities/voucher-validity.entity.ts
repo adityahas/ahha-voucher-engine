@@ -17,6 +17,7 @@ export enum VoucherValidityType {
   DAILY = 'daily', // Voucher is valid every day from start_date to end_date
   BIRTHDAY = 'birthday', // Voucher is valid only on user's birthday
   WEEKLY = 'weekly', // Voucher is valid every week from start_date to end_date
+  CUSTOM_DAY_WEEKLY = 'custom_day_weekly', // Voucher is valid on specific days of the week
   MONTHLY = 'monthly', // Voucher is valid every month from start_date to end_date
   ONE_TIME = 'one_time', // Voucher is valid only once from start_date to end_date
 }
@@ -44,4 +45,7 @@ export class VoucherValidityEntity extends BaseEntity {
 
   @Column({ type: 'time without time zone', default: '23:59:59' })
   end_time: Date;
+
+  @Column({ type: 'jsonb', nullable: true })
+  valid_days: string[];
 }

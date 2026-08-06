@@ -1,5 +1,8 @@
 import { useAuthStore } from '../store/auth.store';
 import { VoucherCategory } from './voucher-categories';
+import { DiscountType } from '../lib/discount-type';
+
+export { DiscountType };
 
 export type VoucherType = 'CLAIMABLE' | 'UNIQUE_CODE';
 
@@ -13,7 +16,7 @@ export interface Voucher {
   categories?: VoucherCategory[];
   allow_combine_categories?: VoucherCategory[];
   target_users?: { id: string; core_user_id: string }[];
-  discount_type: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discount_type: DiscountType;
   discount_value: number;
   created_at: string;
   updated_at: string;
@@ -222,6 +225,7 @@ export interface VoucherValidity {
   end_date: string | null;
   start_time: string;
   end_time: string;
+  valid_days?: string[] | null;
   created_at?: string;
   updated_at?: string;
 }
