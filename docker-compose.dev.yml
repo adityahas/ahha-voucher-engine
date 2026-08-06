@@ -22,6 +22,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    container_name: redis
     ports:
       - '6379:6379'
     healthcheck:
@@ -55,7 +56,7 @@ services:
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: host.docker.internal
+      REDIS_HOST: redis
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -91,7 +92,7 @@ services:
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: host.docker.internal
+      REDIS_HOST: redis
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -127,7 +128,7 @@ services:
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: host.docker.internal
+      REDIS_HOST: redis
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -163,7 +164,7 @@ services:
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: host.docker.internal
+      REDIS_HOST: redis
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -199,7 +200,7 @@ services:
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: host.docker.internal
+      REDIS_HOST: redis
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -235,7 +236,7 @@ services:
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: host.docker.internal
+      REDIS_HOST: redis
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -271,7 +272,7 @@ services:
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: host.docker.internal
+      REDIS_HOST: redis
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -307,7 +308,7 @@ services:
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: host.docker.internal
+      REDIS_HOST: redis
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
