@@ -6,7 +6,15 @@ export function formatVoucherDiscount(
   discountValue: number,
   settings: CurrencySettings,
 ): string {
-  return discountType.trim().toLowerCase() === 'percentage'
-    ? `${discountValue}% off`
-    : formatCurrency(discountValue, settings);
+  const normalizedType = discountType.trim().toLowerCase();
+
+  if (normalizedType === 'percentage') {
+    return `${discountValue}% off`;
+  }
+
+  if (normalizedType === 'fixed' || normalizedType === 'fixed_amount') {
+    return formatCurrency(discountValue, settings);
+  }
+
+  return formatCurrency(discountValue, settings);
 }
