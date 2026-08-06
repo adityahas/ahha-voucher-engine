@@ -41,6 +41,11 @@ describe('ProductCard', () => {
     expect(img).toHaveAttribute('alt', mockProduct.name);
   });
 
+  it('does not invent voucher discount information for products', () => {
+    render(<ProductCard product={mockProduct} />);
+    expect(screen.queryByText(/off|Rp.*discount/i)).not.toBeInTheDocument();
+  });
+
   it('renders fallback icon when image is missing', () => {
     const productWithoutImage = { ...mockProduct, image: undefined };
     const { container } = render(<ProductCard product={productWithoutImage} />);

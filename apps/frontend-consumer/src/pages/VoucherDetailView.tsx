@@ -14,10 +14,8 @@ import { ConsumerLayout } from '../components/layout/ConsumerLayout';
 import { Button } from '../components/ui/Button';
 import { claimVoucher, findEligibleVoucherByCode } from '../api/vouchers';
 import type { Voucher } from '../types/voucher';
-import {
-  formatCurrency,
-  useCurrencySettings,
-} from '../context/currency-settings';
+import { useCurrencySettings } from '../context/currency-settings';
+import { formatVoucherDiscount } from '../lib/voucher-discount-format';
 
 interface VoucherDetailLocationState {
   voucher?: Voucher;
@@ -204,12 +202,11 @@ export default function VoucherDetailView() {
                   </p>
                   {voucher.discount_value > 0 && (
                     <p className="mt-4 text-lg font-semibold text-cyan-300">
-                      {voucher.discount_type === 'PERCENTAGE'
-                        ? `${voucher.discount_value}% off`
-                        : formatCurrency(
-                            voucher.discount_value,
-                            currencySettings,
-                          )}
+                      {formatVoucherDiscount(
+                        voucher.discount_type,
+                        voucher.discount_value,
+                        currencySettings,
+                      )}
                     </p>
                   )}
                 </div>

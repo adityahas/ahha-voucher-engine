@@ -1,10 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getCurrencySettings } from './settings';
 
+vi.mock('../store/auth.store', () => ({
+  useAuthStore: { getState: () => ({ apiKey: 'runtime-api-key' }) },
+}));
+
 describe('getCurrencySettings', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_PRODUCT_API_URL', 'https://tenant.example.test');
     vi.stubEnv('VITE_API_BASE_URL', 'https://fallback.example.test');
+    vi.stubEnv('VITE_TENANT_OVERRIDE', 'runtime-tenant');
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -21,14 +26,16 @@ describe('getCurrencySettings', () => {
     );
   });
 
-  it('uses runtime URL without selecting a tenant', async () => {
+  it('uses configured runtime tenant headers without a client1 fallback', async () => {
     await getCurrencySettings();
     expect(fetch).toHaveBeenCalledWith(
       'https://tenant.example.test/product/settings/currency',
       expect.objectContaining({
-        headers: expect.not.objectContaining({
-          'x-tenant-override': expect.anything(),
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': 'runtime-api-key',
+          'x-tenant-override': 'runtime-tenant',
+        },
       }),
     );
     const [, request] = vi.mocked(fetch).mock.calls[0];
