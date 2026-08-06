@@ -9,11 +9,12 @@ export async function getCurrencySettings(): Promise<CurrencySettings> {
     import.meta.env.VITE_PRODUCT_API_URL ||
     import.meta.env.VITE_API_BASE_URL ||
     '';
-  const { apiKey } = useAuthStore.getState();
+  const { token, apiKey } = useAuthStore.getState();
   const tenant = import.meta.env.VITE_TENANT_OVERRIDE;
   const response = await fetch(`${baseUrl}/product/settings/currency`, {
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(apiKey ? { 'x-api-key': apiKey } : {}),
       ...(tenant ? { 'x-tenant-override': tenant } : {}),
     },

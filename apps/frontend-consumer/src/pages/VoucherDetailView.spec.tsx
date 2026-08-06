@@ -80,4 +80,26 @@ describe('VoucherDetailView', () => {
 
     expect(await screen.findByText('Voucher Not Found')).toBeInTheDocument();
   });
+
+  it('renders fixed discounts with the tenant currency', async () => {
+    const fixedVoucher = {
+      ...mockVoucher,
+      discount_type: 'FIXED_AMOUNT' as const,
+      discount_value: 25000,
+    };
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          { pathname: '/vouchers/DISC10', state: { voucher: fixedVoucher } },
+        ]}
+      >
+        <Routes>
+          <Route path="/vouchers/:code" element={<VoucherDetailView />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText(/25\.000/)).toBeInTheDocument();
+  });
 });

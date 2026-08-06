@@ -6,7 +6,7 @@ export function formatVoucherDiscount(
   discountValue: number,
   settings: CurrencySettings,
 ): string {
-  return discountType.toUpperCase() === 'PERCENTAGE'
+  return discountType.trim().toLowerCase() === 'percentage'
     ? `${discountValue}% off`
     : formatCurrency(discountValue, settings);
 }
