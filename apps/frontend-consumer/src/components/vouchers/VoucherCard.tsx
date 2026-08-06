@@ -12,7 +12,7 @@ import type { Voucher } from '../../types/voucher';
 import { Button } from '../ui/Button';
 import { claimVoucher } from '../../api/vouchers';
 import { useNavigate } from 'react-router-dom';
-import { useCurrencySettings } from '../../context/CurrencyContext';
+import { useCurrencySettings } from '../../context/currency-settings';
 import { formatVoucherDiscount } from '../../lib/voucher-discount-format';
 
 interface VoucherCardProps {
