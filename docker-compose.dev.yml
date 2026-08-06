@@ -50,11 +50,11 @@ services:
       PORT_ADMIN: '9002'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: postgres
+      DB_HOST: host.docker.internal
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: redis
+      REDIS_HOST: host.docker.internal
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -86,11 +86,11 @@ services:
       PORT_LOYALTY_ADMIN: '9003'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: postgres
+      DB_HOST: host.docker.internal
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: redis
+      REDIS_HOST: host.docker.internal
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -122,11 +122,11 @@ services:
       PORT_USER_ADMIN: '9004'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: postgres
+      DB_HOST: host.docker.internal
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: redis
+      REDIS_HOST: host.docker.internal
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -158,11 +158,11 @@ services:
       PORT_LOYALTY_CONSUMER: '9005'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: postgres
+      DB_HOST: host.docker.internal
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: redis
+      REDIS_HOST: host.docker.internal
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -194,11 +194,11 @@ services:
       PORT_USER_CONSUMER: '9006'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: postgres
+      DB_HOST: host.docker.internal
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: redis
+      REDIS_HOST: host.docker.internal
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -230,11 +230,11 @@ services:
       PORT_PRODUCT_ADMIN: '9007'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: postgres
+      DB_HOST: host.docker.internal
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: redis
+      REDIS_HOST: host.docker.internal
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -266,11 +266,11 @@ services:
       PORT_PRODUCT_CONSUMER: '9008'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: postgres
+      DB_HOST: host.docker.internal
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: redis
+      REDIS_HOST: host.docker.internal
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
@@ -302,11 +302,11 @@ services:
       PORT_REDISTRO: '9009'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
-      DB_HOST: postgres
+      DB_HOST: host.docker.internal
       DB_PORT: '5432'
       DB_NAME: ${DB_NAME:-ahha_admin_db}
       DB_SYNC: ${DB_SYNC:-true}
-      REDIS_HOST: redis
+      REDIS_HOST: host.docker.internal
       REDIS_PORT: '6379'
       CLIENT_DB_SECRET: ${CLIENT_DB_SECRET:-9cc4da5ba5f1313590b00dabecdb4299}
       JWT_SECRET: ${JWT_SECRET:-zd8V9PjzqTks/gdScHwyhAVXAkIUyhWSrxBDBtVVlvE=}
