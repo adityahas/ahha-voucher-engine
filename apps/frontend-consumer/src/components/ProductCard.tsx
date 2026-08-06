@@ -4,7 +4,7 @@ import { ShoppingCart, ShoppingBag } from 'lucide-react';
 import type { Product } from '../types/product';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { useCurrencySettings } from '../context/CurrencyContext';
+import { useCurrencySettings } from '../context/currency-settings';
 import { formatCurrency } from '../lib/currency-format';
 
 function cn(...inputs: ClassValue[]) {

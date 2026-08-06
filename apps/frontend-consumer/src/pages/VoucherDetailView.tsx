@@ -14,7 +14,7 @@ import { ConsumerLayout } from '../components/layout/ConsumerLayout';
 import { Button } from '../components/ui/Button';
 import { claimVoucher, findEligibleVoucherByCode } from '../api/vouchers';
 import type { Voucher } from '../types/voucher';
-import { useCurrencySettings } from '../context/CurrencyContext';
+import { useCurrencySettings } from '../context/currency-settings';
 import { formatVoucherDiscount } from '../lib/voucher-discount-format';
 
 interface VoucherDetailLocationState {

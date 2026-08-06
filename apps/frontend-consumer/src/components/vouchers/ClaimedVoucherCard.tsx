@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Ticket, Tag, CalendarClock } from 'lucide-react';
 import type { ClaimedVoucherInfo } from '../../types/voucher';
-import { useCurrencySettings } from '../../context/CurrencyContext';
+import { useCurrencySettings } from '../../context/currency-settings';
 import { formatVoucherDiscount } from '../../lib/voucher-discount-format';
 
 interface ClaimedVoucherCardProps {
