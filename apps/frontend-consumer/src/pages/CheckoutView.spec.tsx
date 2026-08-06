@@ -89,8 +89,8 @@ describe('CheckoutView Automation Suite', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument();
-      expect(screen.getByTestId('product-price')).toHaveTextContent('$100');
-      expect(screen.getByTestId('subtotal-amount')).toHaveTextContent('$100');
+      expect(screen.getByTestId('product-price')).toHaveTextContent('Rp 100');
+      expect(screen.getByTestId('subtotal-amount')).toHaveTextContent('Rp 100');
     });
   });
 
@@ -107,8 +107,8 @@ describe('CheckoutView Automation Suite', () => {
 
     // Assert
     expect(screen.getByText('2')).toBeInTheDocument();
-    expect(screen.getByTestId('subtotal-amount')).toHaveTextContent('$200');
-    expect(screen.getByTestId('total-amount')).toHaveTextContent('$200');
+    expect(screen.getByTestId('subtotal-amount')).toHaveTextContent('Rp 200');
+    expect(screen.getByTestId('total-amount')).toHaveTextContent('Rp 200');
   });
 
   it('applies voucher CHRISTMAS2030 successfully and shows discount breakdown', async () => {
@@ -144,8 +144,8 @@ describe('CheckoutView Automation Suite', () => {
         screen.getByText(/Voucher Applied Successfully!/i),
       ).toBeInTheDocument();
       expect(screen.getByText('Voucher Savings')).toBeInTheDocument();
-      expect(screen.getByText('-$20')).toBeInTheDocument();
-      expect(screen.getByText('$80')).toBeInTheDocument(); // Final Total
+      expect(screen.getByText(/-Rp 20/)).toBeInTheDocument();
+      expect(screen.getByText(/Rp.*80/)).toBeInTheDocument(); // Final Total
     });
   });
 

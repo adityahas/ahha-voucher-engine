@@ -14,6 +14,10 @@ import { ConsumerLayout } from '../components/layout/ConsumerLayout';
 import { Button } from '../components/ui/Button';
 import { claimVoucher, findEligibleVoucherByCode } from '../api/vouchers';
 import type { Voucher } from '../types/voucher';
+import {
+  formatCurrency,
+  useCurrencySettings,
+} from '../context/currency-settings';
 
 interface VoucherDetailLocationState {
   voucher?: Voucher;
@@ -24,6 +28,7 @@ export default function VoucherDetailView() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as VoucherDetailLocationState | null;
+  const currencySettings = useCurrencySettings();
 
   const [voucher, setVoucher] = useState<Voucher | null>(
     state?.voucher && state.voucher.code === code ? state.voucher : null,
@@ -197,6 +202,16 @@ export default function VoucherDetailView() {
                   <p className="max-w-3xl text-slate-200">
                     {voucher.description || 'No description available.'}
                   </p>
+                  {voucher.discount_value > 0 && (
+                    <p className="mt-4 text-lg font-semibold text-cyan-300">
+                      {voucher.discount_type === 'PERCENTAGE'
+                        ? `${voucher.discount_value}% off`
+                        : formatCurrency(
+                            voucher.discount_value,
+                            currencySettings,
+                          )}
+                    </p>
+                  )}
                 </div>
               </div>
 
