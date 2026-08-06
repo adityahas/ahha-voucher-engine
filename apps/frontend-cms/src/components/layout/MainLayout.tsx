@@ -107,13 +107,19 @@ export const MainLayout: React.FC = () => {
               <Package size={20} />
               <span>Product Management</span>
             </NavLink>
-            <a
-              href="#"
-              className="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 font-medium transition-colors"
+            <NavLink
+              to="/settings/currency"
+              className={({ isActive }) =>
+                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
+                }`
+              }
             >
               <Settings size={20} />
               <span>Settings</span>
-            </a>
+            </NavLink>
           </nav>
 
           <div className="p-4 border-t border-slate-700/50">

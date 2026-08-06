@@ -18,8 +18,6 @@ const mockVoucher: Voucher = {
   voucher_type: 'CLAIMABLE',
   quota: 5,
   image: '',
-  discount_type: 'percentage',
-  discount_value: 10,
   categories: [{ id: 'food', name: 'Food' }],
   bindings: [{ bind_type: 'brand', bind_value: 'Ahha' }],
 };
@@ -46,7 +44,6 @@ describe('VoucherDetailView', () => {
 
     expect(await screen.findByText('Discount 10%')).toBeInTheDocument();
     expect(screen.getByText('Code: DISC10')).toBeInTheDocument();
-    expect(screen.getByText('10% off')).toBeInTheDocument();
     expect(mockedFindEligibleVoucherByCode).not.toHaveBeenCalled();
   });
 

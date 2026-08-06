@@ -14,12 +14,15 @@ import { Request } from 'express';
 import { DataSource } from 'typeorm';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
 import { ClientEntity } from '@core/database/entities/client.entity';
+import { ClientSettingsEntity } from '@core/database/entities/client-settings.entity';
+import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as dotenv from 'dotenv';
 import { ProductConsumerController } from './product-consumer.controller';
 import { PurchaseConsumerController } from './purchase-consumer.controller';
 import { PurchaseConsumerService } from './purchase-consumer.service';
 import { HealthController } from '@core/base';
+import { SettingsController } from './settings/settings.controller';
 
 dotenv.config();
 
@@ -35,14 +38,16 @@ dotenv.config();
       namingStrategy: new SnakeNamingStrategy(),
       synchronize: false,
       logging: process.env.DB_LOGGING != 'false',
-      entities: [ClientEntity],
+      entities: [ClientEntity, ClientSettingsEntity],
     }),
     DatabaseModule,
     AuthModule,
     HttpModule,
+    TypeOrmModule.forFeature([ClientSettingsEntity]),
   ],
   providers: [
     PurchaseConsumerService,
+    ClientSettingsService,
     {
       provide: 'PRODUCT_CONSUMER_CONNECTION',
       scope: Scope.REQUEST,
@@ -53,7 +58,7 @@ dotenv.config();
         const databaseName = request['client'].database_name;
         return await databaseService.getConnection(
           databaseName,
-          __dirname + '/../../../**/*.entity{.ts,.js}',
+          __dirname + '/../../../libs/product/src/entities/*.entity{.ts,.js}',
         );
       },
       inject: [REQUEST, DatabaseService],
@@ -62,6 +67,7 @@ dotenv.config();
   controllers: [
     ProductConsumerController,
     PurchaseConsumerController,
+    SettingsController,
     HealthController,
   ],
   exports: ['PRODUCT_CONSUMER_CONNECTION'],

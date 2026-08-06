@@ -14,7 +14,7 @@ export function ClaimedVoucherCard({
   index,
 }: ClaimedVoucherCardProps) {
   const { voucher, created_at } = claimedVoucher;
-  const settings = useCurrencySettings();
+  const currencySettings = useCurrencySettings();
   let claimedDate = 'Unknown Date';
   if (created_at) {
     const d = new Date(created_at);
@@ -64,15 +64,14 @@ export function ClaimedVoucherCard({
           <p className="text-sm text-slate-400 mb-4 line-clamp-2">
             {voucher.description}
           </p>
-          {voucher.discount_value > 0 && (
-            <p className="mb-4 text-sm font-semibold text-fuchsia-300">
-              {formatVoucherDiscount(
-                voucher.discount_type,
-                voucher.discount_value,
-                settings,
-              )}
-            </p>
-          )}
+
+          <p className="mb-4 text-sm font-semibold text-cyan-300">
+            {formatVoucherDiscount(
+              voucher.discount_type,
+              voucher.discount_value,
+              currencySettings,
+            )}
+          </p>
 
           <div className="space-y-3">
             {voucher.categories?.length > 0 && (

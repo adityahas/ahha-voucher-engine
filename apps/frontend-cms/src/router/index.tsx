@@ -20,6 +20,7 @@ import { ProductDetail } from '../pages/ProductDetail';
 import { ProductCreate } from '../pages/ProductCreate';
 import { ProductEdit } from '../pages/ProductEdit';
 import { ErrorElement } from '../components/ErrorElement';
+import CurrencySettings from '../pages/CurrencySettings';
 
 export const router = createBrowserRouter([
   {
@@ -108,6 +109,10 @@ export const router = createBrowserRouter([
       {
         path: '/products/:id/edit',
         element: <ProductEdit />,
+      },
+      {
+        path: '/settings/currency',
+        element: <CurrencySettings />,
       },
       // add more authenticated feature routes here
     ],
