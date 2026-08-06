@@ -12,10 +12,8 @@ import type { Voucher } from '../../types/voucher';
 import { Button } from '../ui/Button';
 import { claimVoucher } from '../../api/vouchers';
 import { useNavigate } from 'react-router-dom';
-import {
-  formatCurrency,
-  useCurrencySettings,
-} from '../../context/currency-settings';
+import { useCurrencySettings } from '../../context/currency-settings';
+import { formatVoucherDiscount } from '../../lib/voucher-discount-format';
 
 interface VoucherCardProps {
   voucher: Voucher;
@@ -90,9 +88,11 @@ export function VoucherCard({
           </p>
           {voucher.discount_value > 0 && (
             <p className="mb-4 text-sm font-semibold text-cyan-300">
-              {voucher.discount_type === 'PERCENTAGE'
-                ? `${voucher.discount_value}% off`
-                : formatCurrency(voucher.discount_value, settings)}
+              {formatVoucherDiscount(
+                voucher.discount_type,
+                voucher.discount_value,
+                settings,
+              )}
             </p>
           )}
 
