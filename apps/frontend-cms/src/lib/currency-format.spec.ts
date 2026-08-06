@@ -17,7 +17,8 @@ describe('formatCurrency', () => {
     ['USD', 'en-US', 1250.5],
     ['EUR', 'de-DE', 1250.5],
   ])('matches Intl for %s/%s', (currency_code, locale, value) => {
-    expect(formatCurrency(value, settings({ currency_code, locale }))).toBe(
+    const current = settings({ currency_code, locale });
+    expect(formatCurrency(value, current)).toBe(
       new Intl.NumberFormat(locale, {
         style: 'currency',
         currency: currency_code,

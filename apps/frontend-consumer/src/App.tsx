@@ -20,8 +20,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-  // Wait for hydration if using persist middleware in production
-
   return (
     <CurrencySettingsProvider>
       <BrowserRouter>
@@ -67,7 +65,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

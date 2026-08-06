@@ -26,12 +26,21 @@ import {
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
 import { CategoryChip } from '../components/ui/CategoryChip';
+import { getCurrencySettings } from '../api/settings';
+import {
+  DEFAULT_CURRENCY_SETTINGS,
+  CurrencySettings,
+} from '../types/currency-settings';
+import { formatCurrency } from '../lib/currency-format';
 
 export const ProductList: React.FC = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currencySettings, setCurrencySettings] = useState<CurrencySettings>(
+    DEFAULT_CURRENCY_SETTINGS,
+  );
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -50,6 +59,9 @@ export const ProductList: React.FC = () => {
 
   useEffect(() => {
     fetchProducts();
+    getCurrencySettings()
+      .then(setCurrencySettings)
+      .catch(() => undefined);
   }, []);
 
   return (
@@ -209,10 +221,7 @@ export const ProductList: React.FC = () => {
                         {product.sku}
                       </TableCell>
                       <TableCell className="font-bold text-slate-200">
-                        {new Intl.NumberFormat('en-US', {
-                          style: 'currency',
-                          currency: 'USD',
-                        }).format(product.price)}
+                        {formatCurrency(product.price, currencySettings)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">

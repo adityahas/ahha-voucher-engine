@@ -8,10 +8,8 @@ import { calculateDiscount } from '../api/vouchers';
 import { FeedbackOverlay } from '../components/FeedbackOverlay';
 import type { Product } from '../types/product';
 import type { CalculateDiscountResponse } from '../types/voucher';
-import {
-  formatCurrency,
-  useCurrencySettings,
-} from '../context/currency-settings';
+import { useCurrencySettings } from '../context/currency-settings';
+import { formatCurrency } from '../lib/currency-format';
 
 export const CheckoutView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
