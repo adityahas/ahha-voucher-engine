@@ -6,6 +6,7 @@ import {
   Scope,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
 import { DatabaseModule, DatabaseService } from '@core/database';
 import { AuthModule } from '@core/auth';
 import { REQUEST } from '@nestjs/core';
@@ -16,6 +17,8 @@ import { ClientEntity } from '@core/database/entities/client.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as dotenv from 'dotenv';
 import { ProductConsumerController } from './product-consumer.controller';
+import { PurchaseConsumerController } from './purchase-consumer.controller';
+import { PurchaseConsumerService } from './purchase-consumer.service';
 import { HealthController } from '@core/base';
 
 dotenv.config();
@@ -36,8 +39,10 @@ dotenv.config();
     }),
     DatabaseModule,
     AuthModule,
+    HttpModule,
   ],
   providers: [
+    PurchaseConsumerService,
     {
       provide: 'PRODUCT_CONSUMER_CONNECTION',
       scope: Scope.REQUEST,
@@ -54,7 +59,11 @@ dotenv.config();
       inject: [REQUEST, DatabaseService],
     },
   ],
-  controllers: [ProductConsumerController, HealthController],
+  controllers: [
+    ProductConsumerController,
+    PurchaseConsumerController,
+    HealthController,
+  ],
   exports: ['PRODUCT_CONSUMER_CONNECTION'],
 })
 export class ProductConsumerModule implements NestModule {
