@@ -12,7 +12,9 @@ export interface VoucherCategory {
 export const getVoucherCategories = async (): Promise<VoucherCategory[]> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
   const baseUrl =
-    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+    import.meta.env.VITE_LOYALTY_API_BASE_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/voucher-categories`, {
     method: 'GET',
@@ -38,7 +40,9 @@ export const getVoucherCategoryBySlug = async (
 ): Promise<VoucherCategory> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
   const baseUrl =
-    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+    import.meta.env.VITE_LOYALTY_API_BASE_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const response = await fetch(
     `${baseUrl}/loyalty-admin/voucher-categories/${slug}`,
@@ -70,7 +74,9 @@ export const createVoucherCategory = async (
 ): Promise<VoucherCategory> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
   const baseUrl =
-    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+    import.meta.env.VITE_LOYALTY_API_BASE_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const response = await fetch(`${baseUrl}/loyalty-admin/voucher-categories`, {
     method: 'POST',
@@ -98,7 +104,9 @@ export const updateVoucherCategory = async (
 ): Promise<VoucherCategory> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
   const baseUrl =
-    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+    import.meta.env.VITE_LOYALTY_API_BASE_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const response = await fetch(
     `${baseUrl}/loyalty-admin/voucher-categories/${slug}`,
@@ -126,7 +134,9 @@ export const updateVoucherCategory = async (
 export const deleteVoucherCategory = async (slug: string): Promise<void> => {
   const { apiKey, tenant, token } = useAuthStore.getState() as any;
   const baseUrl =
-    import.meta.env.VITE_LOYALTY_API_BASE_URL || 'http://client1.ahha-be.local';
+    import.meta.env.VITE_LOYALTY_API_BASE_URL ||
+    import.meta.env.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const response = await fetch(
     `${baseUrl}/loyalty-admin/voucher-categories/${slug}`,

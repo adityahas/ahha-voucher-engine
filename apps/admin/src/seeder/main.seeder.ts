@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { seedAdmins } from './admins.seeder';
 import { seedClients } from './clients.seeder';
+import { seedTenantUsers } from './users.seeder';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { ClientEntity } from '@core/database/entities/client.entity';
 import { AdminEntity } from '../entities/admin.entity';
@@ -24,6 +25,7 @@ dataSource
     console.log('Database connected');
     await seedClients(dataSource);
     await seedAdmins(dataSource);
+    await seedTenantUsers();
     process.exit(0);
   })
   .catch((err) => {

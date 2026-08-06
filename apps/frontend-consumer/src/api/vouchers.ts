@@ -14,7 +14,9 @@ export const findEligibleVouchers = async (
   // Using port 3003 assuming loyalty-consumer runs there based on typical setups
   // Fallback to relative path if proxy is set up
   const LOYALTY_API_URL =
-    import.meta?.env?.VITE_LOYALTY_API_URL || 'http://client1.ahha-be.local';
+    import.meta?.env?.VITE_LOYALTY_API_URL ||
+    import.meta?.env?.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const { token, apiKey } = useAuthStore.getState();
 
@@ -24,7 +26,8 @@ export const findEligibleVouchers = async (
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token || ''}`,
-      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+      'x-api-key': apiKey || 'client1-api-key',
+      'x-tenant-override': 'client1',
     },
     body: JSON.stringify({
       bindings: bindings,
@@ -49,7 +52,9 @@ export const claimVoucher = async (
   voucherCode: string,
 ): Promise<{ success: boolean; message: string }> => {
   const LOYALTY_API_URL =
-    import.meta?.env?.VITE_LOYALTY_API_URL || 'http://client1.ahha-be.local';
+    import.meta?.env?.VITE_LOYALTY_API_URL ||
+    import.meta?.env?.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const { token, apiKey } = useAuthStore.getState();
 
@@ -79,7 +84,9 @@ export const getClaimedVouchers = async (
   size: number = 10,
 ): Promise<PaginatedResponse<ClaimedVoucherInfo>> => {
   const LOYALTY_API_URL =
-    import.meta?.env?.VITE_LOYALTY_API_URL || 'http://client1.ahha-be.local';
+    import.meta?.env?.VITE_LOYALTY_API_URL ||
+    import.meta?.env?.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const { token, apiKey } = useAuthStore.getState();
 
@@ -108,7 +115,9 @@ export const calculateDiscount = async (
   request: CalculateDiscountRequest,
 ): Promise<CalculateDiscountResponse> => {
   const LOYALTY_API_URL =
-    import.meta?.env?.VITE_LOYALTY_API_URL || 'http://client1.ahha-be.local';
+    import.meta?.env?.VITE_LOYALTY_API_URL ||
+    import.meta?.env?.VITE_API_BASE_URL ||
+    'http://localhost:8080';
 
   const { token, apiKey } = useAuthStore.getState();
 

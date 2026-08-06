@@ -30,7 +30,7 @@ const Login: React.FC = () => {
 
     try {
       const baseUrl =
-        import.meta.env.VITE_API_BASE_URL || 'http://localhost:9002';
+        import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
       const response = await fetch(`${baseUrl}/admin/login`, {
         method: 'POST',
         headers: {

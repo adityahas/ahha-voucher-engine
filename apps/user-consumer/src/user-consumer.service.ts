@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserEntity } from '@core/user/entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { EncryptionService } from '@core/encryption';
@@ -22,14 +22,14 @@ export class UserConsumerService {
       where: { email: loginUserDto.email },
     });
     if (!user) {
-      throw new Error('Invalid email or password');
+      throw new UnauthorizedException('Invalid email or password');
     }
-    const isMatch = this.encryptionService.comparePassword(
+    const isMatch = await this.encryptionService.comparePassword(
       loginUserDto.password,
       user.password,
     );
     if (!isMatch) {
-      throw new Error('Invalid email or password');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const payload = { email: user.email, sub: user.id, role: user.role };
