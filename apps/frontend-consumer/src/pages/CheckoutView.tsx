@@ -8,10 +8,15 @@ import { calculateDiscount } from '../api/vouchers';
 import { FeedbackOverlay } from '../components/FeedbackOverlay';
 import type { Product } from '../types/product';
 import type { CalculateDiscountResponse } from '../types/voucher';
+import {
+  formatCurrency,
+  useCurrencySettings,
+} from '../context/currency-settings';
 
 export const CheckoutView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const currencySettings = useCurrencySettings();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -181,7 +186,7 @@ export const CheckoutView: React.FC = () => {
                     data-testid="product-price"
                     className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400"
                   >
-                    ${product.price.toLocaleString()}
+                    {formatCurrency(product.price, currencySettings)}
                   </div>
                   <div className="flex items-center gap-4 bg-white/5 rounded-xl p-1 border border-white/10">
                     <button
@@ -304,7 +309,7 @@ export const CheckoutView: React.FC = () => {
               <div className="flex justify-between text-slate-400">
                 <span>Subtotal</span>
                 <span data-testid="subtotal-amount">
-                  ${subtotal.toLocaleString()}
+                  {formatCurrency(subtotal, currencySettings)}
                 </span>
               </div>
               <AnimatePresence>
@@ -320,7 +325,7 @@ export const CheckoutView: React.FC = () => {
                         <Tag size={14} />
                         <span>Voucher Savings</span>
                       </div>
-                      <span>-${discount.toLocaleString()}</span>
+                      <span>-{formatCurrency(discount, currencySettings)}</span>
                     </div>
                   </motion.div>
                 )}
@@ -331,7 +336,7 @@ export const CheckoutView: React.FC = () => {
                   data-testid="total-amount"
                   className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400"
                 >
-                  ${total.toLocaleString()}
+                  {formatCurrency(total, currencySettings)}
                 </span>
               </div>
             </div>

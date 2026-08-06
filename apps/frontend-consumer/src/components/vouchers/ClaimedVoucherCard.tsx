@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
 import { Ticket, Tag, CalendarClock } from 'lucide-react';
 import type { ClaimedVoucherInfo } from '../../types/voucher';
+import {
+  formatCurrency,
+  useCurrencySettings,
+} from '../../context/currency-settings';
 
 interface ClaimedVoucherCardProps {
   claimedVoucher: ClaimedVoucherInfo;
@@ -12,6 +16,7 @@ export function ClaimedVoucherCard({
   index,
 }: ClaimedVoucherCardProps) {
   const { voucher, created_at } = claimedVoucher;
+  const settings = useCurrencySettings();
   let claimedDate = 'Unknown Date';
   if (created_at) {
     const d = new Date(created_at);
@@ -61,6 +66,13 @@ export function ClaimedVoucherCard({
           <p className="text-sm text-slate-400 mb-4 line-clamp-2">
             {voucher.description}
           </p>
+          {voucher.discount_value > 0 && (
+            <p className="mb-4 text-sm font-semibold text-fuchsia-300">
+              {voucher.discount_type === 'PERCENTAGE'
+                ? `${voucher.discount_value}% off`
+                : formatCurrency(voucher.discount_value, settings)}
+            </p>
+          )}
 
           <div className="space-y-3">
             {voucher.categories?.length > 0 && (
