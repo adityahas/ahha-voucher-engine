@@ -160,6 +160,7 @@ export const CheckoutView: React.FC = () => {
                 <img
                   src={
                     product.image ||
+                    product.image_url ||
                     'https://via.placeholder.com/300?text=Product'
                   }
                   alt={product.name}

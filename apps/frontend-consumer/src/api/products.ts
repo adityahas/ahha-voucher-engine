@@ -26,7 +26,13 @@ export const getProducts = async (): Promise<Product[]> => {
     throw new Error(errorData.message || 'Failed to fetch products');
   }
 
-  return response.json();
+  const data = await response.json();
+  const list = Array.isArray(data) ? data : data.data || [];
+  return list.map((item: any) => ({
+    ...item,
+    image: item.image || item.image_url || '',
+    image_url: item.image_url || item.image || '',
+  }));
 };
 
 export const getProductById = async (id: string): Promise<Product> => {
@@ -51,5 +57,11 @@ export const getProductById = async (id: string): Promise<Product> => {
     throw new Error(errorData.message || `Failed to fetch product ${id}`);
   }
 
-  return response.json();
+  const item = await response.json();
+  const productData = item.data || item;
+  return {
+    ...productData,
+    image: productData.image || productData.image_url || '',
+    image_url: productData.image_url || productData.image || '',
+  };
 };
