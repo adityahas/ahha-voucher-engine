@@ -1,5 +1,6 @@
 export type VoucherType = 'CLAIMABLE' | 'UNIQUE_CODE';
-export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT';
+export type DiscountType =
+  'PERCENTAGE' | 'FIXED_AMOUNT' | 'percentage' | 'fixed';
 
 export interface Voucher {
   voucher_type: VoucherType;
