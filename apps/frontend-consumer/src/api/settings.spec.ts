@@ -11,7 +11,6 @@ describe('getCurrencySettings', () => {
   beforeEach(() => {
     vi.stubEnv('VITE_PRODUCT_API_URL', 'https://tenant.example.test');
     vi.stubEnv('VITE_API_BASE_URL', 'https://fallback.example.test');
-    vi.stubEnv('VITE_TENANT_OVERRIDE', 'runtime-tenant');
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -28,7 +27,7 @@ describe('getCurrencySettings', () => {
     );
   });
 
-  it('uses configured runtime tenant headers without a client1 fallback', async () => {
+  it('uses configured runtime headers without a client1 or tenant override fallback', async () => {
     await getCurrencySettings();
     expect(fetch).toHaveBeenCalledWith(
       'https://tenant.example.test/product/settings/currency',
@@ -37,11 +36,11 @@ describe('getCurrencySettings', () => {
           'Content-Type': 'application/json',
           Authorization: 'Bearer runtime-token',
           'x-api-key': 'runtime-api-key',
-          'x-tenant-override': 'runtime-tenant',
         },
       }),
     );
     const [, request] = vi.mocked(fetch).mock.calls[0];
     expect(JSON.stringify(request)).not.toContain('client1');
+    expect(JSON.stringify(request)).not.toContain('x-tenant-override');
   });
 });

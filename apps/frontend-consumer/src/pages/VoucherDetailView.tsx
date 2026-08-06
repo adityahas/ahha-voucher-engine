@@ -14,7 +14,7 @@ import { ConsumerLayout } from '../components/layout/ConsumerLayout';
 import { Button } from '../components/ui/Button';
 import { claimVoucher, findEligibleVoucherByCode } from '../api/vouchers';
 import type { Voucher } from '../types/voucher';
-import { useCurrencySettings } from '../context/currency-settings';
+import { useCurrencySettings } from '../context/CurrencyContext';
 import { formatVoucherDiscount } from '../lib/voucher-discount-format';
 
 interface VoucherDetailLocationState {
@@ -26,7 +26,6 @@ export default function VoucherDetailView() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as VoucherDetailLocationState | null;
-  const currencySettings = useCurrencySettings();
 
   const [voucher, setVoucher] = useState<Voucher | null>(
     state?.voucher && state.voucher.code === code ? state.voucher : null,
@@ -35,6 +34,7 @@ export default function VoucherDetailView() {
   const [error, setError] = useState<string | null>(null);
   const [isClaiming, setIsClaiming] = useState(false);
   const [isClaimed, setIsClaimed] = useState(false);
+  const currencySettings = useCurrencySettings();
 
   useEffect(() => {
     if (!code) {
@@ -200,15 +200,13 @@ export default function VoucherDetailView() {
                   <p className="max-w-3xl text-slate-200">
                     {voucher.description || 'No description available.'}
                   </p>
-                  {voucher.discount_value > 0 && (
-                    <p className="mt-4 text-lg font-semibold text-cyan-300">
-                      {formatVoucherDiscount(
-                        voucher.discount_type,
-                        voucher.discount_value,
-                        currencySettings,
-                      )}
-                    </p>
-                  )}
+                  <p className="mt-4 text-lg font-semibold text-cyan-300">
+                    {formatVoucherDiscount(
+                      voucher.discount_type,
+                      voucher.discount_value,
+                      currencySettings,
+                    )}
+                  </p>
                 </div>
               </div>
 

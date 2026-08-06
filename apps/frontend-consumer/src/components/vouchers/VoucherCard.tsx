@@ -12,7 +12,7 @@ import type { Voucher } from '../../types/voucher';
 import { Button } from '../ui/Button';
 import { claimVoucher } from '../../api/vouchers';
 import { useNavigate } from 'react-router-dom';
-import { useCurrencySettings } from '../../context/currency-settings';
+import { useCurrencySettings } from '../../context/CurrencyContext';
 import { formatVoucherDiscount } from '../../lib/voucher-discount-format';
 
 interface VoucherCardProps {
@@ -27,10 +27,10 @@ export function VoucherCard({
   onClaimSuccess,
 }: VoucherCardProps) {
   const navigate = useNavigate();
-  const settings = useCurrencySettings();
   const [isClaiming, setIsClaiming] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const currencySettings = useCurrencySettings();
 
   const handleClaim = async () => {
     setIsClaiming(true);
@@ -86,15 +86,14 @@ export function VoucherCard({
           <p className="text-sm text-slate-400 mb-4 line-clamp-2">
             {voucher.description}
           </p>
-          {voucher.discount_value > 0 && (
-            <p className="mb-4 text-sm font-semibold text-cyan-300">
-              {formatVoucherDiscount(
-                voucher.discount_type,
-                voucher.discount_value,
-                settings,
-              )}
-            </p>
-          )}
+
+          <p className="mb-4 text-sm font-semibold text-cyan-300">
+            {formatVoucherDiscount(
+              voucher.discount_type,
+              voucher.discount_value,
+              currencySettings,
+            )}
+          </p>
 
           <div className="space-y-3">
             {voucher.categories?.length > 0 && (
