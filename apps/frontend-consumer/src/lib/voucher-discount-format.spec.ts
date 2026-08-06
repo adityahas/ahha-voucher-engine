@@ -14,4 +14,10 @@ describe('formatVoucherDiscount', () => {
       formatVoucherDiscount('percentage', 10, DEFAULT_CURRENCY_SETTINGS),
     ).toBe('10% off');
   });
+
+  it('normalizes discount type whitespace', () => {
+    expect(
+      formatVoucherDiscount('  PERCENTAGE  ', 10, DEFAULT_CURRENCY_SETTINGS),
+    ).toBe('10% off');
+  });
 });
