@@ -40,6 +40,7 @@ vi.mock('../api/purchase', () => ({
 
 vi.mock('../api/vouchers', () => ({
   calculateDiscount: vi.fn(),
+  getClaimedVouchers: vi.fn(),
 }));
 
 // Mock react-router-dom hooks
@@ -61,6 +62,23 @@ const mockProduct: Product = {
   is_active: true,
   created_at: '',
   updated_at: '',
+};
+
+const mockClaimedVoucher = {
+  id: 1,
+  created_at: '2026-08-07T00:00:00.000Z',
+  voucher: {
+    voucher_type: 'CLAIMABLE',
+    code: 'CHRISTMAS2030',
+    name: 'Christmast discount voucher 222',
+    description: 'desc',
+    quota: 96,
+    image: '',
+    discount_type: 'FIXED_AMOUNT',
+    discount_value: 10000,
+    categories: [],
+    bindings: [],
+  },
 };
 
 describe('CheckoutView Automation Suite', () => {
@@ -216,5 +234,96 @@ describe('CheckoutView Automation Suite', () => {
     // In JSDOM, classes might not expand from @apply, but we check if it is technically there
     // or if we added it explicitly.
     expect(container?.className).toContain('backdrop-blur');
+  });
+
+  it('opens my-vouchers dropdown on field click and lists codes', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (vouchersApi.getClaimedVouchers as any).mockResolvedValue({
+      code: 'SUCCESS',
+      message: 'ok',
+      data: [mockClaimedVoucher],
+      pagination: { page: 0, size: 50, total: 1 },
+    });
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByPlaceholderText(/Enter code/i));
+    await waitFor(() => {
+      expect(vouchersApi.getClaimedVouchers).toHaveBeenCalled();
+      expect(screen.getByText('CHRISTMAS2030')).toBeInTheDocument();
+    });
+  });
+
+  it('applies the selected voucher automatically on item click', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (vouchersApi.getClaimedVouchers as any).mockResolvedValue({
+      code: 'SUCCESS',
+      message: 'ok',
+      data: [mockClaimedVoucher],
+      pagination: { page: 0, size: 50, total: 1 },
+    });
+    (vouchersApi.calculateDiscount as any).mockResolvedValue({
+      isValid: true,
+      discountAmount: 10000,
+      finalPrice: 0,
+      message: 'Voucher applied successfully!',
+    });
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByPlaceholderText(/Enter code/i));
+    await waitFor(() =>
+      expect(screen.getByText('CHRISTMAS2030')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByText('CHRISTMAS2030'));
+    await waitFor(() => {
+      expect(vouchersApi.calculateDiscount).toHaveBeenCalledWith({
+        voucher_code: 'CHRISTMAS2030',
+        product_id: 'prod-123',
+        quantity: 1,
+      });
+      expect(
+        screen.getByText(/Voucher Applied Successfully!/i),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('closes the dropdown on outside click', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (vouchersApi.getClaimedVouchers as any).mockResolvedValue({
+      code: 'SUCCESS',
+      message: 'ok',
+      data: [mockClaimedVoucher],
+      pagination: { page: 0, size: 50, total: 1 },
+    });
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByPlaceholderText(/Enter code/i));
+    await waitFor(() =>
+      expect(screen.getByText('CHRISTMAS2030')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByText('Order Summary'));
+    await waitFor(() => {
+      expect(screen.queryByText('CHRISTMAS2030')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows error message when fetch fails', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (vouchersApi.getClaimedVouchers as any).mockRejectedValue(
+      new Error('Network error'),
+    );
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByPlaceholderText(/Enter code/i));
+    await waitFor(() => {
+      expect(screen.getByText(/Network error/i)).toBeInTheDocument();
+    });
   });
 });
