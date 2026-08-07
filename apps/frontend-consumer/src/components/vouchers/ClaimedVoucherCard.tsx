@@ -47,13 +47,6 @@ export function ClaimedVoucherCard({
             : 'from-fuchsia-500/0 via-cyan-500/0 to-transparent'
         } transition-all duration-500 group-hover:from-fuchsia-500/10 group-hover:via-cyan-500/10`}
       />
-      {expired && (
-        <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/30">
-          <AlertCircle className="w-3 h-3" />
-          EXPIRED
-        </div>
-      )}
-
       <div className="relative z-10 p-6 flex flex-col h-full justify-between">
         <div>
           <div className="flex justify-between items-start mb-4">
@@ -61,10 +54,18 @@ export function ClaimedVoucherCard({
               <Ticket className="w-6 h-6 text-white" />
             </div>
 
-            <span className="flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20">
-              <CalendarClock className="w-3 h-3" />
-              Claimed {claimedDate}
-            </span>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {expired && (
+                <span className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/30">
+                  <AlertCircle className="w-3 h-3" />
+                  EXPIRED
+                </span>
+              )}
+              <span className="flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20">
+                <CalendarClock className="w-3 h-3" />
+                Claimed {claimedDate}
+              </span>
+            </div>
           </div>
 
           <h3 className="text-xl font-bold text-white mb-1 leading-tight">
