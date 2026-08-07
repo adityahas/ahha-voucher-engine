@@ -1,5 +1,11 @@
-import { Controller, Get, Inject, Param } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import {
+  Controller,
+  Get,
+  Inject,
+  NotFoundException,
+  Param,
+} from '@nestjs/common';
+import { DataSource, EntityNotFoundError, Repository } from 'typeorm';
 import { ProductEntity } from '@core/product/entities/product.entity';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -32,8 +38,15 @@ export class ProductConsumerController {
   @ApiResponse({ status: 200, description: 'Return product details' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   async findOne(@Param('id') id: string): Promise<ProductEntity> {
-    return this.productRepository.findOneOrFail({
-      where: { id, is_active: true },
-    });
+    try {
+      return await this.productRepository.findOneOrFail({
+        where: { id, is_active: true },
+      });
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(`Product ${id} not found`);
+      }
+      throw error;
+    }
   }
 }
