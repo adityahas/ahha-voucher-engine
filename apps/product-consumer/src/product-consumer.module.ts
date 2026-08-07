@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 import { DatabaseModule, DatabaseService } from '@core/database';
 import { AuthModule } from '@core/auth';
+import { JwtStrategy } from '@core/auth/jwt.strategy';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { DataSource } from 'typeorm';
@@ -48,6 +49,7 @@ dotenv.config();
   providers: [
     PurchaseConsumerService,
     ClientSettingsService,
+    JwtStrategy,
     {
       provide: 'PRODUCT_CONSUMER_CONNECTION',
       scope: Scope.REQUEST,

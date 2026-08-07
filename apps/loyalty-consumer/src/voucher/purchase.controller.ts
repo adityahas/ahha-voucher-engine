@@ -16,7 +16,7 @@ import { DataSource } from 'typeorm';
 import { ProductEntity } from '@core/product/entities/product.entity';
 import { OrderEntity } from '@core/product/entities/order.entity';
 
-@Controller('purchase')
+@Controller('/loyalty/purchase')
 @UseGuards(ConsumerJwtGuard)
 export class PurchaseController {
   constructor(
@@ -37,7 +37,6 @@ export class PurchaseController {
       // 1. Fetch Product
       const product = await manager.findOne(ProductEntity, {
         where: { id: dto.product_id, is_active: true },
-        lock: { mode: 'pessimistic_read' },
       });
 
       if (!product) {

@@ -264,6 +264,7 @@ services:
       NODE_ENV: development
       SERVICE_NAME: product-consumer
       PORT_PRODUCT_CONSUMER: '9008'
+      LOYALTY_API_BASE_URL: 'http://api-gateway:80'
       DB_USERNAME: ${DB_USERNAME:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-P4ssw0rd!}
       DB_HOST: postgres
