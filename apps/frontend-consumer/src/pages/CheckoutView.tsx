@@ -1,15 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, CreditCard, Info, ShoppingBag, Tag } from 'lucide-react';
 import { getProductById } from '../api/products';
 import { executePurchase } from '../api/purchase';
-import { calculateDiscount } from '../api/vouchers';
+import { calculateDiscount, getClaimedVouchers } from '../api/vouchers';
 import { FeedbackOverlay } from '../components/FeedbackOverlay';
 import type { Product } from '../types/product';
-import type { CalculateDiscountResponse } from '../types/voucher';
+import type {
+  CalculateDiscountResponse,
+  ClaimedVoucherInfo,
+  Voucher,
+} from '../types/voucher';
 import { useCurrencySettings } from '../context/currency-settings';
 import { formatCurrency } from '../lib/currency-format';
+
+function formatVoucherDiscount(voucher: Voucher): string {
+  const val = Number(voucher.discount_value);
+  if (
+    voucher.discount_type === 'PERCENTAGE' ||
+    voucher.discount_type === 'percentage'
+  ) {
+    return `-${val}%`;
+  }
+  return `-Rp ${val.toLocaleString('id-ID')}`;
+}
 
 export const CheckoutView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +41,15 @@ export const CheckoutView: React.FC = () => {
     useState<CalculateDiscountResponse | null>(null);
   const [calculating, setCalculating] = useState(false);
   const [voucherError, setVoucherError] = useState<string | null>(null);
+  const [voucherDropdownOpen, setVoucherDropdownOpen] = useState(false);
+  const [myVouchers, setMyVouchers] = useState<ClaimedVoucherInfo[] | null>(
+    null,
+  );
+  const [voucherLoading, setVoucherLoading] = useState(false);
+  const [voucherFetchError, setVoucherFetchError] = useState<string | null>(
+    null,
+  );
+  const voucherWrapRef = useRef<HTMLDivElement | null>(null);
   const [txnStatus, setTxnStatus] = useState<
     'idle' | 'processing' | 'success' | 'error'
   >('idle');
@@ -54,18 +78,17 @@ export const CheckoutView: React.FC = () => {
     setVoucherError(null);
   }, [quantity]);
 
-  const handleApplyVoucher = async () => {
-    if (!product || !voucherCode) return;
-
+  const applyVoucherCode = async (code: string) => {
+    if (!product) return;
     try {
       setCalculating(true);
       setVoucherError(null);
+      setCalculation(null);
       const result = await calculateDiscount({
-        voucher_code: voucherCode,
+        voucher_code: code,
         product_id: product.id,
         quantity,
       });
-
       if (!result.isValid) {
         setVoucherError(result.message);
         setCalculation(null);
@@ -79,6 +102,60 @@ export const CheckoutView: React.FC = () => {
       setCalculating(false);
     }
   };
+
+  const handleApplyVoucher = async () => {
+    if (!product || !voucherCode) return;
+    await applyVoucherCode(voucherCode);
+  };
+
+  const fetchMyVouchers = async () => {
+    if (myVouchers !== null) return;
+    setVoucherLoading(true);
+    setVoucherFetchError(null);
+    try {
+      const res = await getClaimedVouchers(0, 50);
+      setMyVouchers(res.data);
+    } catch (err: any) {
+      setVoucherFetchError(err.message || 'Failed to load my vouchers');
+    } finally {
+      setVoucherLoading(false);
+    }
+  };
+
+  const handleToggleVoucherDropdown = () => {
+    if (!voucherDropdownOpen) {
+      fetchMyVouchers();
+    }
+    setVoucherDropdownOpen((prev) => !prev);
+  };
+
+  const handleSelectVoucher = (claimed: ClaimedVoucherInfo) => {
+    const code = claimed.voucher.code.toUpperCase();
+    setVoucherCode(code);
+    setVoucherDropdownOpen(false);
+    applyVoucherCode(code);
+  };
+
+  useEffect(() => {
+    if (!voucherDropdownOpen) return;
+    const onOutsideClick = (e: MouseEvent) => {
+      if (
+        voucherWrapRef.current &&
+        !voucherWrapRef.current.contains(e.target as Node)
+      ) {
+        setVoucherDropdownOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setVoucherDropdownOpen(false);
+    };
+    document.addEventListener('click', onOutsideClick);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('click', onOutsideClick);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [voucherDropdownOpen]);
 
   const handlePurchase = async () => {
     if (!product) return;
@@ -248,7 +325,7 @@ export const CheckoutView: React.FC = () => {
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">
                 Voucher Code
               </label>
-              <div className="relative group">
+              <div ref={voucherWrapRef} className="relative group">
                 <Tag
                   className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
                     isVoucherApplied
@@ -261,6 +338,7 @@ export const CheckoutView: React.FC = () => {
                   type="text"
                   placeholder="Enter code..."
                   value={voucherCode}
+                  onClick={handleToggleVoucherDropdown}
                   onChange={(e) => {
                     setVoucherCode(e.target.value.toUpperCase());
                     if (calculation) setCalculation(null);
@@ -281,6 +359,55 @@ export const CheckoutView: React.FC = () => {
                 >
                   {calculating ? '...' : 'APPLY'}
                 </button>
+                <AnimatePresence>
+                  {voucherDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute z-30 mt-2 w-full rounded-2xl border border-white/10 bg-[#0d1220]/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+                    >
+                      {voucherLoading && (
+                        <div className="px-4 py-3 text-xs text-slate-400">
+                          Loading my vouchers...
+                        </div>
+                      )}
+                      {voucherFetchError && (
+                        <div className="px-4 py-3 text-xs text-rose-400">
+                          {voucherFetchError}
+                        </div>
+                      )}
+                      {!voucherLoading &&
+                        !voucherFetchError &&
+                        myVouchers &&
+                        myVouchers.length === 0 && (
+                          <div className="px-4 py-3 text-xs text-slate-400">
+                            No claimed vouchers yet.
+                          </div>
+                        )}
+                      {!voucherLoading &&
+                        !voucherFetchError &&
+                        myVouchers?.map((c) => (
+                          <button
+                            key={c.id}
+                            onClick={() => handleSelectVoucher(c)}
+                            className="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors flex items-center justify-between gap-2 group/item"
+                          >
+                            <span className="font-bold text-white">
+                              {c.voucher.code}
+                            </span>
+                            <span className="text-[10px] text-slate-500 truncate max-w-[120px]">
+                              {c.voucher.name}
+                            </span>
+                            <span className="text-[10px] text-emerald-400 font-bold">
+                              {formatVoucherDiscount(c.voucher)}
+                            </span>
+                          </button>
+                        ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 {effectiveApplied && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
