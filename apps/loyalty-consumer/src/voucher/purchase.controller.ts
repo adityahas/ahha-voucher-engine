@@ -31,7 +31,7 @@ export class PurchaseController {
     @Req() req: any,
     @Body() dto: CreatePurchaseDto,
   ): Promise<OrderEntity> {
-    const userId = req.user.core_user_id;
+    const userId = req.user['userId'];
 
     return this.dataSource.transaction(async (manager) => {
       // 1. Fetch Product

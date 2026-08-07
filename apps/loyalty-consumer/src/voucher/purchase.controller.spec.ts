@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { NotFoundException } from '@nestjs/common';
 import { ProductEntity } from '@core/product/entities/product.entity';
+import { OrderService } from '@core/product/order.service';
 
 describe('PurchaseController', () => {
   let controller: PurchaseController;
@@ -27,6 +28,7 @@ describe('PurchaseController', () => {
 
   const mockVoucherService = {
     useVoucher: jest.fn(),
+    validateAndCalculateDiscount: jest.fn(),
   };
 
   const mockOrderService = {
@@ -73,10 +75,16 @@ describe('PurchaseController', () => {
     };
 
     const mockReq = {
-      user: { core_user_id: 'user-id' },
+      user: { userId: 'user-id' },
     };
 
     it('should successfully orchestrate a purchase with a voucher', async () => {
+      mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
+        isValid: true,
+        discountAmount: 100,
+        finalPrice: 900,
+      });
+
       // Act
       const result = await controller.purchase(mockReq, purchaseDto);
 
