@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { Ticket, Tag, CalendarClock } from 'lucide-react';
+import { Ticket, Tag, CalendarClock, AlertCircle } from 'lucide-react';
 import type { ClaimedVoucherInfo } from '../../types/voucher';
 import { useCurrencySettings } from '../../context/currency-settings';
 import { formatVoucherDiscount } from '../../lib/voucher-discount-format';
+import { isVoucherExpired } from '../../lib/voucher-validity';
 
 interface ClaimedVoucherCardProps {
   claimedVoucher: ClaimedVoucherInfo;
@@ -15,6 +16,7 @@ export function ClaimedVoucherCard({
 }: ClaimedVoucherCardProps) {
   const { voucher, created_at } = claimedVoucher;
   const currencySettings = useCurrencySettings();
+  const expired = isVoucherExpired(voucher.validities);
   let claimedDate = 'Unknown Date';
   if (created_at) {
     const d = new Date(created_at);
@@ -32,9 +34,25 @@ export function ClaimedVoucherCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="glass-panel group relative overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:border-fuchsia-500/50 hover:shadow-2xl hover:shadow-fuchsia-500/20"
+      className={`glass-panel group relative overflow-hidden rounded-2xl transition-all hover:-translate-y-1 hover:shadow-2xl ${
+        expired
+          ? 'border-red-500/40 opacity-70 hover:border-red-500/60 hover:shadow-red-500/10'
+          : 'hover:border-fuchsia-500/50 hover:shadow-fuchsia-500/20'
+      }`}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/0 via-cyan-500/0 to-transparent transition-all duration-500 group-hover:from-fuchsia-500/10 group-hover:via-cyan-500/10" />
+      <div
+        className={`absolute inset-0 bg-gradient-to-br ${
+          expired
+            ? 'from-red-500/5 via-slate-500/0 to-transparent'
+            : 'from-fuchsia-500/0 via-cyan-500/0 to-transparent'
+        } transition-all duration-500 group-hover:from-fuchsia-500/10 group-hover:via-cyan-500/10`}
+      />
+      {expired && (
+        <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/30">
+          <AlertCircle className="w-3 h-3" />
+          EXPIRED
+        </div>
+      )}
 
       <div className="relative z-10 p-6 flex flex-col h-full justify-between">
         <div>
@@ -92,8 +110,14 @@ export function ClaimedVoucherCard({
 
         <div className="mt-6">
           {/* Action buttons like 'Use' or 'Copy Code' could go here in the future */}
-          <div className="w-full py-2.5 bg-white/5 border border-white/10 rounded-xl text-center text-sm font-medium text-slate-300 cursor-not-allowed">
-            Ready to Use
+          <div
+            className={`w-full py-2.5 border rounded-xl text-center text-sm font-medium ${
+              expired
+                ? 'bg-red-500/10 border-red-500/20 text-red-400 cursor-not-allowed'
+                : 'bg-white/5 border-white/10 text-slate-300 cursor-not-allowed'
+            }`}
+          >
+            {expired ? 'Expired' : 'Ready to Use'}
           </div>
         </div>
       </div>

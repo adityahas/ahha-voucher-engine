@@ -2,6 +2,12 @@ export type VoucherType = 'CLAIMABLE' | 'UNIQUE_CODE';
 export type DiscountType =
   'PERCENTAGE' | 'FIXED_AMOUNT' | 'percentage' | 'fixed';
 
+export interface VoucherValidity {
+  type: string;
+  start_date: string;
+  end_date: string | null;
+}
+
 export interface Voucher {
   voucher_type: VoucherType;
   code: string;
@@ -13,6 +19,7 @@ export interface Voucher {
   discount_value: number;
   categories: { id: string; name: string }[];
   bindings: VoucherBinding[];
+  validities?: VoucherValidity[];
 }
 
 export interface CalculateDiscountRequest {

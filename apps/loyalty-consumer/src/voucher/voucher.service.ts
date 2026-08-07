@@ -92,7 +92,7 @@ export class VoucherService {
             core_user_id: userId,
           },
         },
-        relations: ['voucher', 'user'],
+        relations: ['voucher', 'voucher.validities', 'user'],
         skip: paginationDto.page * paginationDto.size,
         take: paginationDto.size,
       },

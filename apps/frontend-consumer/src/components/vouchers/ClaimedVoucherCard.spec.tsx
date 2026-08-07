@@ -50,4 +50,52 @@ describe('ClaimedVoucherCard', () => {
 
     expect(screen.getByText(/25\.000/)).toBeInTheDocument();
   });
+
+  it('shows an expired badge and dims the card when the voucher has expired', () => {
+    render(
+      <ClaimedVoucherCard
+        claimedVoucher={{
+          ...claimedVoucher,
+          voucher: {
+            ...claimedVoucher.voucher,
+            validities: [
+              {
+                type: 'daily',
+                start_date: '2024-06-01T00:00:00.000Z',
+                end_date: '2024-08-31T23:59:59.999Z',
+              },
+            ],
+          },
+        }}
+        index={0}
+      />,
+    );
+
+    expect(screen.getByText('EXPIRED')).toBeInTheDocument();
+    expect(screen.getByText('Expired')).toBeInTheDocument();
+  });
+
+  it('does not show an expired badge for a currently valid voucher', () => {
+    render(
+      <ClaimedVoucherCard
+        claimedVoucher={{
+          ...claimedVoucher,
+          voucher: {
+            ...claimedVoucher.voucher,
+            validities: [
+              {
+                type: 'daily',
+                start_date: '2026-01-01T00:00:00.000Z',
+                end_date: '2026-12-31T23:59:59.999Z',
+              },
+            ],
+          },
+        }}
+        index={0}
+      />,
+    );
+
+    expect(screen.queryByText('EXPIRED')).not.toBeInTheDocument();
+    expect(screen.getByText('Ready to Use')).toBeInTheDocument();
+  });
 });
