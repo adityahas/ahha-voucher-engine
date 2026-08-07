@@ -14,7 +14,12 @@ import { AuthModule } from '@core/auth';
   ],
   controllers: [VoucherController, PurchaseController],
   providers: [
-    OrderService,
+    {
+      provide: OrderService,
+      scope: Scope.REQUEST,
+      useFactory: (dataSource: DataSource) => new OrderService(dataSource),
+      inject: ['LOYALTY_CONSUMER_CONNECTION'],
+    },
     {
       provide: 'VOUCHER_SERVICE',
       scope: Scope.REQUEST,

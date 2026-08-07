@@ -7,14 +7,12 @@ export interface CreatePurchaseDto {
 }
 
 export const executePurchase = async (dto: CreatePurchaseDto): Promise<any> => {
-  const LOYALTY_API_URL =
-    import.meta?.env?.VITE_LOYALTY_API_URL ||
-    import.meta?.env?.VITE_API_BASE_URL ||
-    'http://localhost:8080';
+  const BASE_URL =
+    import.meta?.env?.VITE_API_BASE_URL || 'http://localhost:8080';
 
   const { token, apiKey } = useAuthStore.getState();
 
-  const response = await fetch(`${LOYALTY_API_URL}/loyalty/purchase`, {
+  const response = await fetch(`${BASE_URL}/product/purchase`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
