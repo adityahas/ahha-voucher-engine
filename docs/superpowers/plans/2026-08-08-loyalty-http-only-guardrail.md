@@ -14,7 +14,7 @@
 - `loyalty-admin`/`loyalty-consumer` must remain able to import `@core/loyalty`.
 - The custom violation message must be: `Loyalty must be called through its HTTP API only. Do not import @core/loyalty directly.`
 - Do not modify `eslint.config.js` sections outside the new block; do not touch `linterOptions`, `globalIgnores`, or other rules.
-- `yarn lint` must pass on the unmodified tree and fail on a probe file importing `@core/loyalty`.
+- `yarn lint` must report zero `no-restricted-imports` findings on the unmodified tree and must flag a probe file importing `@core/loyalty` (with the custom message). The exit code may be non-zero due to ~15 pre-existing unrelated lint errors.
 
 ---
 
@@ -73,7 +73,10 @@ Note: since `globalIgnores` is a spread element and config blocks are array elem
 yarn lint
 ```
 
-Expected: exits 0, no violations reported.
+Expected: zero `no-restricted-imports` violations reported. (Note: `yarn lint` may
+exit non-zero due to ~15 PRE-EXISTING unrelated lint errors in the committed tree;
+the guardrail check passes when the output contains no `no-restricted-imports`
+findings.)
 
 - [ ] **Step 4: Negative control — confirm the rule fires**
 
@@ -88,10 +91,11 @@ export { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 Then run, expecting the restricted-import error with the custom message:
 
 ```bash
-yarn lint 2>&1 | rg 'guardrail_probe|Loyalty must be called'
+set -o pipefail; yarn lint 2>&1 | rg 'guardrail_probe|Loyalty must be called'
 ```
 
-Expected: non-zero exit; output contains both `_guardrail_probe.ts` and the message.
+Expected: pipeline exits non-zero (eslint `no-restricted-imports` is severity `error`);
+output contains both `_guardrail_probe.ts` and the custom message.
 
 - [ ] **Step 5: Remove the probe and re-verify**
 
@@ -101,7 +105,8 @@ Delete `apps/product-consumer/src/_guardrail_probe.ts`, then:
 yarn lint
 ```
 
-Expected: exits 0.
+Expected: no `no-restricted-imports` findings. (Same pre-existing-error caveat as
+Step 3: judge success by absence of `no-restricted-imports`, not the exit code.)
 
 - [ ] **Step 6: Commit**
 
@@ -131,7 +136,9 @@ Run a lint pass over the two loyalty apps specifically:
 npx eslint "apps/loyalty-consumer/**/*.ts" "apps/loyalty-admin/**/*.ts"
 ```
 
-Expected: exits 0 (no `no-restricted-imports` errors because the guard block's `files` excludes these dirs).
+Expected: zero `no-restricted-imports` errors because the guard block's `files`
+excludes these dirs. (The 15 pre-existing unrelated errors may still appear and
+keep the exit code non-zero; that is expected and unrelated.)
 
 - [ ] **Step 2: Commit any formatting drift (none expected)**
 
