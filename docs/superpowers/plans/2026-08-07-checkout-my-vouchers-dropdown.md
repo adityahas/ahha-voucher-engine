@@ -75,22 +75,6 @@ Add a small helper (near `formatCurrency` usage) to render discount info from a 
 
 ```ts
 function formatVoucherDiscount(voucher: Voucher): string {
-  if (voucher.discount_type === 'PERCENTAGE') {
-    return `${discountValue(voucher)}% off`;
-  }
-  return formatCurrency(
-    discountValue(voucher),
-    currencySettingsFallback(voucher),
-  );
-}
-```
-
-> **Note for implementer:** Per `apps/frontend-consumer/src/lib/currency-format.ts`, `formatCurrency` requires a `currencySettings` object (via `useCurrencySettings`). To keep the helper simple and testable, format discount as a plain label instead: return `-${voucher.discount_type === 'PERCENTAGE' ? voucher.discount_value + '%' : 'Rp ' + Number(voucher.discount_value).toLocaleString('id-ID')}`. Skip `formatCurrency` dependency in the helper.
-
-Use this final version:
-
-```ts
-function formatVoucherDiscount(voucher: Voucher): string {
   const val = Number(voucher.discount_value);
   if (voucher.discount_type === 'PERCENTAGE') {
     return `-${val}%`;
@@ -99,7 +83,7 @@ function formatVoucherDiscount(voucher: Voucher): string {
 }
 ```
 
-Verify `Voucher` is already imported in CheckoutView; the `type { Voucher }` import must be added if not present. Also confirm `discount_value` may be number or string (see `Voucher` type `discount_value: number`) — the fixture uses a number.
+> **Note for implementer:** This helper intentionally avoids the `formatCurrency` dependency (which requires `useCurrencySettings`), keeping it simple and testable. Verify `Voucher` is already imported in CheckoutView; add `type { Voucher }` to the type import if not present. The `Voucher` type declares `discount_value: number`; the fixture uses a number.
 
 - [ ] **Step 4: Add state, refs, and handler logic**
 
