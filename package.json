@@ -22,6 +22,7 @@
     "start:prod": "node dist/apps/main/main",
     "lint": "eslint \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "lint:fix": "eslint \"apps/**/*.ts\" \"libs/**/*.ts\" --fix",
+    "lint:guardrail": "bash scripts/verify-guardrail.sh",
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
