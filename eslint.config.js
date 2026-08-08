@@ -48,4 +48,28 @@ module.exports = defineConfig([
     'apps/frontend-consumer/',
     '**/*.js',
   ]),
+  {
+    files: [
+      'apps/admin/**/*.ts',
+      'apps/product-admin/**/*.ts',
+      'apps/product-consumer/**/*.ts',
+      'apps/redistro/**/*.ts',
+      'apps/user-admin/**/*.ts',
+      'apps/user-consumer/**/*.ts',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@core/loyalty', '@core/loyalty/*'],
+              message:
+                'Loyalty must be called through its HTTP API only. Do not import @core/loyalty directly.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
