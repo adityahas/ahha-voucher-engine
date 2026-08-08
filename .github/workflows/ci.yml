@@ -22,6 +22,8 @@ jobs:
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn lint
+      - name: Verify loyalty HTTP-only guardrail
+        run: yarn lint:guardrail
 
   type-check:
     name: Type Check
