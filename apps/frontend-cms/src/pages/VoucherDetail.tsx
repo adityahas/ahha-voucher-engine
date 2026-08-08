@@ -194,41 +194,46 @@ export const VoucherDetail: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                    <Database size={12} className="text-purple-500" />
-                    Current Quota
-                  </label>
-                  <div className="p-3 rounded-xl bg-slate-800/30 border border-slate-700/50 flex items-end gap-2">
-                    <span className="text-2xl font-mono font-bold text-slate-100">
-                      {voucher.quota}
-                    </span>
-                    <span className="text-xs text-slate-500 font-medium pb-1 uppercase">
-                      Allocated Items
-                    </span>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                      <Database size={12} className="text-purple-500" />
+                      Current Quota
+                    </label>
+                    <div className="p-3 rounded-xl bg-slate-800/30 border border-slate-700/50 flex items-end gap-2">
+                      <span className="text-2xl font-mono font-bold text-slate-100">
+                        {voucher.quota}
+                      </span>
+                      <span className="text-xs text-slate-500 font-medium pb-1 uppercase">
+                        Allocated Items
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* New Reward Calculation Section */}
-                <div className="space-y-4 pt-4 border-t border-slate-800/50">
+                <div className="space-y-4 pt-4 border-t border-slate-800/50 md:col-span-2">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
                     <CreditCard size={12} className="text-emerald-500" />
                     Reward Calculation
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-slate-800/30 border border-slate-700/50 space-y-1">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+                    <div className="p-4 rounded-2xl bg-slate-800/30 border border-slate-700/50 space-y-1 min-w-0 overflow-hidden">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter block truncate">
                         Discount Type
                       </span>
-                      <div className="text-lg font-bold text-slate-200 uppercase">
+                      <div
+                        className="text-lg font-bold text-slate-200 uppercase truncate"
+                        title={formatDiscountType(voucher.discount_type)}
+                      >
                         {formatDiscountType(voucher.discount_type)}
                       </div>
                     </div>
-                    <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-1">
-                      <span className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-tighter">
+                    <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-1 min-w-0 overflow-hidden">
+                      <span className="text-[10px] font-bold text-emerald-500/60 uppercase tracking-tighter block truncate">
                         Value
                       </span>
-                      <div className="text-2xl font-black text-emerald-400">
+                      <div className="text-2xl font-black text-emerald-400 truncate">
                         {voucher.discount_type === DiscountType.PERCENTAGE
                           ? `${voucher.discount_value}%`
                           : `Rp ${(voucher.discount_value || 0).toLocaleString('id-ID')}`}
