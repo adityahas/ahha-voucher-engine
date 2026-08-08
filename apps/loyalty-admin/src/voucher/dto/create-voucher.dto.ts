@@ -41,21 +41,25 @@ export class CreateVoucherDto {
   @IsOptional()
   discount_value?: number;
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateVoucherCategoryDto)
   categories: CreateVoucherCategoryDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateVoucherCategoryDto)
   allow_combine_categories: CreateVoucherCategoryDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateVoucherValidityDto)
   validities: CreateVoucherValidityDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateVoucherBindingDto)
