@@ -74,11 +74,12 @@ readable: "any backend app other than loyalty-admin/loyalty-consumer".
 
 ## Verification
 
-1. `yarn lint` passes on the current tree — no existing import violates the rule.
+1. `yarn lint` reports zero `no-restricted-imports` errors on the current tree — no existing code imports `@core/loyalty` outside the loyalty apps. (Note: `yarn lint` may exit non-zero today due to ~15 pre-existing, unrelated lint errors in committed files; judge success by the absence of `no-restricted-imports` findings, not the exit code.)
 2. Negative control (manual, not committed): temporarily add
-   `apps/product-consumer/src/_probe.ts` containing
+   `apps/product-consumer/src/_guardrail_probe.ts` containing
    `export { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';`,
-   run `yarn lint`, confirm it fails with the custom message, then delete the probe.
+   run `set -o pipefail; yarn lint 2>&1 | rg 'Loyalty must be called'`, confirm the
+   custom message appears, then delete the probe.
 
 Covered by existing tooling: `yarn lint` (GitHub CI `lint` job),
 `lint-staged` (pre-commit hooks).
