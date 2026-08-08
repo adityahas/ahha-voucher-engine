@@ -134,6 +134,19 @@ export class VoucherService {
         throw new BadRequestException('Voucher quota exhausted');
       }
 
+      const targetCoreUserIds: string[] = await manager
+        .getRepository(VoucherEntity)
+        .createQueryBuilder('v')
+        .innerJoin('v.target_users', 'tu')
+        .select('tu.core_user_id', 'core_user_id')
+        .where('v.code = :code', { code: voucherCode })
+        .getRawMany()
+        .then((rows) => rows.map((r) => r.core_user_id));
+
+      if (targetCoreUserIds.length > 0 && !targetCoreUserIds.includes(userId)) {
+        throw new BadRequestException('Voucher is not valid for this user');
+      }
+
       const existingClaim = await manager.findOne(VoucherClaimEntity, {
         where: {
           voucher: { code: voucherCode },
