@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PurchaseController } from './purchase.controller';
 import { DataSource } from 'typeorm';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ProductEntity } from '@core/product/entities/product.entity';
 import { OrderService } from '@core/product/order.service';
 
@@ -124,6 +124,53 @@ describe('PurchaseController', () => {
       await expect(controller.purchase(mockReq, purchaseDto)).rejects.toThrow(
         NotFoundException,
       );
+    });
+
+    it('should reject the purchase when voucher validation fails', async () => {
+      mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
+        isValid: false,
+        discountAmount: 0,
+        finalPrice: 1000,
+        message: 'Voucher quota exhausted',
+      });
+
+      await expect(controller.purchase(mockReq, purchaseDto)).rejects.toThrow(
+        new BadRequestException('Voucher quota exhausted'),
+      );
+      expect(mockVoucherService.useVoucher).not.toHaveBeenCalled();
+      expect(mockOrderService.create).not.toHaveBeenCalled();
+    });
+
+    it('persists the complete price breakdown for a discounted purchase', async () => {
+      mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
+        isValid: true,
+        discountAmount: 300,
+        finalPrice: 1700,
+      });
+
+      await controller.purchase(mockReq, { ...purchaseDto, quantity: 2 });
+
+      expect(mockOrderService.create).toHaveBeenCalledWith({
+        user_id: 'user-id',
+        product_id: 'prod-id',
+        quantity: 2,
+        subtotal: 2000,
+        discount_amount: 300,
+        total_price: 1700,
+        voucher_code: 'VOU-10',
+      });
+    });
+
+    it('does not create an order when an inactive product is returned as unavailable', async () => {
+      mockEntityManager.findOne.mockResolvedValueOnce(null);
+
+      await expect(
+        controller.purchase(mockReq, {
+          ...purchaseDto,
+          voucher_code: undefined,
+        }),
+      ).rejects.toThrow(NotFoundException);
+      expect(mockOrderService.create).not.toHaveBeenCalled();
     });
   });
 });

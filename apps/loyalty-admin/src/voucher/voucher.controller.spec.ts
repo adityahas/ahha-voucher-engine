@@ -58,24 +58,30 @@ describe('VoucherController', () => {
       const result = { id: '1', ...createVoucherDto };
       jest.spyOn(service, 'create').mockResolvedValue(result as any);
 
-      expect(await controller.create(createVoucherDto)).toBe(result);
+      expect(await controller.create(createVoucherDto)).toEqual(
+        expect.objectContaining(result),
+      );
     });
   });
 
   describe('findAll', () => {
     it('should return an array of vouchers', async () => {
       const result = ['test-voucher-1', 'test-voucher-2'];
-      jest.spyOn(service, 'findAll').mockResolvedValue(result as any);
+      jest.spyOn(service, 'findAll').mockResolvedValue({
+        code: 'SUCCESS',
+        message: 'ok',
+        data: result,
+        pagination: { page: 0, size: 10, total: 2 },
+      } as any);
 
-      expect(
-        await controller.findAll({
-          page: 0,
-          size: 10,
-          search: '',
-          sort: 'code',
-          order: 'ASC',
-        }),
-      ).toBe(result);
+      const response = await controller.findAll({
+        page: 0,
+        size: 10,
+        search: '',
+        sort: 'code',
+        order: 'ASC',
+      });
+      expect(response).toEqual(expect.objectContaining({ data: result }));
     });
   });
 
@@ -84,7 +90,9 @@ describe('VoucherController', () => {
       const result = { id: '1', code: 'TEST1234', quota: 100 };
       jest.spyOn(service, 'findOne').mockResolvedValue(result as any);
 
-      expect(await controller.findOne('1')).toBe(result);
+      expect(await controller.findOne('1')).toEqual(
+        expect.objectContaining(result),
+      );
     });
   });
 
@@ -94,7 +102,9 @@ describe('VoucherController', () => {
       const result = { id: '1', code: 'UPDATED123', quota: 100 };
       jest.spyOn(service, 'update').mockResolvedValue(result as any);
 
-      expect(await controller.update('1', updateVoucherDto)).toBe(result);
+      expect(await controller.update('1', updateVoucherDto)).toEqual(
+        expect.objectContaining(result),
+      );
     });
   });
 

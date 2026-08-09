@@ -30,4 +30,38 @@ describe('CreateVoucherDto validation', () => {
     const errors = await validate(dto);
     expect(errors).toEqual([]);
   });
+
+  it('rejects a missing code', async () => {
+    const dto = plainToClass(CreateVoucherDto, {
+      ...minimalPayload,
+      code: '',
+    });
+    expect((await validate(dto)).length).toBeGreaterThan(0);
+  });
+
+  it('rejects invalid voucher and discount enums', async () => {
+    const dto = plainToClass(CreateVoucherDto, {
+      ...minimalPayload,
+      voucher_type: 'INVALID',
+      discount_type: 'INVALID',
+    });
+    expect((await validate(dto)).length).toBeGreaterThan(0);
+  });
+
+  it('rejects non-integer quota and non-numeric discount values', async () => {
+    const dto = plainToClass(CreateVoucherDto, {
+      ...minimalPayload,
+      quota: 1.5,
+      discount_value: 'ten',
+    });
+    expect((await validate(dto)).length).toBeGreaterThan(0);
+  });
+
+  it('rejects invalid target-user UUIDs', async () => {
+    const dto = plainToClass(CreateVoucherDto, {
+      ...minimalPayload,
+      target_users: ['not-a-uuid'],
+    });
+    expect((await validate(dto)).length).toBeGreaterThan(0);
+  });
 });
