@@ -3,6 +3,8 @@ import { VoucherService } from './voucher.service';
 import { DataSource } from 'typeorm';
 import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
+import { VoucherCategoryEntity } from '@core/loyalty/voucher/entities/voucher-category.entity';
+import { NotFoundException } from '@nestjs/common';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 
 describe('VoucherService', () => {
@@ -236,5 +238,59 @@ describe('VoucherService', () => {
       expect(result.target_users).toEqual(mockUsers);
       expect(mockVoucherRepository.save).toHaveBeenCalled();
     });
+
+    it('resolves categories and allow-combine categories before saving', async () => {
+      const categories = [{ slug: 'food' }];
+      const combineCategories = [{ slug: 'drink' }];
+      mockVoucherCategoryRepository.findBy
+        .mockResolvedValueOnce(categories)
+        .mockResolvedValueOnce(combineCategories);
+      mockVoucherRepository.save.mockImplementation((value) =>
+        Promise.resolve(value),
+      );
+
+      const result = await service.create({
+        code: 'COMBO',
+        categories,
+        allow_combine_categories: combineCategories,
+      } as any);
+
+      expect(result.categories).toEqual(categories);
+      expect(result.allow_combine_categories).toEqual(combineCategories);
+      expect(mockVoucherCategoryRepository.findBy).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('findOne', () => {
+    it('loads a voucher and its relations by code', async () => {
+      const voucher = { code: 'VOU-1' };
+      mockVoucherRepository.findOne.mockResolvedValue(voucher);
+
+      await expect(service.findOne('VOU-1')).resolves.toBe(voucher);
+      expect(mockVoucherRepository.findOne).toHaveBeenCalledWith({
+        where: { code: 'VOU-1' },
+        relations: ['categories', 'allow_combine_categories', 'target_users'],
+      });
+    });
+  });
+
+  describe('remove', () => {
+    it('soft deletes the voucher by code', async () => {
+      mockVoucherRepository.softDelete = jest.fn().mockResolvedValue({
+        affected: 1,
+      });
+
+      await service.remove('VOU-1');
+
+      expect(mockVoucherRepository.softDelete).toHaveBeenCalledWith('VOU-1');
+    });
+  });
+
+  it('throws NotFoundException when updating an unknown voucher', async () => {
+    mockVoucherRepository.findOne.mockResolvedValue(null);
+
+    await expect(service.update('MISSING', {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
