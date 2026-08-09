@@ -48,12 +48,15 @@ Authorization: Bearer {jwt}  (for protected endpoints)
 
 ### 1. Vouchers (`/loyalty/vouchers`)
 
-Voucher discovery and retrieval for consumers.
+Voucher discovery, claiming, discount calculation, and redemption for consumers.
 
-| Method | Endpoint               | Auth | Description                                         |
-| ------ | ---------------------- | ---- | --------------------------------------------------- |
-| GET    | `/loyalty/vouchers`    | JWT  | Get eligible vouchers based on user_id and bindings |
-| GET    | `/loyalty/vouchers/my` | JWT  | Get user's claimed vouchers (paginated)             |
+| Method | Endpoint                               | Auth | Description                                   |
+| ------ | -------------------------------------- | ---- | --------------------------------------------- |
+| POST   | `/loyalty/vouchers/eligible`           | JWT  | Get eligible vouchers based on bindings       |
+| GET    | `/loyalty/vouchers/my`                 | JWT  | Get user's claimed vouchers (paginated)       |
+| POST   | `/loyalty/vouchers/:code/claim`        | JWT  | Claim an eligible voucher                     |
+| POST   | `/loyalty/vouchers/calculate-discount` | JWT  | Validate a voucher and calculate the discount |
+| POST   | `/loyalty/vouchers/:code/redeem`       | JWT  | Redeem a previously claimed voucher           |
 
 **Get Eligible Vouchers:**
 
@@ -65,6 +68,27 @@ Voucher discovery and retrieval for consumers.
 
 - Returns user's claimed vouchers with pagination
 - Includes voucher details and claim information
+
+**Claim Voucher:**
+
+- Creates a loyalty user record when needed
+- Validates the voucher exists and has remaining quota
+- Validates targeted-user restrictions
+- Prevents duplicate claims
+- Decrements the voucher quota atomically
+
+**Calculate Discount:**
+
+- Validates voucher quota, validity dates, targeted users, and product/category bindings
+- Supports percentage and fixed-amount discounts
+- Caps the discount at the order subtotal
+- Returns validity, discount amount, final price, and a status message
+
+**Redeem Voucher:**
+
+- Requires the voucher to have been claimed by the current user
+- Prevents a voucher from being redeemed more than once
+- Records a `VoucherUsageEntity` entry
 
 #### DTOs
 
@@ -304,8 +328,11 @@ To add new reward types:
 ### Vouchers
 
 ```
-GET    /loyalty/vouchers      # Get eligible vouchers
-GET    /loyalty/vouchers/my   # Get my claimed vouchers
+POST   /loyalty/vouchers/eligible            # Get eligible vouchers
+GET    /loyalty/vouchers/my                  # Get my claimed vouchers
+POST   /loyalty/vouchers/:code/claim         # Claim a voucher
+POST   /loyalty/vouchers/calculate-discount  # Calculate voucher discount
+POST   /loyalty/vouchers/:code/redeem        # Redeem a voucher
 ```
 
 ### Rewards
@@ -322,7 +349,7 @@ POST   /rewards/claim/:reward_id   # Claim a reward
 Potential improvements:
 
 - Add more reward strategies (e.g., 'pulsa', 'ovo', 'dana')
-- Implement voucher claiming (currently only viewing)
+- Add voucher usage history endpoint
 - Add reward claim history endpoint
 - Implement reward expiration notifications
 - Add caching for eligible vouchers
