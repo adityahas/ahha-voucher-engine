@@ -227,7 +227,7 @@ Edit `~/.config/opencode/opencode.json` so the `mcp` block reads:
     "environment": {
       "JIRA_HOST": "https://akarintiteknologi.atlassian.net",
       "JIRA_EMAIL": "aditya.hadi@akarinti.tech",
-      "JIRA_API_TOKEN": "ATATT3x<REDACTED>"
+      "JIRA_API_TOKEN": "<JIRA_API_TOKEN>"
     },
     "enabled": true
   },

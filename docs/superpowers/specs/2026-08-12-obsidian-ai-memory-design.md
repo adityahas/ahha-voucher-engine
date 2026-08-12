@@ -29,9 +29,9 @@ notes are versioned in git.
                            │ MCP over stdio (npx)
 ┌──────────────────────────▼───────────────────────────────┐
 │  cyanheads/obsidian-mcp-server  (via npx, no build)      │
-│  env: OBSIDIAN_API_KEY, OBSIDIAN_REST_API_URL            │
+│  env: OBSIDIAN_API_KEY, OBSIDIAN_BASE_URL            │
 └──────────────────────────┬───────────────────────────────┘
-                           │ HTTP 127.0.0.1:27124 (Local REST API)
+                           │ HTTP 127.0.0.1:27123 (Local REST API)
 ┌──────────────────────────▼───────────────────────────────┐
 │  Obsidian Desktop App (brew --cask) + Local REST API     │
 │  plugin — must be running                                │
@@ -48,7 +48,7 @@ notes are versioned in git.
 1. **Obsidian Desktop App** — installed via `brew install --cask obsidian`; open the vault at
    `vault/` once via the UI.
 2. **Local REST API plugin** — installed from Obsidian Community Plugins; generates an API key;
-   default port `27124`.
+   default port `27123`.
 3. **MCP server** (`cyanheads/obsidian-mcp-server`) — three config entries, all via npx:
    - `~/.config/opencode/opencode.json` (mcp block)
    - `~/.claude/settings.json` (Claude Code `mcpServers`)
@@ -74,7 +74,7 @@ notes are versioned in git.
 
 1. Agent calls an MCP tool (e.g., `obsidian_write_note`, `obsidian_search_notes`).
 2. `obsidian-mcp-server` (npx process, spawned per client) forwards the request to Local REST
-   API `http://127.0.0.1:27124` with the API key header.
+   API `http://127.0.0.1:27123` with the API key header.
 3. Obsidian app handles the request, reading/writing markdown files in `vault/`.
 4. Changes persist to disk automatically; file-based memory skills (e.g., para-memory-files) can
    still access files directly as a fallback.
@@ -91,12 +91,12 @@ Example flow: user says "remember this fact" → agent calls `obsidian_write_not
 | Wrong API key            | `401` → clear error; re-check plugin settings.                                        |
 | Path outside scope       | `path_forbidden` → server refuses (via `OBSIDIAN_READ_PATHS`/`WRITE_PATHS` policies). |
 | Vault not opened yet     | Setup docs: open vault once via the UI first.                                         |
-| Port 27124 conflict      | Changeable in plugin settings; adjust `OBSIDIAN_REST_API_URL` accordingly.            |
+| Port 27123 conflict      | Changeable in plugin settings; adjust `OBSIDIAN_BASE_URL` accordingly.                |
 
 ## Testing / Verification
 
 1. `brew install --cask obsidian` succeeds; vault opens.
-2. Local REST API plugin active; `curl http://127.0.0.1:27124` responds.
+2. Local REST API plugin active; `curl http://127.0.0.1:27123` responds.
 3. MCP server runs: `npx -y obsidian-mcp-server` with no errors; tools registered.
 4. **opencode**: create a test note via MCP tool → file appears in `vault/`.
 5. **Claude Code**: `/mcp` shows server connected.
