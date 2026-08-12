@@ -144,7 +144,7 @@ describe('LoyaltyUserEntity', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --testPathPattern="loyalty-user.entity" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="loyalty-user.entity" 2>&1 | tail -5`
 Expected: FAIL — `Property 'lifetime_points' does not exist`.
 
 - [ ] **Step 3: Modify the loyalty-user entity**
@@ -361,16 +361,18 @@ export class TierHistoryEntity extends BaseEntity {
 ```typescript
 export * from './entities/loyalty-tier.entity';
 export * from './entities/tier-category-override.entity';
-export * from './tier.service';
 ```
+
+> Note: `./tier.service` export is added in Task 3 when the service is created (avoids TS2307 on a missing module).
 
 `libs/loyalty/src/point/index.ts`:
 
 ```typescript
 export * from './entities/point-ledger.entity';
 export * from './entities/tier-history.entity';
-export * from './point.service';
 ```
+
+> Note: `./point.service` export is added in Task 3 when the service is created (avoids TS2307 on a missing module).
 
 - [ ] **Step 9: Modify reward item entity**
 
@@ -444,7 +446,7 @@ export * from './voucher/entities/voucher-category.entity';
 
 - [ ] **Step 11: Run test to verify it passes**
 
-Run: `yarn test --testPathPattern="loyalty-user.entity" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="loyalty-user.entity" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 12: Type-check the lib**
@@ -512,7 +514,7 @@ describe('ClientSettingsService loyalty settings', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --testPathPattern="client-settings.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="client-settings.service" 2>&1 | tail -5`
 Expected: FAIL — `getLoyaltySettings is not a function`.
 
 - [ ] **Step 3: Add columns to the settings entity**
@@ -585,7 +587,7 @@ export const DEFAULT_LOYALTY_SETTINGS: LoyaltySettings = {
 
 - [ ] **Step 6: Run test to verify it passes**
 
-Run: `yarn test --testPathPattern="client-settings.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="client-settings.service" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 7: Commit**
@@ -603,6 +605,8 @@ git commit -m "feat(database): add loyalty settings to client settings"
 
 - Create: `libs/loyalty/src/tier/tier.service.ts`
 - Create: `libs/loyalty/src/point/point.service.ts`
+- Modify: `libs/loyalty/src/tier/index.ts` (add `export * from './tier.service';`)
+- Modify: `libs/loyalty/src/point/index.ts` (add `export * from './point.service';`)
 
 **Interfaces:**
 
@@ -793,7 +797,7 @@ describe('PointService', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `yarn test --testPathPattern="tier.service|point.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="tier.service|point.service" 2>&1 | tail -5`
 Expected: FAIL — module not found.
 
 - [ ] **Step 3: Implement TierService**
@@ -1003,7 +1007,7 @@ export class PointService {
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `yarn test --testPathPattern="tier.service|point.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="tier.service|point.service" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 6: Type-check**
@@ -1050,7 +1054,7 @@ describe('AclService loyalty permissions', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --testPathPattern="acl.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="acl.service" 2>&1 | tail -5`
 Expected: FAIL.
 
 - [ ] **Step 3: Add permissions**
@@ -1064,7 +1068,7 @@ Expected: FAIL.
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `yarn test --testPathPattern="acl.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="acl.service" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -1159,7 +1163,7 @@ describe('TierController', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `yarn test --testPathPattern="tier-admin|tier.controller" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="tier-admin|tier.controller" 2>&1 | tail -5`
 Expected: FAIL — module not found.
 
 - [ ] **Step 3: Create DTOs**
@@ -1447,7 +1451,7 @@ export class TierModule {}
 
 - [ ] **Step 7: Run tests to verify they pass**
 
-Run: `yarn test --testPathPattern="tier-admin|tier.controller" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="tier-admin|tier.controller" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 8: Build the admin app**
@@ -1523,7 +1527,7 @@ describe('RewardItemService point pricing', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --testPathPattern="reward-item.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="reward-item.service" 2>&1 | tail -5`
 Expected: FAIL.
 
 - [ ] **Step 3: Update DTOs**
@@ -1695,7 +1699,7 @@ export class RewardItemModule {}
 
 - [ ] **Step 6: Run tests**
 
-Run: `yarn test --testPathPattern="reward-item" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="reward-item" 2>&1 | tail -5`
 Expected: PASS (existing + new).
 
 - [ ] **Step 7: Build admin app**
@@ -1771,7 +1775,7 @@ describe('UserPointsService', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --testPathPattern="user-points" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="user-points" 2>&1 | tail -5`
 Expected: FAIL — module not found.
 
 - [ ] **Step 3: Implement DTO**
@@ -1957,7 +1961,7 @@ export class UserPointsModule {}
 
 - [ ] **Step 7: Run tests**
 
-Run: `yarn test --testPathPattern="user-points" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="user-points" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 8: Build admin app**
@@ -2034,7 +2038,7 @@ describe('PointsService', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --testPathPattern="points.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="points.service" 2>&1 | tail -5`
 Expected: FAIL — module not found.
 
 - [ ] **Step 3: Implement service**
@@ -2172,7 +2176,7 @@ export class PointsModule {}
 
 - [ ] **Step 6: Run tests**
 
-Run: `yarn test --testPathPattern="points.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="points.service" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 7: Build consumer app**
@@ -2245,7 +2249,7 @@ it('rejects voucher bound to a tier the user does not have', async () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --testPathPattern="voucher.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="voucher.service" 2>&1 | tail -5`
 Expected: FAIL — tier binding not checked.
 
 - [ ] **Step 3: Add userRepository field**
@@ -2291,7 +2295,7 @@ if (tierBindings.length > 0) {
 
 - [ ] **Step 5: Run tests**
 
-Run: `yarn test --testPathPattern="voucher.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="voucher.service" 2>&1 | tail -5`
 Expected: PASS (existing + new).
 
 - [ ] **Step 6: Build consumer app**
@@ -2376,7 +2380,7 @@ describe('computeTierDiscountAndPoints', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `yarn test --testPathPattern="discount-points" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="discount-points" 2>&1 | tail -5`
 Expected: FAIL — module not found.
 
 - [ ] **Step 3: Implement the util**
@@ -2416,7 +2420,7 @@ export function computeTierDiscountAndPoints(params: {
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `yarn test --testPathPattern="discount-points" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="discount-points" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 5: Modify the purchase controller**
@@ -2619,7 +2623,7 @@ with:
 
 - [ ] **Step 7: Run tests**
 
-Run: `yarn test --testPathPattern="purchase|discount-points" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="purchase|discount-points" 2>&1 | tail -5`
 Expected: PASS.
 
 - [ ] **Step 8: Wire VoucherModule providers**
@@ -2668,7 +2672,12 @@ import { AuthModule } from '@core/auth';
 export class VoucherModule {}
 ```
 
-Note: `ClientSettingsService` constructor injects a `Repository<ClientSettingsEntity>` via `@InjectRepository` (TypeORM). The consumer app's `TypeOrmModule.forRoot` registers only `ClientEntity`. To make `ClientSettingsService` work in the consumer app, register `ClientSettingsEntity` in the master connection and the repository provider — mirror `apps/admin/src/admin.module.ts` / `apps/product-consumer/src/product-consumer.module.ts`, which already make `ClientSettingsService` injectable. Read those modules first and replicate the same registration in `apps/loyalty-consumer/src/loyalty-consumer.module.ts`.
+Note: `ClientSettingsService` constructor injects a `Repository<ClientSettingsEntity>` via `@InjectRepository` (TypeORM), and the master connection must register the entity. Replicate `apps/product-consumer/src/product-consumer.module.ts` exactly in `apps/loyalty-consumer/src/loyalty-consumer.module.ts`:
+
+1. Import `ClientSettingsEntity` from `@core/database/entities/client-settings.entity` and `ClientSettingsService` from `@core/database/client-settings/client-settings.service`.
+2. Add `ClientSettingsEntity` to the `TypeOrmModule.forRoot({...})` `entities` array (currently `[ClientEntity]` → `[ClientEntity, ClientSettingsEntity]`).
+3. Add `TypeOrmModule.forFeature([ClientSettingsEntity])` to `imports`.
+4. Add `ClientSettingsService` to `providers`.
 
 - [ ] **Step 9: Build consumer app**
 
@@ -2724,7 +2733,7 @@ it('rejects claim when balance is insufficient', async () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `yarn test --testPathPattern="reward.service" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="reward.service" 2>&1 | tail -5`
 Expected: FAIL — spend logic not present.
 
 - [ ] **Step 3: Implement reward service**
@@ -2893,7 +2902,7 @@ export class RewardModule {}
 
 - [ ] **Step 5: Run tests**
 
-Run: `yarn test --testPathPattern="reward" 2>&1 | tail -5`
+Run: `yarn test --testPathPatterns="reward" 2>&1 | tail -5`
 Expected: PASS (existing + new).
 
 - [ ] **Step 6: Build consumer app**
