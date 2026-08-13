@@ -73,3 +73,19 @@ Status: FIXED
 - `cd apps/frontend-cms && npx tsc --noEmit` — PASS.
 - `graphify update .` — completed; existing warnings remain for empty `extensions.json` and `skills-lock.json`.
 - `git diff --check` — PASS.
+
+## Remaining Important Finding Fix
+
+Status: FIXED
+
+### Changes
+
+- Configured tenant migrations now always run, regardless of `DB_SYNC`; `synchronize` remains false whenever migration paths are present. This prevents `DB_SYNC=true` from silently disabling both migration execution and schema synchronization.
+- `RewardItemSourceService.findOne` and `update` now consistently throw `NotFoundException` when the entity is missing, including if it disappears after a successful update.
+
+### Verification
+
+- `yarn test --runInBand libs/database/src/database.service.spec.ts apps/loyalty-admin/src/reward-item-source/reward-item-source.service.spec.ts apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.spec.ts` — PASS, 3 suites and 24 tests.
+- `yarn test --runInBand libs/database/src/database.service.spec.ts apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.spec.ts` — PASS, 2 suites and 5 tests.
+- `yarn nest build loyalty-admin` — PASS.
+- `graphify update .` — completed; existing warnings remain for empty `extensions.json` and `skills-lock.json`.

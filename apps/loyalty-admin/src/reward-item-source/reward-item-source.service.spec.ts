@@ -130,6 +130,13 @@ describe('RewardItemSourceService', () => {
       const result = await service.findOne('1');
       expect(result.apiKey).toBe('sec***et7');
     });
+
+    it('throws when the reward item source does not exist', async () => {
+      mockRepository.findOne.mockResolvedValue(undefined);
+      await expect(service.findOne('missing')).rejects.toThrow(
+        'Reward item source missing not found.',
+      );
+    });
   });
 
   describe('update', () => {
@@ -149,6 +156,14 @@ describe('RewardItemSourceService', () => {
 
     it('throws when no source is updated', async () => {
       mockRepository.update.mockResolvedValue({ affected: 0 });
+      await expect(service.update('missing', {} as any)).rejects.toThrow(
+        'Reward item source missing not found.',
+      );
+    });
+
+    it('throws if the source disappears after the update', async () => {
+      mockRepository.update.mockResolvedValue({ affected: 1 });
+      mockRepository.findOne.mockResolvedValue(undefined);
       await expect(service.update('missing', {} as any)).rejects.toThrow(
         'Reward item source missing not found.',
       );

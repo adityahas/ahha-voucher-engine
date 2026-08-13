@@ -73,7 +73,10 @@ export class RewardItemSourceService {
     const entity = await this.rewardItemSourceRepository.findOne({
       where: { id },
     });
-    return entity && this.maskEntity(entity);
+    if (!entity) {
+      throw new NotFoundException(`Reward item source ${id} not found.`);
+    }
+    return this.maskEntity(entity);
   }
 
   async update(
@@ -90,7 +93,10 @@ export class RewardItemSourceService {
     const entity = await this.rewardItemSourceRepository.findOne({
       where: { id },
     });
-    return entity && this.maskEntity(entity);
+    if (!entity) {
+      throw new NotFoundException(`Reward item source ${id} not found.`);
+    }
+    return this.maskEntity(entity);
   }
 
   async remove(id: string): Promise<void> {

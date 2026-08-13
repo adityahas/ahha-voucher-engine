@@ -50,11 +50,11 @@ export class DatabaseService {
           namingStrategy: new SnakeNamingStrategy(),
           entities: entityPath.filter((path) => !path.includes('/migrations/')),
           migrations: migrationPath,
-          // TypeORM rejects enabling schema synchronization and migrations together.
-          migrationsRun:
-            migrationPath.length > 0 && process.env.DB_SYNC !== 'true',
+          // Configured migrations take precedence over DB_SYNC so schema changes
+          // cannot be silently skipped.
+          migrationsRun: migrationPath.length > 0,
           synchronize:
-            process.env.DB_SYNC === 'true' && migrationPath.length === 0,
+            migrationPath.length === 0 && process.env.DB_SYNC === 'true',
         });
       });
     }
