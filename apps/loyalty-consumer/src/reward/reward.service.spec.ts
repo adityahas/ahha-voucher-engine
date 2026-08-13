@@ -4,6 +4,9 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import axios from 'axios';
+import { RewardClaimStrategyFactory } from './strategy/reward-claim-strategy-factory.service';
+import { SyntheticRewardStrategy } from './strategy/synthetic-reward.strategy';
 
 describe('RewardService', () => {
   const rewardRepoMock = {
@@ -180,6 +183,47 @@ describe('RewardService', () => {
       'r1',
       managerMock,
     );
+  });
+
+  it('claims synthetic rewards through the factory without calling a provider', async () => {
+    const rewardItem = makeReward({
+      id: 'reward-123',
+      source: { source_type: 'synthetic' },
+      stock: 3,
+      point_price: 250,
+    });
+    const user = makeUser({ id: 'user-456', core_user_id: 'user-456' });
+    const goPayStrategy = { claim: jest.fn() };
+    const factory = new RewardClaimStrategyFactory(
+      goPayStrategy as any,
+      new SyntheticRewardStrategy(),
+    );
+    const axiosPostSpy = jest.spyOn(axios, 'post');
+    rewardRepoMock.findOne.mockResolvedValue(rewardItem);
+    userRepoMock.findOne.mockResolvedValue(user);
+    strategyFactoryMock.getStrategy.mockImplementation((sourceType: string) =>
+      factory.getStrategy(sourceType),
+    );
+
+    const result = await service.claimReward('user-456', 'reward-123');
+
+    expect(result).toEqual({
+      status: 'SUCCESS',
+      code: 'SYNTHETIC-reward-123-user-456',
+    });
+    expect(strategyFactoryMock.getStrategy).toHaveBeenCalledWith('synthetic');
+    expect(rewardItem.stock).toBe(2);
+    expect(rewardRepoMock.save).toHaveBeenCalledWith(rewardItem);
+    expect(pointServiceMock.spend).toHaveBeenCalledWith(
+      user,
+      250,
+      'REWARD_CLAIM',
+      'reward-123',
+      managerMock,
+    );
+    expect(goPayStrategy.claim).not.toHaveBeenCalled();
+    expect(axiosPostSpy).not.toHaveBeenCalled();
+    axiosPostSpy.mockRestore();
   });
 
   it('does not spend points for a free reward (point_price 0)', async () => {
