@@ -92,7 +92,7 @@ Open Obsidian → click the vault picker (icon bottom-left) → **Open folder as
 Run:
 
 ```bash
-curl -s http://127.0.0.1:27123/ -H "Authorization: Bearer a82fed8b810f599ee0d71b63d38f886b28300304a9d064b6c9ccff536a7671b1"
+curl -s http://127.0.0.1:27123/ -H "Authorization: Bearer <OBSIDIAN_API_KEY>"
 ```
 
 Expected: `"authenticated": true`. (The plugin config + API key moved with `.obsidian/`.)
