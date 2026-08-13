@@ -3,6 +3,7 @@ import { RewardController } from './reward.controller';
 import { RewardService } from './reward.service';
 import { RewardClaimStrategyFactory } from './strategy/reward-claim-strategy-factory.service';
 import { GoPayRewardStrategy } from './strategy/gopay-reward.strategy';
+import { SyntheticRewardStrategy } from './strategy/synthetic-reward.strategy';
 import { PointService } from '@core/loyalty/point/point.service';
 import { DataSource } from 'typeorm';
 import { LoyaltyConsumerModule } from '../loyalty-consumer.module';
@@ -18,6 +19,7 @@ import { AuthModule } from '@core/auth';
     PointService,
     RewardClaimStrategyFactory,
     GoPayRewardStrategy,
+    SyntheticRewardStrategy,
     {
       provide: 'REWARD_SERVICE',
       scope: Scope.REQUEST,
