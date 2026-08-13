@@ -1,4 +1,5 @@
 import {
+  forwardRef,
   MiddlewareConsumer,
   Module,
   NestModule,
@@ -58,7 +59,7 @@ dotenv.config();
     VoucherCategoryModule,
     RewardItemModule,
     RewardItemSourceModule,
-    TierModule,
+    forwardRef(() => TierModule),
   ],
   controllers: [LoyaltyAdminController, HealthController],
   providers: [

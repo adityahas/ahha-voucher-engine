@@ -8,6 +8,17 @@ import { UpdateTierDto } from './dto/update-tier.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 
+const SORTABLE_COLUMNS = new Set([
+  'name',
+  'level',
+  'min_points',
+  'point_multiplier',
+  'extra_discount_percent',
+  'is_active',
+  'created_at',
+  'updated_at',
+]);
+
 @Injectable()
 export class TierAdminService {
   private tierRepository: Repository<LoyaltyTierEntity>;
@@ -58,7 +69,9 @@ export class TierAdminService {
       qb.where('tier.name ILIKE :search', { search: `%${search}%` });
     }
     if (sort && order) {
-      qb.orderBy(`tier.${sort}`, order);
+      const sortColumn = SORTABLE_COLUMNS.has(sort) ? sort : 'created_at';
+      const orderDir = order === 'DESC' ? 'DESC' : 'ASC';
+      qb.orderBy(`tier.${sortColumn}`, orderDir);
     }
     const [data, total] = await qb.skip(skip).take(size).getManyAndCount();
     return {
