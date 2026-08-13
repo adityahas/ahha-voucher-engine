@@ -24,12 +24,14 @@ export class VoucherService {
   private voucherRepository: Repository<VoucherEntity>;
   private claimedVouchersRepository: Repository<VoucherClaimEntity>;
   private usageRepository: Repository<VoucherUsageEntity>;
+  private userRepository: Repository<LoyaltyUserEntity>;
 
   constructor(dataSource: DataSource) {
     this.voucherRepository = dataSource.getRepository(VoucherEntity);
     this.claimedVouchersRepository =
       dataSource.getRepository(VoucherClaimEntity);
     this.usageRepository = dataSource.getRepository(VoucherUsageEntity);
+    this.userRepository = dataSource.getRepository(LoyaltyUserEntity);
   }
 
   async findEligibleVouchers(
@@ -272,6 +274,25 @@ export class VoucherService {
         (u) => u.core_user_id === userId,
       );
       if (!isTargeted) {
+        return {
+          isValid: false,
+          discountAmount: 0,
+          finalPrice: subtotal,
+          message: 'Voucher is not valid for this user',
+        };
+      }
+    }
+
+    // 3b. Check Tier Bindings
+    const tierBindings = voucher.bindings.filter((b) => b.bind_type === 'tier');
+    if (tierBindings.length > 0) {
+      const user = await this.userRepository.findOne({
+        where: { core_user_id: userId },
+        relations: ['tier'],
+      });
+      const userTierId = user?.tier?.id;
+      const isTierBound = tierBindings.some((b) => b.bind_value === userTierId);
+      if (!isTierBound) {
         return {
           isValid: false,
           discountAmount: 0,

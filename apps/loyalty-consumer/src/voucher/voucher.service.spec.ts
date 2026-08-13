@@ -748,6 +748,41 @@ describe('VoucherService', () => {
       });
     });
 
+    describe('tier bindings', () => {
+      it('rejects voucher bound to a tier the user does not have', async () => {
+        (voucherRepo.findOne as jest.Mock)
+          .mockResolvedValueOnce(
+            makeVoucher({
+              discount_type: DiscountType.PERCENTAGE,
+              discount_value: 20,
+              bindings: [
+                { bind_type: 'tier', bind_value: 'gold-tier-id' },
+              ] as any,
+            }),
+          )
+          .mockResolvedValueOnce({
+            id: 'u1',
+            core_user_id: 'user-id',
+            tier: { id: 'bronze-tier-id' },
+          });
+
+        const result = await service.validateAndCalculateDiscount(
+          'VOU-10',
+          100000,
+          'user-id',
+          'prod-1',
+          ['Food'],
+        );
+
+        expect(result).toMatchObject({
+          isValid: false,
+          discountAmount: 0,
+          finalPrice: 100000,
+          message: 'Voucher is not valid for this user',
+        });
+      });
+    });
+
     describe('discount calculation', () => {
       it('calculates percentage discount', async () => {
         const result = await service.validateAndCalculateDiscount(
