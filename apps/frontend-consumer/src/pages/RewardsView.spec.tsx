@@ -23,6 +23,7 @@ const rewards = [
     exclusive_days: 0,
     source_id: 's1',
     min_tier: null,
+    created_at: '2026-01-01T00:00:00Z',
   },
   {
     id: 'r2',
@@ -33,6 +34,7 @@ const rewards = [
     exclusive_days: 30,
     source_id: 's2',
     min_tier: { id: 'g', name: 'Gold' },
+    created_at: new Date().toISOString(),
   },
   {
     id: 'r3',
@@ -43,6 +45,18 @@ const rewards = [
     exclusive_days: 0,
     source_id: 's3',
     min_tier: null,
+    created_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 'r4',
+    name: 'Too Expensive',
+    type: 'gopay',
+    stock: 5,
+    point_price: 999999,
+    exclusive_days: 0,
+    source_id: 's4',
+    min_tier: null,
+    created_at: '2026-01-01T00:00:00Z',
   },
 ];
 
@@ -79,6 +93,7 @@ describe('RewardsView', () => {
       name: /requires gold/i,
     });
     expect(goldButtons.length).toBeGreaterThan(0);
+    expect(goldButtons[0]).toBeDisabled();
   });
 
   it('disables claim for out of stock reward', async () => {
@@ -91,6 +106,20 @@ describe('RewardsView', () => {
       name: /out of stock/i,
     });
     expect(outButtons.length).toBeGreaterThan(0);
+    expect(outButtons[0]).toBeDisabled();
+  });
+
+  it('disables claim for insufficient points reward', async () => {
+    render(
+      <MemoryRouter>
+        <RewardsView />
+      </MemoryRouter>,
+    );
+    const insufficientButtons = await screen.findAllByRole('button', {
+      name: /insufficient points/i,
+    });
+    expect(insufficientButtons.length).toBeGreaterThan(0);
+    expect(insufficientButtons[0]).toBeDisabled();
   });
 
   it('claims a reward and shows the voucher code', async () => {

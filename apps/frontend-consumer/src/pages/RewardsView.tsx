@@ -11,6 +11,7 @@ interface Reward {
   point_price: number;
   exclusive_days: number;
   source_id: string;
+  created_at: string;
   min_tier?: { id: string; name: string } | null;
 }
 
@@ -28,14 +29,19 @@ function tierRequirementMet(
 ): boolean {
   if (!reward.min_tier) return true;
   if (!profile?.tier) return false;
-  const inWindow =
-    reward.exclusive_days > 0 &&
-    new Date() <
-      new Date(Date.now() + reward.exclusive_days * 24 * 60 * 60 * 1000);
-  // Tier gate applies only during the exclusive window (I1 semantics);
-  // without a window, the gate is not enforced.
-  if (!inWindow) return true;
-  return profile.tier.id === reward.min_tier.id;
+  if (reward.exclusive_days > 0 && reward.created_at) {
+    const exclusiveUntil =
+      new Date(reward.created_at).getTime() +
+      reward.exclusive_days * 24 * 60 * 60 * 1000;
+    // Tier gate applies only during the exclusive window (I1 semantics)
+    if (new Date().getTime() < exclusiveUntil) {
+      return profile.tier.id === reward.min_tier.id;
+    }
+    // window elapsed → gate released
+    return true;
+  }
+  // no window → gate not enforced
+  return true;
 }
 
 function getClaimHint(reward: Reward, profile: PointsProfile | null) {
