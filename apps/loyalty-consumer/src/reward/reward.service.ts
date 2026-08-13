@@ -1,21 +1,27 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
+import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
+import { PointService } from '@core/loyalty/point/point.service';
 import { DataSource, Repository } from 'typeorm';
 import { RewardClaimStrategyFactory } from './strategy/reward-claim-strategy-factory.service';
 
 @Injectable()
 export class RewardService {
   private rewardItemRepo: Repository<RewardItemEntity>;
+  private userRepo: Repository<LoyaltyUserEntity>;
 
   constructor(
     private dataSource: DataSource,
     private readonly strategyFactory: RewardClaimStrategyFactory,
+    private readonly pointService: PointService,
   ) {
     this.rewardItemRepo = dataSource.getRepository(RewardItemEntity);
+    this.userRepo = dataSource.getRepository(LoyaltyUserEntity);
   }
 
   async claimReward(userId: string, rewardItemId: string) {
@@ -25,13 +31,54 @@ export class RewardService {
           .getRepository(RewardItemEntity)
           .findOne({
             where: { id: rewardItemId },
-            relations: ['source'],
+            relations: ['source', 'min_tier'],
           });
 
         if (!rewardItem) throw new NotFoundException('Reward item not found');
-
         if (rewardItem.stock === 0) {
           throw new BadRequestException('Reward item is out of stock');
+        }
+
+        const user = await transactionalEntityManager
+          .getRepository(LoyaltyUserEntity)
+          .findOne({
+            where: { core_user_id: userId },
+            relations: ['tier'],
+          });
+        if (!user) {
+          throw new BadRequestException('User has no loyalty profile');
+        }
+
+        if (
+          rewardItem.min_tier &&
+          (!user.tier || user.tier.level < rewardItem.min_tier.level)
+        ) {
+          throw new ForbiddenException(
+            `This reward requires tier ${rewardItem.min_tier.name}`,
+          );
+        }
+
+        if (rewardItem.exclusive_days > 0 && rewardItem.min_tier) {
+          const created = new Date(rewardItem.created_at || Date.now());
+          const exclusiveUntil = new Date(
+            created.getTime() + rewardItem.exclusive_days * 24 * 60 * 60 * 1000,
+          );
+          const now = new Date();
+          if (
+            now < exclusiveUntil &&
+            (!user.tier || user.tier.level < rewardItem.min_tier.level)
+          ) {
+            throw new ForbiddenException(
+              `This reward is exclusive to tier ${rewardItem.min_tier.name} for now`,
+            );
+          }
+        }
+
+        if (
+          Number(rewardItem.point_price) > 0 &&
+          Number(user.balance_points) < Number(rewardItem.point_price)
+        ) {
+          throw new BadRequestException('Insufficient points');
         }
 
         if (rewardItem.stock !== -1) {
@@ -52,6 +99,16 @@ export class RewardService {
           );
         }
 
+        if (Number(rewardItem.point_price) > 0) {
+          await this.pointService.spend(
+            user,
+            Number(rewardItem.point_price),
+            'REWARD_CLAIM',
+            rewardItem.id,
+            transactionalEntityManager,
+          );
+        }
+
         return claimResult;
       },
     );
@@ -59,7 +116,7 @@ export class RewardService {
 
   findAllRewards() {
     return this.rewardItemRepo.find({
-      relations: ['source'],
+      relations: ['source', 'min_tier'],
     });
   }
 }
