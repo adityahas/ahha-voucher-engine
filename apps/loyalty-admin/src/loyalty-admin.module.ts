@@ -28,6 +28,7 @@ import { ClientEntity } from '@core/database/entities/client.entity';
 import { RewardItemSourceModule } from './reward-item-source/reward-item-source.module';
 import { TierModule } from './tier/tier.module';
 import { VoucherCategoryModule } from './voucher-category/voucher-category.module';
+import { UserPointsModule } from './user-points/user-points.module';
 import { HealthController } from '@core/base';
 
 dotenv.config();
@@ -60,6 +61,7 @@ dotenv.config();
     RewardItemModule,
     RewardItemSourceModule,
     forwardRef(() => TierModule),
+    forwardRef(() => UserPointsModule),
   ],
   controllers: [LoyaltyAdminController, HealthController],
   providers: [
