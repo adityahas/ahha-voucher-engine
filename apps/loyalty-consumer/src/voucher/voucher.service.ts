@@ -351,7 +351,11 @@ export class VoucherService {
     };
   }
 
-  async calculateDiscount(dto: CalculateDiscountDto, userId: string) {
+  async calculateDiscount(
+    dto: CalculateDiscountDto,
+    userId: string,
+    pointToCurrencyRate?: number,
+  ) {
     const entityManager = this.voucherRepository.manager;
     const product = await entityManager.findOne(ProductEntity, {
       where: { id: dto.product_id, is_active: true },
@@ -380,6 +384,7 @@ export class VoucherService {
       subtotal,
       voucher_discount_amount: voucherResult.discountAmount,
       user_balance_points: Number(user?.balance_points ?? 0),
+      point_to_currency_rate: pointToCurrencyRate,
       points_to_use: dto.points_to_use,
     });
     return { ...voucherResult, ...breakdown };

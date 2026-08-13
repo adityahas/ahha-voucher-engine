@@ -17,14 +17,41 @@ export interface HybridPaymentBreakdown {
   final_price: number;
 }
 
+/**
+ * Rounds a monetary value to 2 decimal places (minor units).
+ * All money values use decimal(12,2) in the database; rounding here keeps the
+ * shared calculation free of floating-point drift (e.g. fractional rates).
+ */
+export function roundMoney(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+function assertFiniteNonNegative(value: number, label: string): void {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
+    throw new BadRequestException(
+      `${label} must be a finite non-negative number`,
+    );
+  }
+}
+
 export function calculateHybridPayment(
   input: HybridPaymentInput,
 ): HybridPaymentBreakdown {
   const points = input.points_to_use ?? 0;
-  const rate = input.point_to_currency_rate || 1;
-  const afterVoucher = input.subtotal - input.voucher_discount_amount;
+  const rate = input.point_to_currency_rate ?? 1;
 
-  if (!Number.isInteger(points) || points < 0) {
+  assertFiniteNonNegative(input.subtotal, 'subtotal');
+  assertFiniteNonNegative(
+    input.voucher_discount_amount,
+    'voucher_discount_amount',
+  );
+  assertFiniteNonNegative(input.user_balance_points, 'user_balance_points');
+  if (typeof rate !== 'number' || !Number.isFinite(rate) || rate <= 0) {
+    throw new BadRequestException(
+      'point_to_currency_rate must be a finite positive number',
+    );
+  }
+  if (typeof points !== 'number' || !Number.isInteger(points) || points < 0) {
     throw new BadRequestException(
       'points_to_use must be a non-negative integer',
     );
@@ -32,17 +59,21 @@ export function calculateHybridPayment(
   if (points > input.user_balance_points) {
     throw new BadRequestException('points_to_use exceeds point balance');
   }
-  if (points * rate > afterVoucher) {
+
+  const afterVoucher = roundMoney(
+    input.subtotal - input.voucher_discount_amount,
+  );
+  const pointDiscount = roundMoney(points * rate);
+  if (pointDiscount > afterVoucher) {
     throw new BadRequestException(
       'points_to_use exceeds the post-voucher subtotal',
     );
   }
 
-  const pointDiscount = points * rate;
-  const cashAmount = afterVoucher - pointDiscount;
+  const cashAmount = roundMoney(afterVoucher - pointDiscount);
   return {
-    subtotal: input.subtotal,
-    voucher_discount_amount: input.voucher_discount_amount,
+    subtotal: roundMoney(input.subtotal),
+    voucher_discount_amount: roundMoney(input.voucher_discount_amount),
     points_used: points,
     point_discount_amount: pointDiscount,
     cash_amount: cashAmount,

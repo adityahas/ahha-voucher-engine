@@ -1032,6 +1032,155 @@ describe('VoucherService', () => {
       expect(spy).toHaveBeenCalledWith('VOU-10', 500, 'user-id', 'prod-1', []);
       spy.mockRestore();
     });
+
+    it('returns a hybrid breakdown when points are requested', async () => {
+      const product = {
+        id: 'prod-1',
+        price: 1000,
+        is_active: true,
+        categories: [{ name: 'groceries' }],
+      };
+      mockManager.findOne.mockResolvedValueOnce(product);
+      (voucherRepo.findOne as jest.Mock).mockResolvedValueOnce(makeVoucher());
+      (mockRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        core_user_id: 'user-id',
+        balance_points: 5000,
+      });
+
+      const result = await service.calculateDiscount(
+        {
+          voucher_code: 'VOU-10',
+          product_id: 'prod-1',
+          quantity: 1,
+          points_to_use: 100,
+        },
+        'user-id',
+        1,
+      );
+
+      expect(result.points_used).toBe(100);
+      expect(result.point_discount_amount).toBe(100);
+      expect(result.cash_amount).toBe(650); // 1000 - 250 voucher - 100 points
+      expect(result.final_price).toBe(650);
+    });
+
+    it('honours a custom tenant point rate in the preview', async () => {
+      const product = {
+        id: 'prod-1',
+        price: 10000,
+        is_active: true,
+        categories: [],
+      };
+      mockManager.findOne.mockResolvedValueOnce(product);
+      (voucherRepo.findOne as jest.Mock).mockResolvedValueOnce(makeVoucher());
+      (mockRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        core_user_id: 'user-id',
+        balance_points: 1000,
+      });
+
+      const result = await service.calculateDiscount(
+        {
+          voucher_code: 'VOU-10',
+          product_id: 'prod-1',
+          quantity: 1,
+          points_to_use: 100,
+        },
+        'user-id',
+        2,
+      );
+
+      expect(result.point_discount_amount).toBe(200);
+      expect(result.cash_amount).toBe(7300); // 10000 - 2500 - 200
+    });
+
+    it('is read-only: never touches usage, ledger, stock, or orders', async () => {
+      const product = {
+        id: 'prod-1',
+        price: 1000,
+        is_active: true,
+        categories: [],
+      };
+      mockManager.findOne.mockResolvedValueOnce(product);
+      (voucherRepo.findOne as jest.Mock).mockResolvedValueOnce(makeVoucher());
+      (mockRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        core_user_id: 'user-id',
+        balance_points: 5000,
+      });
+
+      await service.calculateDiscount(
+        {
+          voucher_code: 'VOU-10',
+          product_id: 'prod-1',
+          quantity: 1,
+          points_to_use: 100,
+        },
+        'user-id',
+        1,
+      );
+
+      expect(mockManager.save).not.toHaveBeenCalled();
+      expect(mockManager.create).not.toHaveBeenCalled();
+      expect(mockManager.transaction).not.toHaveBeenCalled();
+    });
+
+    it('rejects points above the point balance in the preview', async () => {
+      const product = {
+        id: 'prod-1',
+        price: 1000,
+        is_active: true,
+        categories: [],
+      };
+      mockManager.findOne.mockResolvedValueOnce(product);
+      (voucherRepo.findOne as jest.Mock).mockResolvedValueOnce(makeVoucher());
+      (mockRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        core_user_id: 'user-id',
+        balance_points: 50,
+      });
+
+      await expect(
+        service.calculateDiscount(
+          {
+            voucher_code: 'VOU-10',
+            product_id: 'prod-1',
+            quantity: 1,
+            points_to_use: 100,
+          },
+          'user-id',
+          1,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('keeps zero-point previews backward compatible', async () => {
+      const product = {
+        id: 'prod-1',
+        price: 1000,
+        is_active: true,
+        categories: [],
+      };
+      mockManager.findOne.mockResolvedValueOnce(product);
+      (voucherRepo.findOne as jest.Mock).mockResolvedValueOnce(makeVoucher());
+      (mockRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        core_user_id: 'user-id',
+        balance_points: 5000,
+      });
+
+      const result = await service.calculateDiscount(
+        {
+          voucher_code: 'VOU-10',
+          product_id: 'prod-1',
+          quantity: 1,
+          points_to_use: 0,
+        },
+        'user-id',
+        1,
+      );
+
+      expect(result.points_used).toBe(0);
+      expect(result.point_discount_amount).toBe(0);
+      expect(result.cash_amount).toBe(750);
+      expect(result.finalPrice).toBe(750);
+    });
   });
 
   function mockClaim(overrides: any = {}) {

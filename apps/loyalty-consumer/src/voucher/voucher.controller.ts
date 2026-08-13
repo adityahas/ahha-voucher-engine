@@ -18,12 +18,14 @@ import { VoucherResponseDto } from './dto/voucher-response.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 import { CalculateDiscountDto } from './dto/calculate-discount.dto';
+import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
 
 @Controller('/loyalty/vouchers')
 export class VoucherController {
   constructor(
     @Inject('VOUCHER_SERVICE')
     private readonly voucherService: VoucherService,
+    private readonly settingsService: ClientSettingsService,
   ) {}
 
   @Post('eligible')
@@ -63,7 +65,14 @@ export class VoucherController {
     @Req() req: Request,
   ) {
     const userId = req.user['userId'];
-    return this.voucherService.calculateDiscount(dto, userId);
+    const settings = await this.settingsService.getLoyaltySettings(
+      req['client'].database_name,
+    );
+    return this.voucherService.calculateDiscount(
+      dto,
+      userId,
+      Number(settings.point_to_currency_rate),
+    );
   }
 
   @Post(':code/redeem')

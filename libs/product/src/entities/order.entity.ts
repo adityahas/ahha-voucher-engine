@@ -35,7 +35,7 @@ export class OrderEntity extends BaseEntity {
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   voucher_discount_amount: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  @Column({ type: 'int', default: 0 })
   points_used: number;
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
