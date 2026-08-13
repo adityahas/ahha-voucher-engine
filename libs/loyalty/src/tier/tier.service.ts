@@ -21,7 +21,7 @@ export class TierService {
       });
     const match = overrides.find((o) =>
       categoryNames.some(
-        (name) => o.category.slug.toLowerCase() === name.toLowerCase(),
+        (name) => o.category.name.toLowerCase() === name.toLowerCase(),
       ),
     );
     return match

@@ -25,7 +25,7 @@ describe('TierService', () => {
 
   it('returns category override multiplier when a category matches', async () => {
     const override = new TierCategoryOverrideEntity();
-    override.category = { slug: 'food' } as any;
+    override.category = { name: 'food' } as any;
     override.point_multiplier = 3;
     managerMock.getRepository.mockReturnValue({
       find: jest.fn().mockResolvedValue([override]),

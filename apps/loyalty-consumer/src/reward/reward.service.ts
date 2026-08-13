@@ -49,6 +49,8 @@ export class RewardService {
           throw new BadRequestException('User has no loyalty profile');
         }
 
+        // Exclusive window semantics: min_tier gates only DURING the window
+        // (exclusive to that tier), then the reward opens to everyone.
         const created = new Date(rewardItem.created_at || Date.now());
         const exclusiveUntil = new Date(
           created.getTime() + rewardItem.exclusive_days * 24 * 60 * 60 * 1000,

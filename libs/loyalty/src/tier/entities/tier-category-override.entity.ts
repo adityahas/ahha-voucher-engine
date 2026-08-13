@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '@core/base/entities/base.entity';
 import { LoyaltyTierEntity } from './loyalty-tier.entity';
-import { VoucherCategoryEntity } from '@core/loyalty/voucher/entities/voucher-category.entity';
+import { ProductCategoryEntity } from '@core/product/entities/product-category.entity';
 
 @Entity('loyalty_tier_category_overrides')
 export class TierCategoryOverrideEntity extends BaseEntity {
@@ -18,9 +18,9 @@ export class TierCategoryOverrideEntity extends BaseEntity {
   @JoinColumn({ name: 'tier_id' })
   tier: LoyaltyTierEntity;
 
-  @ManyToOne(() => VoucherCategoryEntity)
-  @JoinColumn({ name: 'category_slug', referencedColumnName: 'slug' })
-  category: VoucherCategoryEntity;
+  @ManyToOne(() => ProductCategoryEntity)
+  @JoinColumn({ name: 'category_id' })
+  category: ProductCategoryEntity;
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 1 })
   point_multiplier: number;

@@ -11,7 +11,7 @@ export interface Tier {
   exclusive_window_hours: number;
   category_overrides?: {
     id: string;
-    category: { slug: string; name: string };
+    category: { id: string; name: string };
     point_multiplier: number;
   }[];
 }
@@ -24,7 +24,7 @@ export interface TierInput {
   extra_discount_percent?: number;
   is_active?: boolean;
   exclusive_window_hours?: number;
-  category_overrides?: { category_slug: string; point_multiplier: number }[];
+  category_overrides?: { category_id: string; point_multiplier: number }[];
 }
 
 const getUrl = () =>

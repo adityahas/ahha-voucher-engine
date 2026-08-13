@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { LoyaltyTierEntity } from '@core/loyalty/tier/entities/loyalty-tier.entity';
 import { TierCategoryOverrideEntity } from '@core/loyalty/tier/entities/tier-category-override.entity';
-import { VoucherCategoryEntity } from '@core/loyalty/voucher/entities/voucher-category.entity';
+import { ProductCategoryEntity } from '@core/product/entities/product-category.entity';
 import { CreateTierDto } from './dto/create-tier.dto';
 import { UpdateTierDto } from './dto/update-tier.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
@@ -23,14 +23,14 @@ const SORTABLE_COLUMNS = new Set([
 export class TierAdminService {
   private tierRepository: Repository<LoyaltyTierEntity>;
   private overrideRepository: Repository<TierCategoryOverrideEntity>;
-  private categoryRepository: Repository<VoucherCategoryEntity>;
+  private categoryRepository: Repository<ProductCategoryEntity>;
 
   constructor(dataSource: DataSource) {
     this.tierRepository = dataSource.getRepository(LoyaltyTierEntity);
     this.overrideRepository = dataSource.getRepository(
       TierCategoryOverrideEntity,
     );
-    this.categoryRepository = dataSource.getRepository(VoucherCategoryEntity);
+    this.categoryRepository = dataSource.getRepository(ProductCategoryEntity);
   }
 
   async create(dto: CreateTierDto): Promise<LoyaltyTierEntity> {
@@ -41,7 +41,7 @@ export class TierAdminService {
     if (category_overrides && category_overrides.length > 0) {
       for (const o of category_overrides) {
         const category = await this.categoryRepository.findOne({
-          where: { slug: o.category_slug },
+          where: { id: o.category_id },
         });
         if (!category) continue;
         const override = this.overrideRepository.create({
@@ -101,7 +101,7 @@ export class TierAdminService {
       await this.overrideRepository.delete({ tier: { id } });
       for (const o of category_overrides) {
         const category = await this.categoryRepository.findOne({
-          where: { slug: o.category_slug },
+          where: { id: o.category_id },
         });
         if (!category) continue;
         const override = this.overrideRepository.create({

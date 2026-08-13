@@ -7,14 +7,15 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
   ValidateNested,
 } from 'class-validator';
 
 export class CreateTierCategoryOverrideDto {
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
-  category_slug: string;
+  category_id: string;
 
   @IsNumber()
   @Min(0)

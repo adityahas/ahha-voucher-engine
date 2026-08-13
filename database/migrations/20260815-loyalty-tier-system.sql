@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS loyalty_tiers (
 CREATE TABLE IF NOT EXISTS loyalty_tier_category_overrides (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tier_id uuid NOT NULL REFERENCES loyalty_tiers(id) ON DELETE CASCADE,
-  category_slug varchar NOT NULL REFERENCES voucher_categories(slug),
+  category_id uuid NOT NULL REFERENCES product_categories(id) ON DELETE CASCADE,
   point_multiplier decimal(12,2) NOT NULL DEFAULT 1,
   created_at timestamptz(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamptz(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

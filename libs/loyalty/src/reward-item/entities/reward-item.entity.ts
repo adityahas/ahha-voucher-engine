@@ -33,6 +33,11 @@ export class RewardItemEntity extends BaseEntity {
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   point_price: number;
 
+  // Exclusive claim window semantics: the `min_tier` gate is enforced ONLY while
+  // `exclusive_days > 0` and the window has not elapsed (reward exclusive to that
+  // tier during the window, then open to everyone). Setting `min_tier` with
+  // `exclusive_days: 0` (or elapsed) DISABLES the tier gate entirely — configure
+  // `exclusive_days` if a tier restriction is intended.
   @ManyToOne(() => LoyaltyTierEntity, { nullable: true })
   @JoinColumn({ name: 'min_tier_id' })
   min_tier: LoyaltyTierEntity | null;
