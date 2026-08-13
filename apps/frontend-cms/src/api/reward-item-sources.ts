@@ -46,8 +46,16 @@ const request = async <T>(url: string, options?: RequestInit): Promise<T> => {
     );
   }
 
-  const result = await response.json();
-  return (result.data ?? result) as T;
+  if (response.status === 204) return undefined as T;
+
+  let result: unknown;
+  try {
+    result = await response.json();
+  } catch {
+    return undefined as T;
+  }
+
+  return ((result as { data?: T }).data ?? result) as T;
 };
 
 export const getRewardSources = (): Promise<RewardItemSource[]> =>

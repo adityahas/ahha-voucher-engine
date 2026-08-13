@@ -21,6 +21,12 @@ const source = {
   source_type: 'gopay',
 };
 
+const authHeaders = {
+  Authorization: 'Bearer token',
+  'x-api-key': 'api-key',
+  'x-tenant-override': 'tenant',
+};
+
 describe('reward item source API', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', fetchMock);
@@ -40,11 +46,7 @@ describe('reward item source API', () => {
       'http://localhost:8080/loyalty-admin/reward-item-source?page=0&size=100',
       expect.objectContaining({
         method: 'GET',
-        headers: expect.objectContaining({
-          Authorization: 'Bearer token',
-          'x-api-key': 'api-key',
-          'x-tenant-override': 'tenant',
-        }),
+        headers: expect.objectContaining(authHeaders),
       }),
     );
   });
@@ -53,7 +55,9 @@ describe('reward item source API', () => {
     await getRewardSource('source-1');
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:8080/loyalty-admin/reward-item-source/source-1',
-      expect.any(Object),
+      expect.objectContaining({
+        headers: expect.objectContaining(authHeaders),
+      }),
     );
   });
 
@@ -62,7 +66,11 @@ describe('reward item source API', () => {
     await createRewardSource(input);
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:8080/loyalty-admin/reward-item-source',
-      expect.objectContaining({ method: 'POST', body: JSON.stringify(input) }),
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify(input),
+        headers: expect.objectContaining(authHeaders),
+      }),
     );
   });
 
@@ -71,15 +79,23 @@ describe('reward item source API', () => {
     await updateRewardSource('source-1', input);
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:8080/loyalty-admin/reward-item-source/source-1',
-      expect.objectContaining({ method: 'PATCH', body: JSON.stringify(input) }),
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify(input),
+        headers: expect.objectContaining(authHeaders),
+      }),
     );
   });
 
-  it('deletes a source', async () => {
+  it('deletes a source on a 204 response', async () => {
+    fetchMock.mockResolvedValue({ ok: true, status: 204 });
     await deleteRewardSource('source-1');
     expect(fetchMock).toHaveBeenCalledWith(
       'http://localhost:8080/loyalty-admin/reward-item-source/source-1',
-      expect.objectContaining({ method: 'DELETE' }),
+      expect.objectContaining({
+        method: 'DELETE',
+        headers: expect.objectContaining(authHeaders),
+      }),
     );
   });
 
