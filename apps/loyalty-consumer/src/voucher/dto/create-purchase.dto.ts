@@ -26,4 +26,13 @@ export class CreatePurchaseDto {
   @IsString()
   @IsOptional()
   voucher_code?: string;
+
+  @ApiProperty({
+    description: 'Optional loyalty points to use',
+    required: false,
+  })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  points_to_use?: number;
 }

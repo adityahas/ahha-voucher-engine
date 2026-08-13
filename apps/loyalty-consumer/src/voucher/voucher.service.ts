@@ -18,6 +18,7 @@ import { VoucherResponseDto } from './dto/voucher-response.dto';
 import { BasePaginationDto } from '@core/base/dto/base-pagination.dto';
 import { BasePaginationResponseInterface } from '@core/base/dto/base-response.interface';
 import { VoucherUsageEntity } from '@core/loyalty/voucher/entities/voucher-usage.entity';
+import { calculateHybridPayment } from './point-payment.calculator';
 
 @Injectable()
 export class VoucherService {
@@ -364,13 +365,24 @@ export class VoucherService {
     const subtotal = product.price * dto.quantity;
     const categoryNames = product.categories?.map((c) => c.name) || [];
 
-    return this.validateAndCalculateDiscount(
+    const voucherResult = await this.validateAndCalculateDiscount(
       dto.voucher_code,
       subtotal,
       userId,
       product.id,
       categoryNames,
     );
+
+    const user = await this.userRepository.findOne({
+      where: { core_user_id: userId },
+    });
+    const breakdown = calculateHybridPayment({
+      subtotal,
+      voucher_discount_amount: voucherResult.discountAmount,
+      user_balance_points: Number(user?.balance_points ?? 0),
+      points_to_use: dto.points_to_use,
+    });
+    return { ...voucherResult, ...breakdown };
   }
 
   private async getOrCreateLoyaltyUser(

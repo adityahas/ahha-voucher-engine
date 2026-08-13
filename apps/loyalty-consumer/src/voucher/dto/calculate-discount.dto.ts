@@ -1,4 +1,11 @@
-import { IsInt, IsNotEmpty, IsString, IsUUID, Min } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CalculateDiscountDto {
@@ -16,4 +23,13 @@ export class CalculateDiscountDto {
   @IsInt()
   @Min(1)
   quantity: number;
+
+  @ApiProperty({
+    description: 'Optional loyalty points to use',
+    required: false,
+  })
+  @IsInt()
+  @Min(0)
+  @IsOptional()
+  points_to_use?: number;
 }
