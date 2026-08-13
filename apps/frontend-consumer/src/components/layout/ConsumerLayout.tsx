@@ -8,6 +8,8 @@ import {
   List,
   Package,
   History,
+  Award,
+  Gift,
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
@@ -89,6 +91,32 @@ export function ConsumerLayout({ children }: ConsumerLayoutProps) {
               <History className="w-4 h-4" />
               Point History
             </NavLink>
+            <NavLink
+              to="/loyalty"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-fuchsia-500/20 text-white shadow-inner shadow-white/5'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`
+              }
+            >
+              <Award className="w-4 h-4" />
+              Loyalty
+            </NavLink>
+            <NavLink
+              to="/rewards"
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-cyan-500/20 to-fuchsia-500/20 text-white shadow-inner shadow-white/5'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`
+              }
+            >
+              <Gift className="w-4 h-4" />
+              Rewards
+            </NavLink>
           </div>
         </div>
 
@@ -163,6 +191,32 @@ export function ConsumerLayout({ children }: ConsumerLayoutProps) {
           >
             <History className="w-5 h-5" />
             <span className="text-[10px] font-medium">Points</span>
+          </NavLink>
+          <NavLink
+            to="/loyalty"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
+                isActive
+                  ? 'text-cyan-400 bg-cyan-500/10'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
+              }`
+            }
+          >
+            <Award className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Loyalty</span>
+          </NavLink>
+          <NavLink
+            to="/rewards"
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
+                isActive
+                  ? 'text-fuchsia-400 bg-fuchsia-500/10'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
+              }`
+            }
+          >
+            <Gift className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Rewards</span>
           </NavLink>
         </div>
       </div>
