@@ -1,0 +1,60 @@
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+
+export class CreateTierCategoryOverrideDto {
+  @IsString()
+  @IsNotEmpty()
+  category_slug: string;
+
+  @IsNumber()
+  @Min(0)
+  point_multiplier: number;
+}
+
+export class CreateTierDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsInt()
+  @Min(1)
+  level: number;
+
+  @IsNumber()
+  @Min(0)
+  min_points: number;
+
+  @IsNumber()
+  @Min(0)
+  point_multiplier: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  extra_discount_percent?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  is_active?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  exclusive_window_hours?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateTierCategoryOverrideDto)
+  category_overrides?: CreateTierCategoryOverrideDto[];
+}

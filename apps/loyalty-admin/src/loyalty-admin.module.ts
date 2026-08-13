@@ -25,6 +25,7 @@ import { REQUEST } from '@nestjs/core';
 import { LoyaltyAdminController } from './loyalty-admin.controller';
 import { ClientEntity } from '@core/database/entities/client.entity';
 import { RewardItemSourceModule } from './reward-item-source/reward-item-source.module';
+import { TierModule } from './tier/tier.module';
 import { VoucherCategoryModule } from './voucher-category/voucher-category.module';
 import { HealthController } from '@core/base';
 
@@ -57,6 +58,7 @@ dotenv.config();
     VoucherCategoryModule,
     RewardItemModule,
     RewardItemSourceModule,
+    TierModule,
   ],
   controllers: [LoyaltyAdminController, HealthController],
   providers: [
