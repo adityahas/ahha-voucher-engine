@@ -19,6 +19,7 @@ export default function RewardForm({
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [sources, setSources] = useState<RewardItemSource[]>([]);
   const [sourcesLoading, setSourcesLoading] = useState(true);
+  const [sourcesError, setSourcesError] = useState(false);
   const [minTierId, setMinTierId] = useState<string>(
     (initial as any)?.min_tier?.id ?? (initial as any)?.min_tier_id ?? '',
   );
@@ -31,14 +32,23 @@ export default function RewardForm({
     exclusive_days: initial?.exclusive_days ?? 0,
   });
 
+  const loadSources = async () => {
+    setSourcesLoading(true);
+    setSourcesError(false);
+    try {
+      setSources(await getRewardSources());
+    } catch {
+      setSourcesError(true);
+    } finally {
+      setSourcesLoading(false);
+    }
+  };
+
   useEffect(() => {
     getTiers()
       .then(setTiers)
       .catch(() => setTiers([]));
-    getRewardSources()
-      .then(setSources)
-      .catch(() => setSources([]))
-      .finally(() => setSourcesLoading(false));
+    loadSources();
   }, []);
 
   const set = (key: keyof typeof form, value: any) =>
@@ -84,6 +94,15 @@ export default function RewardForm({
         </label>
         {sourcesLoading ? (
           <p className="text-sm text-slate-400">Loading reward sources...</p>
+        ) : sourcesError ? (
+          <div className="space-y-2">
+            <p className="text-sm text-red-400">
+              Could not load reward sources.
+            </p>
+            <Button type="button" onClick={loadSources}>
+              Retry
+            </Button>
+          </div>
         ) : sources.length ? (
           <select
             id="source_id"
@@ -157,7 +176,7 @@ export default function RewardForm({
         type="submit"
         icon={Save}
         iconRight
-        disabled={!sourcesLoading && !form.source_id}
+        disabled={sourcesLoading || sourcesError || !form.source_id}
       >
         Save
       </Button>
