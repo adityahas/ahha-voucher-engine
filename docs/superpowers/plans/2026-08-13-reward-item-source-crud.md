@@ -28,6 +28,7 @@
 - Modify: `libs/loyalty/src/reward-item-source/entities/reward-item-source.entity.ts`
 - Modify: `apps/loyalty-admin/src/reward-item-source/reward-item-source.controller.ts`
 - Modify: `apps/loyalty-admin/src/reward-item-source/reward-item-source.service.ts`
+- Create: `apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.ts`
 - Test: `apps/loyalty-admin/src/reward-item-source/reward-item-source.service.spec.ts`
 
 **Interfaces:**
@@ -69,22 +70,26 @@ Run `yarn test --runInBand apps/loyalty-admin/src/reward-item-source/reward-item
 
 Use `@IsString()` and `@IsNotEmpty()` for `name` and `source_type`, `@IsUrl()` plus `@IsOptional()` for `api_endpoint`, and `@IsString()` plus `@IsOptional()` for `apiKey`. Normalize blank `apiKey` to null in the service before save. Mark the TypeORM `apiKey` column nullable.
 
-- [ ] **Step 4: Add a service masking helper and apply it to CRUD responses**
+- [ ] **Step 4: Add the tenant database migration**
+
+Create a TypeORM migration that executes `ALTER TABLE reward_item_sources ALTER COLUMN "apiKey" DROP NOT NULL` in `up()` and restores `SET NOT NULL` in `down()`. Follow the repository's existing migration export/configuration pattern and ensure the migration is included in the loyalty-admin tenant migration path.
+
+- [ ] **Step 5: Add a service masking helper and apply it to CRUD responses**
 
 Implement a private `maskApiKey(value: string | null): string | null` with this behavior: null/empty returns null; values of length 6 or less return `***`; longer values return `${value.slice(0, 3)}***${value.slice(-3)}`. Clone saved/fetched entities before replacing `apiKey`, so the repository's plaintext value is never mutated.
 
-- [ ] **Step 5: Fix UUID deletion and normalize create/update input**
+- [ ] **Step 6: Fix UUID deletion and normalize create/update input**
 
 Change the controller and service delete signatures from number to string. Before create/update, convert an empty API key to null and preserve the existing key on update when `apiKey` is omitted. Return masked entities from create, findOne, update, and findAll.
 
-- [ ] **Step 6: Run focused tests and backend build**
+- [ ] **Step 7: Run focused tests, migration verification, and backend build**
 
-Run `yarn test --runInBand apps/loyalty-admin/src/reward-item-source/reward-item-source.service.spec.ts` and `yarn nest build loyalty-admin`. Expected: tests pass and the loyalty-admin build exits 0.
+Run `yarn test --runInBand apps/loyalty-admin/src/reward-item-source/reward-item-source.service.spec.ts`, the repository's migration test/compile command for the new migration, and `yarn nest build loyalty-admin`. Expected: tests pass, migration compiles, and the loyalty-admin build exits 0.
 
-- [ ] **Step 7: Commit the backend contract**
+- [ ] **Step 8: Commit the backend contract**
 
 ```bash
-git add apps/loyalty-admin/src/reward-item-source libs/loyalty/src/reward-item-source
+git add apps/loyalty-admin/src/reward-item-source apps/loyalty-admin/src/migrations libs/loyalty/src/reward-item-source
 git commit -m "fix(loyalty): align reward item source contract"
 ```
 
