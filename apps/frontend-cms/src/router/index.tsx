@@ -24,6 +24,9 @@ import CurrencySettings from '../pages/CurrencySettings';
 import TierList from '../pages/TierList';
 import TierCreate from '../pages/TierCreate';
 import TierEdit from '../pages/TierEdit';
+import RewardList from '../pages/RewardList';
+import RewardCreate from '../pages/RewardCreate';
+import RewardEdit from '../pages/RewardEdit';
 
 export const router = createBrowserRouter([
   {
@@ -128,6 +131,18 @@ export const router = createBrowserRouter([
       {
         path: '/tiers/:id/edit',
         element: <TierEdit />,
+      },
+      {
+        path: '/rewards',
+        element: <RewardList />,
+      },
+      {
+        path: '/rewards/create',
+        element: <RewardCreate />,
+      },
+      {
+        path: '/rewards/:id/edit',
+        element: <RewardEdit />,
       },
       // add more authenticated feature routes here
     ],

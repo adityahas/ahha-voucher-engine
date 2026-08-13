@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Save, AlertCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { VoucherBinding } from '../api/vouchers';
+import { getTiers, Tier } from '../api/tiers';
 
 interface VoucherBindingModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ const BIND_TYPES = [
   'product_type',
   'product_sku',
   'product_vendor',
+  'tier',
 ];
 
 export const VoucherBindingModal: React.FC<VoucherBindingModalProps> = ({
@@ -30,6 +32,13 @@ export const VoucherBindingModal: React.FC<VoucherBindingModalProps> = ({
   const [bindValue, setBindValue] = React.useState<string>('');
   const [isSaving, setIsSaving] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [tiers, setTiers] = useState<Tier[]>([]);
+
+  useEffect(() => {
+    getTiers()
+      .then(setTiers)
+      .catch(() => setTiers([]));
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -123,21 +132,56 @@ export const VoucherBindingModal: React.FC<VoucherBindingModalProps> = ({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label
-              htmlFor="bindValue"
-              className="text-xs font-bold text-slate-400 uppercase tracking-widest"
-            >
-              Binding Value
-            </label>
-            <Input
-              id="bindValue"
-              value={bindValue}
-              onChange={(e) => setBindValue(e.target.value)}
-              placeholder="e.g., admin, electronics, SKU123"
-              className="bg-slate-800 border-none focus:ring-primary-500"
-            />
-          </div>
+          {bindType === 'tier' ? (
+            <div className="space-y-2">
+              <label
+                htmlFor="bindValue"
+                className="text-xs font-bold text-slate-400 uppercase tracking-widest"
+              >
+                Binding Tier
+              </label>
+              <div className="relative">
+                <select
+                  id="bindValue"
+                  value={bindValue}
+                  onChange={(e) => setBindValue(e.target.value)}
+                  className="w-full bg-slate-800 border-none rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all appearance-none"
+                >
+                  <option value="">Select tier...</option>
+                  {tiers.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                  <svg
+                    className="fill-current h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <label
+                htmlFor="bindValue"
+                className="text-xs font-bold text-slate-400 uppercase tracking-widest"
+              >
+                Binding Value
+              </label>
+              <Input
+                id="bindValue"
+                value={bindValue}
+                onChange={(e) => setBindValue(e.target.value)}
+                placeholder="e.g., admin, electronics, SKU123"
+                className="bg-slate-800 border-none focus:ring-primary-500"
+              />
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
             <Button

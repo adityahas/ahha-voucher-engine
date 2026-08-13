@@ -12,6 +12,9 @@ vi.mock('../api/vouchers', () => ({
   deleteVoucherBinding: vi.fn(),
 }));
 
+// The binding modal loads tiers on mount; keep the store chain out of this spec.
+vi.mock('../api/tiers', () => ({ getTiers: vi.fn().mockResolvedValue([]) }));
+
 describe('VoucherBindingList Component', () => {
   const mockVoucherId = 'VOUCHER100';
   const mockBindings = [

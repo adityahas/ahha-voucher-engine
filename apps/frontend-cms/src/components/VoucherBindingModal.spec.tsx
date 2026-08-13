@@ -3,6 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import VoucherBindingModal from './VoucherBindingModal';
 import { VoucherBinding } from '../api/vouchers';
+import * as tiersApi from '../api/tiers';
+
+vi.mock('../api/tiers', () => ({ getTiers: vi.fn() }));
 
 // We need to mock Framer Motion if it was used, but we used standard CSS animate-in.
 
@@ -18,6 +21,7 @@ describe('VoucherBindingModal Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    (tiersApi.getTiers as any).mockResolvedValue([]);
   });
 
   it('SHOULD not render when isOpen is false', () => {
@@ -73,6 +77,37 @@ describe('VoucherBindingModal Component', () => {
       expect(mockOnSave).toHaveBeenCalledWith({
         bind_type: 'role',
         bind_value: 'NEW-ROLE',
+      });
+    });
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it('SHOULD render a tier dropdown when bind_type is tier', async () => {
+    (tiersApi.getTiers as any).mockResolvedValue([
+      { id: 't1', name: 'Gold' },
+      { id: 't2', name: 'Platinum' },
+    ]);
+    mockOnSave.mockResolvedValueOnce(undefined);
+    render(<VoucherBindingModal {...defaultProps} />);
+
+    const typeSelect = screen.getByLabelText(/Binding Type/i);
+    fireEvent.change(typeSelect, { target: { value: 'tier' } });
+
+    expect(screen.getByLabelText(/Binding Tier/i)).toBeInTheDocument();
+    expect(await screen.findByText('Gold')).toBeInTheDocument();
+    expect(screen.getByText('Platinum')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/Binding Tier/i), {
+      target: { value: 't2' },
+    });
+
+    const saveButton = screen.getByRole('button', { name: /Save Constraint/i });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(mockOnSave).toHaveBeenCalledWith({
+        bind_type: 'tier',
+        bind_value: 't2',
       });
     });
     expect(mockOnClose).toHaveBeenCalled();
