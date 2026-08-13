@@ -5,7 +5,15 @@ export interface RewardItemSource {
   name: string;
   source_type: string;
   api_endpoint?: string;
-  apiKey?: string | null;
+  apiKey?: MaskedApiKey;
+}
+
+export type MaskedApiKey = string | null;
+
+export interface AuthState {
+  apiKey?: string;
+  tenant?: string;
+  token?: string;
 }
 
 export interface RewardItemSourceInput {
@@ -23,7 +31,7 @@ const getUrl = () =>
   }/loyalty-admin/reward-item-source`;
 
 const getHeaders = () => {
-  const { apiKey, tenant, token } = useAuthStore.getState() as any;
+  const { apiKey, tenant, token } = useAuthStore.getState() as AuthState;
   return {
     'Content-Type': 'application/json',
     'x-api-key': apiKey,

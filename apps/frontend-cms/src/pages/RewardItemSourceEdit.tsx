@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   getRewardSource,
+  RewardItemSource,
   updateRewardSource,
 } from '../api/reward-item-sources';
 import RewardItemSourceForm from '../components/RewardItemSourceForm';
 export default function RewardItemSourceEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [initial, setInitial] = useState<any>();
+  const [initial, setInitial] = useState<RewardItemSource>();
   const [error, setError] = useState('');
   useEffect(() => {
     if (id)

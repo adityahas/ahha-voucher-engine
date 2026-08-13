@@ -18,6 +18,10 @@ describe('RewardItemSourceApiKeyNullable1786641866501', () => {
     );
     expect(query).toHaveBeenNthCalledWith(
       2,
+      'UPDATE reward_item_sources SET "api_key" = \'synthetic-backfill\' WHERE "api_key" IS NULL',
+    );
+    expect(query).toHaveBeenNthCalledWith(
+      3,
       'ALTER TABLE reward_item_sources ALTER COLUMN "api_key" SET NOT NULL',
     );
   });

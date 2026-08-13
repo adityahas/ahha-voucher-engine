@@ -45,13 +45,20 @@ export default function RewardForm({
   };
 
   useEffect(() => {
+    let active = true;
     getTiers()
-      .then(setTiers)
-      .catch(() => setTiers([]));
-    loadSources();
+      .then((value) => active && setTiers(value))
+      .catch(() => active && setTiers([]));
+    getRewardSources()
+      .then((value) => active && setSources(value))
+      .catch(() => active && setSourcesError(true))
+      .finally(() => active && setSourcesLoading(false));
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const set = (key: keyof typeof form, value: any) =>
+  const set = (key: keyof typeof form, value: string | number) =>
     setForm((f) => ({ ...f, [key]: value }));
 
   return (

@@ -108,6 +108,16 @@ describe('RewardItemSourceService', () => {
       expect(result.pagination.total).toBe(1);
       expect(result.data[0].apiKey).toBe('***');
     });
+
+    it('ignores unsupported sort fields', async () => {
+      await service.findAll({
+        page: 0,
+        size: 10,
+        sort: 'apiKey',
+        order: 'ASC',
+      } as any);
+      expect(mockQueryBuilder.orderBy).not.toHaveBeenCalled();
+    });
   });
 
   describe('findOne', () => {
@@ -136,6 +146,13 @@ describe('RewardItemSourceService', () => {
         name: 'Updated',
       });
     });
+
+    it('throws when no source is updated', async () => {
+      mockRepository.update.mockResolvedValue({ affected: 0 });
+      await expect(service.update('missing', {} as any)).rejects.toThrow(
+        'Reward item source missing not found.',
+      );
+    });
   });
 
   describe('remove', () => {
@@ -143,6 +160,13 @@ describe('RewardItemSourceService', () => {
       mockRepository.delete.mockResolvedValue({ affected: 1 });
       await service.remove('uuid-1');
       expect(mockRepository.delete).toHaveBeenCalledWith('uuid-1');
+    });
+
+    it('throws when no source is deleted', async () => {
+      mockRepository.delete.mockResolvedValue({ affected: 0 });
+      await expect(service.remove('missing')).rejects.toThrow(
+        'Reward item source missing not found.',
+      );
     });
   });
 });

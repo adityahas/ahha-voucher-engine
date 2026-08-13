@@ -47,8 +47,12 @@ export default function RewardItemSourceForm({
         if (form.apiKey.trim()) input.apiKey = form.apiKey;
         try {
           await onSubmit(input);
-        } catch (error: any) {
-          setApiError(error.message || 'Failed to save reward source');
+        } catch (error: unknown) {
+          setApiError(
+            error instanceof Error
+              ? error.message
+              : 'Failed to save reward source',
+          );
         }
       }}
     >

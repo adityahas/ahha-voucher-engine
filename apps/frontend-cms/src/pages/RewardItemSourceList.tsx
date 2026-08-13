@@ -26,13 +26,18 @@ const mask = (key?: string | null) => (key ? '******' : '-');
 export default function RewardItemSourceList() {
   const navigate = useNavigate();
   const [sources, setSources] = useState<RewardItemSource[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const load = async () => {
     try {
       setError('');
       setSources(await getRewardSources());
-    } catch (e: any) {
-      setError(e.message || 'Failed to load reward sources');
+    } catch (e: unknown) {
+      setError(
+        e instanceof Error ? e.message : 'Failed to load reward sources',
+      );
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -43,8 +48,10 @@ export default function RewardItemSourceList() {
     try {
       await deleteRewardSource(id);
       await load();
-    } catch (e: any) {
-      setError(e.message || 'Failed to delete reward source');
+    } catch (e: unknown) {
+      setError(
+        e instanceof Error ? e.message : 'Failed to delete reward source',
+      );
     }
   };
   return (
@@ -71,46 +78,52 @@ export default function RewardItemSourceList() {
               {error}
             </p>
           )}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Endpoint</TableHead>
-                <TableHead>API Key</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sources.map((source) => (
-                <TableRow key={source.id}>
-                  <TableCell>{source.name}</TableCell>
-                  <TableCell>{source.source_type}</TableCell>
-                  <TableCell>{source.api_endpoint || '-'}</TableCell>
-                  <TableCell>{mask(source.apiKey)}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        navigate(`/reward-sources/${source.id}/edit`)
-                      }
-                    >
-                      Edit
-                    </Button>
-                    <button
-                      type="button"
-                      aria-label={`Delete ${source.name}`}
-                      onClick={() => remove(source.id)}
-                      className="ml-2 text-red-400"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </TableCell>
+          {loading ? (
+            <p className="text-slate-400">Loading reward sources...</p>
+          ) : !sources.length && !error ? (
+            <p className="text-slate-400">No reward sources configured.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Endpoint</TableHead>
+                  <TableHead>API Key</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {sources.map((source) => (
+                  <TableRow key={source.id}>
+                    <TableCell>{source.name}</TableCell>
+                    <TableCell>{source.source_type}</TableCell>
+                    <TableCell>{source.api_endpoint || '-'}</TableCell>
+                    <TableCell>{mask(source.apiKey)}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          navigate(`/reward-sources/${source.id}/edit`)
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <button
+                        type="button"
+                        aria-label={`Delete ${source.name}`}
+                        onClick={() => remove(source.id)}
+                        className="ml-2 text-red-400"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

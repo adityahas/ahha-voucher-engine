@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRewardItemSourceDto } from './dto/create-reward-item-source.dto';
 import { UpdateRewardItemSourceDto } from './dto/update-reward-item-source.dto';
 import { RewardItemSourceEntity } from '@core/loyalty/reward-item-source/entities/reward-item-source.entity';
@@ -42,7 +42,13 @@ export class RewardItemSourceService {
       });
     }
 
-    if (sort && order) {
+    const sortableFields = new Set([
+      'id',
+      'name',
+      'source_type',
+      'api_endpoint',
+    ]);
+    if (sort && order && sortableFields.has(sort)) {
       queryBuilder.orderBy(`rewardItemSource.${sort}`, order);
     }
 
@@ -74,10 +80,13 @@ export class RewardItemSourceService {
     id: string,
     updateRewardItemSourceDto: UpdateRewardItemSourceDto,
   ): Promise<RewardItemSourceEntity> {
-    await this.rewardItemSourceRepository.update(
+    const result = await this.rewardItemSourceRepository.update(
       id,
       this.normalizeInput(updateRewardItemSourceDto),
     );
+    if (!result.affected) {
+      throw new NotFoundException(`Reward item source ${id} not found.`);
+    }
     const entity = await this.rewardItemSourceRepository.findOne({
       where: { id },
     });
@@ -85,7 +94,10 @@ export class RewardItemSourceService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.rewardItemSourceRepository.delete(id);
+    const result = await this.rewardItemSourceRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException(`Reward item source ${id} not found.`);
+    }
   }
 
   private normalizeInput(
