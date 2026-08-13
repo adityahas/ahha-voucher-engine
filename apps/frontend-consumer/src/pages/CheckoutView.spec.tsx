@@ -168,13 +168,15 @@ describe('CheckoutView Automation Suite', () => {
         voucher_code: 'CHRISTMAS2030',
         product_id: 'prod-123',
         quantity: 1,
+        points_to_use: 0,
       });
       expect(
         screen.getByText(/Voucher Applied Successfully!/i),
       ).toBeInTheDocument();
       expect(screen.getByText('Voucher Savings')).toBeInTheDocument();
       expect(screen.getByText(/-Rp\s*20/)).toBeInTheDocument();
-      expect(screen.getByText(/Rp\s*80/)).toBeInTheDocument(); // Final Total
+      // Final Total (multiple "Rp 80" texts exist with the cash remainder note)
+      expect(screen.getAllByText(/Rp\s*80/).length).toBeGreaterThan(0);
     });
   });
 
@@ -225,6 +227,7 @@ describe('CheckoutView Automation Suite', () => {
       product_id: 'prod-123',
       quantity: 1,
       voucher_code: undefined,
+      points_to_use: undefined,
     });
 
     await waitFor(() => {
@@ -294,6 +297,7 @@ describe('CheckoutView Automation Suite', () => {
         voucher_code: 'CHRISTMAS2030',
         product_id: 'prod-123',
         quantity: 1,
+        points_to_use: 0,
       });
       expect(
         screen.getByText(/Voucher Applied Successfully!/i),
@@ -335,6 +339,316 @@ describe('CheckoutView Automation Suite', () => {
     fireEvent.click(screen.getByPlaceholderText(/Enter code/i));
     await waitFor(() => {
       expect(screen.getByText(/Network error/i)).toBeInTheDocument();
+    });
+  });
+
+  // ---------------------------------------------------------------
+  // Hybrid points payment
+  // ---------------------------------------------------------------
+  it('defaults points to the maximum valid amount after voucher', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (pointsApi.getPointsProfile as any).mockResolvedValue({
+      tier: null,
+      lifetime_points: 5000,
+      balance_points: 5000,
+      next_tier: null,
+      point_to_currency_rate: 1,
+    });
+    (vouchersApi.calculateDiscount as any)
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 0,
+        point_discount_amount: 0,
+        cash_amount: 80,
+        message: 'ok',
+      })
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 80,
+        point_discount_amount: 80,
+        cash_amount: 0,
+        message: 'ok',
+      });
+
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/Enter code/i), {
+      target: { value: 'CHRISTMAS2030' },
+    });
+    fireEvent.click(screen.getByText('APPLY'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('points-input')).toHaveValue(80);
+      expect(screen.getByText(/Points Applied \(80 pts\)/)).toBeInTheDocument();
+      expect(screen.getByTestId('total-amount')).toHaveTextContent('Rp 0');
+    });
+    expect(vouchersApi.calculateDiscount).toHaveBeenCalledTimes(2);
+    expect(vouchersApi.calculateDiscount).toHaveBeenLastCalledWith({
+      voucher_code: 'CHRISTMAS2030',
+      product_id: 'prod-123',
+      quantity: 1,
+      points_to_use: 80,
+    });
+  });
+
+  it('refreshes the preview when the user edits points', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (pointsApi.getPointsProfile as any).mockResolvedValue({
+      tier: null,
+      lifetime_points: 5000,
+      balance_points: 5000,
+      next_tier: null,
+      point_to_currency_rate: 1,
+    });
+    (vouchersApi.calculateDiscount as any)
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 0,
+        point_discount_amount: 0,
+        cash_amount: 80,
+        message: 'ok',
+      })
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 80,
+        point_discount_amount: 80,
+        cash_amount: 0,
+        message: 'ok',
+      })
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 30,
+        point_discount_amount: 30,
+        cash_amount: 50,
+        message: 'ok',
+      });
+
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/Enter code/i), {
+      target: { value: 'CHRISTMAS2030' },
+    });
+    fireEvent.click(screen.getByText('APPLY'));
+    await waitFor(() =>
+      expect(screen.getByTestId('points-input')).toHaveValue(80),
+    );
+
+    fireEvent.change(screen.getByTestId('points-input'), {
+      target: { value: '30' },
+    });
+
+    await waitFor(() => {
+      expect(vouchersApi.calculateDiscount).toHaveBeenLastCalledWith({
+        voucher_code: 'CHRISTMAS2030',
+        product_id: 'prod-123',
+        quantity: 1,
+        points_to_use: 30,
+      });
+      expect(screen.getByText(/Points Applied \(30 pts\)/)).toBeInTheDocument();
+      expect(screen.getByTestId('total-amount')).toHaveTextContent('Rp 50');
+    });
+  });
+
+  it('shows an error for fractional points and does not submit them', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (pointsApi.getPointsProfile as any).mockResolvedValue({
+      tier: null,
+      lifetime_points: 5000,
+      balance_points: 5000,
+      next_tier: null,
+      point_to_currency_rate: 1,
+    });
+    (vouchersApi.calculateDiscount as any)
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 0,
+        point_discount_amount: 0,
+        cash_amount: 80,
+        message: 'ok',
+      })
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 80,
+        point_discount_amount: 80,
+        cash_amount: 0,
+        message: 'ok',
+      });
+
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/Enter code/i), {
+      target: { value: 'CHRISTMAS2030' },
+    });
+    fireEvent.click(screen.getByText('APPLY'));
+    await waitFor(() =>
+      expect(screen.getByTestId('points-input')).toHaveValue(80),
+    );
+
+    fireEvent.change(screen.getByTestId('points-input'), {
+      target: { value: '12.5' },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Points must be a non-negative integer/i),
+      ).toBeInTheDocument();
+    });
+    expect(purchaseApi.executePurchase).not.toHaveBeenCalled();
+  });
+
+  it('submits points_to_use with the purchase payload', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (pointsApi.getPointsProfile as any).mockResolvedValue({
+      tier: null,
+      lifetime_points: 5000,
+      balance_points: 5000,
+      next_tier: null,
+      point_to_currency_rate: 1,
+    });
+    (vouchersApi.calculateDiscount as any).mockResolvedValue({
+      isValid: true,
+      discountAmount: 20,
+      finalPrice: 80,
+      subtotal: 100,
+      voucher_discount_amount: 20,
+      points_used: 30,
+      point_discount_amount: 30,
+      cash_amount: 50,
+      message: 'ok',
+    });
+    (purchaseApi.executePurchase as any).mockResolvedValue({ success: true });
+
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/Enter code/i), {
+      target: { value: 'CHRISTMAS2030' },
+    });
+    fireEvent.click(screen.getByText('APPLY'));
+    await waitFor(() =>
+      expect(screen.getByTestId('points-input')).toHaveValue(80),
+    );
+
+    fireEvent.change(screen.getByTestId('points-input'), {
+      target: { value: '30' },
+    });
+    fireEvent.click(screen.getByText(/Complete Purchase/i));
+
+    await waitFor(() => {
+      expect(screen.getByText('Purchase Successful!')).toBeInTheDocument();
+    });
+    expect(purchaseApi.executePurchase).toHaveBeenCalledWith({
+      product_id: 'prod-123',
+      quantity: 1,
+      voucher_code: 'CHRISTMAS2030',
+      points_to_use: 30,
+    });
+  });
+
+  it('displays the cash remainder note for hybrid purchases', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (pointsApi.getPointsProfile as any).mockResolvedValue({
+      tier: null,
+      lifetime_points: 5000,
+      balance_points: 5000,
+      next_tier: null,
+      point_to_currency_rate: 1,
+    });
+    (vouchersApi.calculateDiscount as any)
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 0,
+        point_discount_amount: 0,
+        cash_amount: 80,
+        message: 'ok',
+      })
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 80,
+        point_discount_amount: 80,
+        cash_amount: 0,
+        message: 'ok',
+      })
+      .mockResolvedValueOnce({
+        isValid: true,
+        discountAmount: 20,
+        finalPrice: 80,
+        subtotal: 100,
+        voucher_discount_amount: 20,
+        points_used: 30,
+        point_discount_amount: 30,
+        cash_amount: 50,
+        message: 'ok',
+      });
+
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+
+    fireEvent.change(screen.getByPlaceholderText(/Enter code/i), {
+      target: { value: 'CHRISTMAS2030' },
+    });
+    fireEvent.click(screen.getByText('APPLY'));
+    await waitFor(() =>
+      expect(screen.getByTestId('points-input')).toHaveValue(80),
+    );
+
+    fireEvent.change(screen.getByTestId('points-input'), {
+      target: { value: '30' },
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Cash remainder Rp 50 will be recorded as pending/i),
+      ).toBeInTheDocument();
     });
   });
 });

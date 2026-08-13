@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, CreditCard, Info, ShoppingBag, Tag } from 'lucide-react';
+import {
+  ArrowLeft,
+  CreditCard,
+  Info,
+  ShoppingBag,
+  Sparkles,
+  Tag,
+} from 'lucide-react';
 import { getProductById } from '../api/products';
 import { executePurchase } from '../api/purchase';
 import { calculateDiscount, getClaimedVouchers } from '../api/vouchers';
@@ -56,10 +63,18 @@ export const CheckoutView: React.FC = () => {
   >('idle');
   const [txnMessage, setTxnMessage] = useState('');
   const [balancePoints, setBalancePoints] = useState(0);
+  const [pointRate, setPointRate] = useState(1);
+  const [pointsToUse, setPointsToUse] = useState(0);
+  const [pointsError, setPointsError] = useState<string | null>(null);
 
   useEffect(() => {
     getPointsProfile()
-      .then((p) => setBalancePoints(p.balance_points))
+      .then((p) => {
+        setBalancePoints(p.balance_points);
+        if (typeof p.point_to_currency_rate === 'number') {
+          setPointRate(p.point_to_currency_rate || 1);
+        }
+      })
       .catch(() => setBalancePoints(0));
   }, []);
 
@@ -84,24 +99,54 @@ export const CheckoutView: React.FC = () => {
     // Reset calculation if quantity changes OR voucher is manually changed without applying
     setCalculation(null);
     setVoucherError(null);
+    setPointsError(null);
   }, [quantity]);
 
-  const applyVoucherCode = async (code: string) => {
+  const applyVoucherCode = async (code: string, points = pointsToUse) => {
     if (!product) return;
     try {
       setCalculating(true);
       setVoucherError(null);
+      setPointsError(null);
       setCalculation(null);
       const result = await calculateDiscount({
         voucher_code: code,
         product_id: product.id,
         quantity,
+        points_to_use: points,
       });
       if (!result.isValid) {
         setVoucherError(result.message);
         setCalculation(null);
       } else {
         setCalculation(result);
+        // Default points to the maximum valid amount: min(balance, floor(after_voucher / rate))
+        const afterVoucher =
+          result.cash_amount !== undefined
+            ? result.cash_amount + (result.point_discount_amount || 0)
+            : result.finalPrice;
+        const maxPoints = Math.max(
+          0,
+          Math.min(
+            Math.floor(balancePoints),
+            Math.floor(afterVoucher / pointRate),
+          ),
+        );
+        if (maxPoints !== points) {
+          setPointsToUse(maxPoints);
+          const defaulted = await calculateDiscount({
+            voucher_code: code,
+            product_id: product.id,
+            quantity,
+            points_to_use: maxPoints,
+          });
+          if (defaulted.isValid) {
+            setCalculation(defaulted);
+            setPointsError(null);
+          }
+        } else {
+          setPointsToUse(points);
+        }
       }
     } catch (err: any) {
       setVoucherError(err.message || 'Failed to validate voucher');
@@ -111,9 +156,50 @@ export const CheckoutView: React.FC = () => {
     }
   };
 
+  const refreshPreview = async (points: number) => {
+    if (!product) return;
+    if (points < 0 || !Number.isInteger(points)) {
+      setPointsError('Points must be a non-negative integer');
+      return;
+    }
+    try {
+      setCalculating(true);
+      setPointsError(null);
+      const result = await calculateDiscount({
+        voucher_code: voucherCode,
+        product_id: product.id,
+        quantity,
+        points_to_use: points,
+      });
+      setCalculation(result);
+      if (!result.isValid) {
+        setVoucherError(result.message);
+        setCalculation(null);
+      }
+    } catch (err: any) {
+      setPointsError(err.message || 'Failed to recalculate');
+      setCalculation(null);
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  const handlePointsChange = (raw: string) => {
+    setPointsError(null);
+    const value = raw === '' ? 0 : Number(raw);
+    setPointsToUse(value);
+    if (value < 0 || !Number.isInteger(value)) {
+      setPointsError('Points must be a non-negative integer');
+      return;
+    }
+    if (isVoucherApplied) {
+      refreshPreview(value);
+    }
+  };
+
   const handleApplyVoucher = async () => {
     if (!product || !voucherCode) return;
-    await applyVoucherCode(voucherCode);
+    await applyVoucherCode(voucherCode, 0);
   };
 
   const fetchMyVouchers = async () => {
@@ -174,6 +260,7 @@ export const CheckoutView: React.FC = () => {
         product_id: product.id,
         quantity,
         voucher_code: voucherCode || undefined,
+        points_to_use: pointsToUse > 0 ? pointsToUse : undefined,
       });
       setTxnStatus('success');
       setTxnMessage(
@@ -214,9 +301,15 @@ export const CheckoutView: React.FC = () => {
 
   const subtotal = product.price * quantity;
   const discount = calculation?.discountAmount || 0;
-  const total = calculation?.finalPrice || subtotal;
+  const pointDiscount = calculation?.point_discount_amount || 0;
+  const pointsUsed = calculation?.points_used || 0;
+  const total =
+    calculation?.cash_amount !== undefined
+      ? calculation.cash_amount
+      : (calculation?.finalPrice ?? subtotal);
   const isVoucherApplied = !!calculation && calculation.isValid;
   const effectiveApplied = isVoucherApplied && discount > 0;
+  const pointsApplied = isVoucherApplied && pointDiscount > 0;
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] p-6 overflow-hidden flex items-center justify-center">
@@ -437,6 +530,70 @@ export const CheckoutView: React.FC = () => {
               </div>
             </div>
 
+            {/* Points Field */}
+            <div className="space-y-3">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">
+                Use Loyalty Points
+              </label>
+              <div className="relative group">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400">
+                  <Sparkles size={18} />
+                </span>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  placeholder="0"
+                  value={pointsToUse}
+                  onChange={(e) => handlePointsChange(e.target.value)}
+                  data-testid="points-input"
+                  className={`w-full pl-11 pr-24 py-4 rounded-2xl bg-black/20 border transition-all outline-none font-bold placeholder:text-slate-600 ${
+                    pointsError
+                      ? 'border-rose-500/50 text-rose-400 ring-2 ring-rose-500/10'
+                      : pointsApplied
+                        ? 'border-cyan-500/50 text-cyan-400 ring-2 ring-cyan-500/10'
+                        : 'border-white/10 focus:border-cyan-500/50 text-white'
+                  }`}
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-slate-500 font-bold uppercase">
+                  pts
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                <p className="text-[10px] text-slate-500">
+                  Balance: {balancePoints} pts · 1 pt ={' '}
+                  {formatCurrency(pointRate, currencySettings)}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePointsChange(String(0))}
+                    className="text-[10px] font-bold text-slate-400 hover:text-white transition-colors"
+                  >
+                    None
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handlePointsChange(String(Math.max(0, balancePoints)))
+                    }
+                    className="text-[10px] font-bold text-cyan-400 hover:text-white transition-colors"
+                  >
+                    Max
+                  </button>
+                </div>
+              </div>
+              {pointsError && (
+                <motion.div
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-[10px] text-rose-400 font-bold uppercase tracking-tight px-1"
+                >
+                  {pointsError}
+                </motion.div>
+              )}
+            </div>
+
             {/* Cost Breakdown */}
             <div className="space-y-4 pt-4 border-t border-white/5">
               <div className="flex justify-between text-slate-400">
@@ -463,6 +620,26 @@ export const CheckoutView: React.FC = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
+              <AnimatePresence>
+                {pointsApplied && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                    animate={{ height: 'auto', opacity: 1, marginTop: 16 }}
+                    exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex justify-between text-cyan-400 font-medium">
+                      <div className="flex items-center gap-2">
+                        <Sparkles size={14} />
+                        <span>Points Applied ({pointsUsed} pts)</span>
+                      </div>
+                      <span>
+                        -{formatCurrency(pointDiscount, currencySettings)}
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <div className="flex justify-between text-white font-black text-2xl pt-2">
                 <span>Total</span>
                 <span
@@ -480,6 +657,18 @@ export const CheckoutView: React.FC = () => {
                   <p className="text-xs text-cyan-400/80">
                     You will earn ~{Math.floor(total / 1000)} pts with this
                     purchase
+                  </p>
+                )}
+                {isVoucherApplied && total === 0 && (
+                  <p className="text-xs text-emerald-400/90">
+                    Fully covered by voucher &amp; points — order will be marked
+                    PAID.
+                  </p>
+                )}
+                {isVoucherApplied && total > 0 && (
+                  <p className="text-xs text-amber-400/80">
+                    Cash remainder {formatCurrency(total, currencySettings)}{' '}
+                    will be recorded as pending payment.
                   </p>
                 )}
               </div>
