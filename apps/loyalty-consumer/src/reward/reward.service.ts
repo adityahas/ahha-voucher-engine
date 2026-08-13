@@ -49,29 +49,21 @@ export class RewardService {
           throw new BadRequestException('User has no loyalty profile');
         }
 
+        const created = new Date(rewardItem.created_at || Date.now());
+        const exclusiveUntil = new Date(
+          created.getTime() + rewardItem.exclusive_days * 24 * 60 * 60 * 1000,
+        );
+        const inWindow =
+          rewardItem.exclusive_days > 0 && new Date() < exclusiveUntil;
+
         if (
           rewardItem.min_tier &&
+          inWindow &&
           (!user.tier || user.tier.level < rewardItem.min_tier.level)
         ) {
           throw new ForbiddenException(
-            `This reward requires tier ${rewardItem.min_tier.name}`,
+            `This reward is exclusive to tier ${rewardItem.min_tier.name} for now`,
           );
-        }
-
-        if (rewardItem.exclusive_days > 0 && rewardItem.min_tier) {
-          const created = new Date(rewardItem.created_at || Date.now());
-          const exclusiveUntil = new Date(
-            created.getTime() + rewardItem.exclusive_days * 24 * 60 * 60 * 1000,
-          );
-          const now = new Date();
-          if (
-            now < exclusiveUntil &&
-            (!user.tier || user.tier.level < rewardItem.min_tier.level)
-          ) {
-            throw new ForbiddenException(
-              `This reward is exclusive to tier ${rewardItem.min_tier.name} for now`,
-            );
-          }
         }
 
         if (

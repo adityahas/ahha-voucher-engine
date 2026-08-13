@@ -107,6 +107,7 @@ describe('RewardService', () => {
   it('rejects claim when user tier is below the required tier', async () => {
     rewardRepoMock.findOne.mockResolvedValue(
       makeReward({
+        exclusive_days: 30,
         min_tier: { id: 'g', name: 'Gold', level: 3 },
       }),
     );
@@ -119,6 +120,45 @@ describe('RewardService', () => {
     );
     expect(strategyMock.claim).not.toHaveBeenCalled();
     expect(pointServiceMock.spend).not.toHaveBeenCalled();
+  });
+
+  it('rejects below-tier user while the exclusive window is still open', async () => {
+    const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+    rewardRepoMock.findOne.mockResolvedValue(
+      makeReward({
+        exclusive_days: 30,
+        created_at: tenDaysAgo,
+        min_tier: { id: 'g', name: 'Gold', level: 3 },
+      }),
+    );
+    userRepoMock.findOne.mockResolvedValue(
+      makeUser({ tier: { id: 'b', name: 'Bronze', level: 1 } }),
+    );
+
+    await expect(service.claimReward('c1', 'r1')).rejects.toThrow(
+      'This reward is exclusive to tier Gold for now',
+    );
+    expect(strategyMock.claim).not.toHaveBeenCalled();
+    expect(pointServiceMock.spend).not.toHaveBeenCalled();
+  });
+
+  it('opens the reward to below-tier users once the exclusive window has elapsed', async () => {
+    const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
+    const rewardItem = makeReward({
+      exclusive_days: 30,
+      created_at: sixtyDaysAgo,
+      min_tier: { id: 'g', name: 'Gold', level: 3 },
+    });
+    rewardRepoMock.findOne.mockResolvedValue(rewardItem);
+    userRepoMock.findOne.mockResolvedValue(
+      makeUser({ tier: { id: 'b', name: 'Bronze', level: 1 } }),
+    );
+
+    const result = await service.claimReward('c1', 'r1');
+
+    expect(result.status).toBe('SUCCESS');
+    expect(strategyMock.claim).toHaveBeenCalledWith('c1', rewardItem);
+    expect(pointServiceMock.spend).toHaveBeenCalled();
   });
 
   it('claims successfully, decrements stock, and spends points', async () => {
