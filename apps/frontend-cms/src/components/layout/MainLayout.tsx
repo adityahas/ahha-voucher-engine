@@ -139,6 +139,19 @@ export const MainLayout: React.FC = () => {
               <span>Reward Management</span>
             </NavLink>
             <NavLink
+              to="/reward-sources"
+              className={({ isActive }) =>
+                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
+                }`
+              }
+            >
+              <Gift size={20} />
+              <span>Reward Sources</span>
+            </NavLink>
+            <NavLink
               to="/settings/currency"
               className={({ isActive }) =>
                 `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${

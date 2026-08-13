@@ -27,6 +27,9 @@ import TierEdit from '../pages/TierEdit';
 import RewardList from '../pages/RewardList';
 import RewardCreate from '../pages/RewardCreate';
 import RewardEdit from '../pages/RewardEdit';
+import RewardItemSourceList from '../pages/RewardItemSourceList';
+import RewardItemSourceCreate from '../pages/RewardItemSourceCreate';
+import RewardItemSourceEdit from '../pages/RewardItemSourceEdit';
 
 export const router = createBrowserRouter([
   {
@@ -143,6 +146,18 @@ export const router = createBrowserRouter([
       {
         path: '/rewards/:id/edit',
         element: <RewardEdit />,
+      },
+      {
+        path: '/reward-sources',
+        element: <RewardItemSourceList />,
+      },
+      {
+        path: '/reward-sources/create',
+        element: <RewardItemSourceCreate />,
+      },
+      {
+        path: '/reward-sources/:id/edit',
+        element: <RewardItemSourceEdit />,
       },
       // add more authenticated feature routes here
     ],

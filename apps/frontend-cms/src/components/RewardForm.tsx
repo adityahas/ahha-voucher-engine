@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { RewardInput } from '../api/rewards';
 import { getTiers, Tier } from '../api/tiers';
+import { getRewardSources, RewardItemSource } from '../api/reward-item-sources';
+import { Link } from 'react-router-dom';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { Save } from 'lucide-react';
@@ -15,6 +17,8 @@ export default function RewardForm({
   onSubmit: (input: RewardInput) => Promise<void>;
 }) {
   const [tiers, setTiers] = useState<Tier[]>([]);
+  const [sources, setSources] = useState<RewardItemSource[]>([]);
+  const [sourcesLoading, setSourcesLoading] = useState(true);
   const [minTierId, setMinTierId] = useState<string>(
     (initial as any)?.min_tier?.id ?? (initial as any)?.min_tier_id ?? '',
   );
@@ -31,6 +35,10 @@ export default function RewardForm({
     getTiers()
       .then(setTiers)
       .catch(() => setTiers([]));
+    getRewardSources()
+      .then(setSources)
+      .catch(() => setSources([]))
+      .finally(() => setSourcesLoading(false));
   }, []);
 
   const set = (key: keyof typeof form, value: any) =>
@@ -67,13 +75,39 @@ export default function RewardForm({
         required
         placeholder="e.g. gopay, pulsa"
       />
-      <Input
-        label="Source ID"
-        value={form.source_id}
-        onChange={(e) => set('source_id', e.target.value)}
-        required
-        placeholder="Reward source UUID"
-      />
+      <div className="space-y-1.5">
+        <label
+          htmlFor="source_id"
+          className="text-xs font-bold text-slate-300 uppercase tracking-wider ml-1"
+        >
+          Reward Source
+        </label>
+        {sourcesLoading ? (
+          <p className="text-sm text-slate-400">Loading reward sources...</p>
+        ) : sources.length ? (
+          <select
+            id="source_id"
+            value={form.source_id}
+            onChange={(e) => set('source_id', e.target.value)}
+            required
+            className="w-full h-12 rounded-xl bg-slate-900/50 border border-slate-700/50 px-4 text-sm text-slate-100"
+          >
+            <option value="">Select a reward source</option>
+            {sources.map((source) => (
+              <option key={source.id} value={source.id}>
+                {source.name} ({source.source_type})
+              </option>
+            ))}
+          </select>
+        ) : (
+          <Link
+            className="text-sm text-primary-400 hover:text-primary-300"
+            to="/reward-sources/create"
+          >
+            Create a reward source
+          </Link>
+        )}
+      </div>
       <Input
         label="Stock (-1 = unlimited, 0 = out)"
         type="number"
@@ -119,7 +153,12 @@ export default function RewardForm({
           ))}
         </select>
       </div>
-      <Button type="submit" icon={Save} iconRight>
+      <Button
+        type="submit"
+        icon={Save}
+        iconRight
+        disabled={!sourcesLoading && !form.source_id}
+      >
         Save
       </Button>
     </form>
