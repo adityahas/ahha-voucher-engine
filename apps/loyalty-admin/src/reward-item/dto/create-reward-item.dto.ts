@@ -17,10 +17,6 @@ export class CreateRewardItemDto {
   @IsOptional()
   description?: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  value: number;
-
   @IsString()
   @IsNotEmpty()
   type: string;

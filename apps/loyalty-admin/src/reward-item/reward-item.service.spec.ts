@@ -3,6 +3,8 @@ import { DataSource } from 'typeorm';
 import { RewardItemService } from './reward-item.service';
 import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
 import { LoyaltyTierEntity } from '@core/loyalty/tier/entities/loyalty-tier.entity';
+import { CreateRewardItemDto } from './dto/create-reward-item.dto';
+import { validate } from 'class-validator';
 
 describe('RewardItemService', () => {
   let service: RewardItemService;
@@ -112,6 +114,24 @@ describe('RewardItemService', () => {
       await service.remove('1');
       expect(mockRepository.delete).toHaveBeenCalledWith('1');
     });
+  });
+});
+
+describe('CreateRewardItemDto', () => {
+  it('accepts the point-priced reward payload without the obsolete value field', async () => {
+    const dto = Object.assign(new CreateRewardItemDto(), {
+      name: 'Gopay 10k',
+      type: 'gopay',
+      stock: -1,
+      source_id: '3e90601f-0cc9-4d1b-9f37-f7d2bf80d107',
+      point_price: 10,
+      exclusive_days: 10,
+      min_tier_id: '597ddd0c-0124-48fd-b110-d88fee791dee',
+    });
+
+    const errors = await validate(dto);
+
+    expect(errors).toHaveLength(0);
   });
 });
 
