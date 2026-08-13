@@ -1059,3 +1059,12 @@ Rules:
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+
+## Memory
+
+Persistent AI memory lives in the Obsidian vault at `~/ObsidianVault` (MOC: `~/ObsidianVault/index.md`), written via the Obsidian MCP server (`obsidian_*` tools). Use the `obsidian-memory` skill for the full save rules (PARA paths, frontmatter, dedup).
+
+- **Start of a session**: read `~/ObsidianVault/index.md`, then `obsidian_search_notes` for context relevant to this repo's work before doing anything.
+- **During a session**: when a durable fact emerges (people, companies, active projects, tech stack, decisions, preferences, lessons), save it via `obsidian-memory` (people → `Areas/people/`, companies → `Areas/companies/`, projects → `Projects/`, topics → `Resources/`).
+- **End of a significant session**: save a daily-note summary to `~/ObsidianVault/daily/YYYY-MM-DD.md` (append if it exists), covering what was done, decisions, blockers, next actions.
+- Always read a note before writing (dedup); never create duplicates. If Obsidian is unreachable, stage the memory at `/tmp/obsidian-memory-pending.md` and tell the user.
