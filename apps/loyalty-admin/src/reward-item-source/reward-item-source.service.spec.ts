@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
 import { RewardItemSourceService } from './reward-item-source.service';
 import { RewardItemSourceEntity } from '@core/loyalty/reward-item-source/entities/reward-item-source.entity';
+import { CreateRewardItemSourceDto } from './dto/create-reward-item-source.dto';
+import { validate } from 'class-validator';
 
 describe('RewardItemSourceService', () => {
   let service: RewardItemSourceService;
@@ -50,52 +52,108 @@ describe('RewardItemSourceService', () => {
   });
 
   describe('create', () => {
-    it('should create a reward item source', async () => {
-      const dto = { name: 'Test Source', point: 50 };
-      const created = { id: '1', ...dto };
+    it('normalizes a blank api key and masks the saved response', async () => {
+      const dto = { name: 'Test Source', source_type: 'synthetic', apiKey: '' };
+      const created = { id: '1', ...dto, apiKey: null };
       mockRepository.create.mockReturnValue(created);
       mockRepository.save.mockResolvedValue(created);
 
       const result = await service.create(dto as any);
-      expect(result).toEqual(created);
-      expect(mockRepository.create).toHaveBeenCalledWith(dto);
+      expect(result).toEqual({ ...created, apiKey: null });
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        ...dto,
+        apiKey: null,
+      });
       expect(mockRepository.save).toHaveBeenCalledWith(created);
+    });
+
+    it('masks a plaintext api key without mutating the saved entity', async () => {
+      const created = { id: '1', name: 'Test Source', apiKey: 'abc123456' };
+      mockRepository.create.mockReturnValue(created);
+      mockRepository.save.mockResolvedValue(created);
+
+      const result = await service.create({ name: 'Test Source' } as any);
+
+      expect(result.apiKey).toBe('abc***456');
+      expect(created.apiKey).toBe('abc123456');
     });
   });
 
   describe('findAll', () => {
     it('should return paginated reward item sources', async () => {
       const paginationDto = { page: 0, size: 10 };
-      mockQueryBuilder.getManyAndCount.mockResolvedValue([[{ id: '1' }], 1]);
+      mockQueryBuilder.getManyAndCount.mockResolvedValue([
+        [{ id: '1', apiKey: 'abcdef' }],
+        1,
+      ]);
 
       const result = await service.findAll(paginationDto as any);
       expect(result.data).toHaveLength(1);
       expect(result.pagination.total).toBe(1);
+      expect(result.data[0].apiKey).toBe('***');
     });
   });
 
   describe('findOne', () => {
     it('should return a reward item source by id', async () => {
-      mockRepository.findOne.mockResolvedValue({ id: '1', name: 'Test' });
+      mockRepository.findOne.mockResolvedValue({
+        id: '1',
+        name: 'Test',
+        apiKey: 'secret7',
+      });
       const result = await service.findOne('1');
-      expect(result).toBeDefined();
+      expect(result.apiKey).toBe('sec***et7');
     });
   });
 
   describe('update', () => {
     it('should update a reward item source', async () => {
       mockRepository.update.mockResolvedValue({ affected: 1 });
-      mockRepository.findOne.mockResolvedValue({ id: '1', name: 'Updated' });
+      mockRepository.findOne.mockResolvedValue({
+        id: '1',
+        name: 'Updated',
+        apiKey: 'secret7',
+      });
       const result = await service.update('1', { name: 'Updated' } as any);
-      expect(result).toBeDefined();
+      expect(result.apiKey).toBe('sec***et7');
+      expect(mockRepository.update).toHaveBeenCalledWith('1', {
+        name: 'Updated',
+      });
     });
   });
 
   describe('remove', () => {
     it('should remove a reward item source', async () => {
       mockRepository.delete.mockResolvedValue({ affected: 1 });
-      await service.remove(1);
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+      await service.remove('uuid-1');
+      expect(mockRepository.delete).toHaveBeenCalledWith('uuid-1');
     });
+  });
+});
+
+describe('CreateRewardItemSourceDto validation', () => {
+  const validateDto = (input: object) =>
+    validate(Object.assign(new CreateRewardItemSourceDto(), input));
+
+  it('accepts the required fields without apiKey', async () => {
+    await expect(
+      validateDto({ name: 'Synthetic', source_type: 'synthetic' }),
+    ).resolves.toHaveLength(0);
+  });
+
+  it('rejects invalid required fields and URLs', async () => {
+    await expect(
+      validateDto({ name: '', source_type: 'synthetic' }),
+    ).resolves.not.toHaveLength(0);
+    await expect(
+      validateDto({ name: 'Synthetic', source_type: '' }),
+    ).resolves.not.toHaveLength(0);
+    await expect(
+      validateDto({
+        name: 'Synthetic',
+        source_type: 'synthetic',
+        api_endpoint: 'not-a-url',
+      }),
+    ).resolves.not.toHaveLength(0);
   });
 });

@@ -44,6 +44,6 @@ export class RewardItemSourceController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.rewardItemSourceService.remove(+id);
+    return this.rewardItemSourceService.remove(id);
   }
 }

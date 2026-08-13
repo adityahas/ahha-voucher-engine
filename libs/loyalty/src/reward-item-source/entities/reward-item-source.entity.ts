@@ -11,9 +11,9 @@ export class RewardItemSourceEntity {
   @Column()
   source_type: string; // e.g. 'gopay', 'pulsa', 'kitabisa'
 
-  @Column()
-  api_endpoint: string;
+  @Column({ nullable: true })
+  api_endpoint: string | null;
 
-  @Column()
-  apiKey: string;
+  @Column({ nullable: true })
+  apiKey: string | null;
 }

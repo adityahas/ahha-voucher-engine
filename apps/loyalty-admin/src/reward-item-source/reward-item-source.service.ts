@@ -20,9 +20,11 @@ export class RewardItemSourceService {
     createRewardItemSourceDto: CreateRewardItemSourceDto,
   ): Promise<RewardItemSourceEntity> {
     const newRewardItemSource = this.rewardItemSourceRepository.create(
-      createRewardItemSourceDto,
+      this.normalizeInput(createRewardItemSourceDto),
     );
-    return this.rewardItemSourceRepository.save(newRewardItemSource);
+    const saved =
+      await this.rewardItemSourceRepository.save(newRewardItemSource);
+    return this.maskEntity(saved);
   }
 
   async findAll(
@@ -52,7 +54,7 @@ export class RewardItemSourceService {
     return {
       code: 'SUCCESS',
       message: 'Reward item sources retrieved successfully',
-      data,
+      data: data.map((item) => this.maskEntity(item)),
       pagination: {
         page,
         size,
@@ -62,18 +64,48 @@ export class RewardItemSourceService {
   }
 
   async findOne(id: string): Promise<RewardItemSourceEntity> {
-    return this.rewardItemSourceRepository.findOne({ where: { id } });
+    const entity = await this.rewardItemSourceRepository.findOne({
+      where: { id },
+    });
+    return entity && this.maskEntity(entity);
   }
 
   async update(
     id: string,
     updateRewardItemSourceDto: UpdateRewardItemSourceDto,
   ): Promise<RewardItemSourceEntity> {
-    await this.rewardItemSourceRepository.update(id, updateRewardItemSourceDto);
-    return this.rewardItemSourceRepository.findOne({ where: { id } });
+    await this.rewardItemSourceRepository.update(
+      id,
+      this.normalizeInput(updateRewardItemSourceDto),
+    );
+    const entity = await this.rewardItemSourceRepository.findOne({
+      where: { id },
+    });
+    return entity && this.maskEntity(entity);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     await this.rewardItemSourceRepository.delete(id);
+  }
+
+  private normalizeInput(
+    input: CreateRewardItemSourceDto | UpdateRewardItemSourceDto,
+  ) {
+    return {
+      ...input,
+      ...(Object.prototype.hasOwnProperty.call(input, 'apiKey') && {
+        apiKey: input.apiKey?.trim() || null,
+      }),
+    };
+  }
+
+  private maskEntity(entity: RewardItemSourceEntity): RewardItemSourceEntity {
+    return { ...entity, apiKey: this.maskApiKey(entity.apiKey) };
+  }
+
+  private maskApiKey(value: string | null): string | null {
+    if (!value) return null;
+    if (value.length <= 6) return '***';
+    return `${value.slice(0, 3)}***${value.slice(-3)}`;
   }
 }

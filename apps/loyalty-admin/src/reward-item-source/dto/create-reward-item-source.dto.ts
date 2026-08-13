@@ -6,10 +6,14 @@ export class CreateRewardItemSourceDto {
   name: string;
 
   @IsString()
-  @IsOptional()
-  description?: string;
+  @IsNotEmpty()
+  source_type: string;
 
   @IsUrl()
   @IsOptional()
-  url?: string;
+  api_endpoint?: string;
+
+  @IsString()
+  @IsOptional()
+  apiKey?: string;
 }
