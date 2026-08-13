@@ -26,6 +26,15 @@ export class ConsumerProductPurchaseDto {
   voucher_code?: string;
 
   @ApiPropertyOptional({
+    description: 'Optional loyalty points to use',
+    minimum: 0,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  points_to_use?: number;
+
+  @ApiPropertyOptional({
     description: 'Preferred payment method',
     default: 'MANUAL_TRANSFER',
   })

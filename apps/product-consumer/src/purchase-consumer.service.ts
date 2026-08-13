@@ -32,6 +32,9 @@ export class PurchaseConsumerService {
       product_id: dto.product_id,
       quantity: dto.quantity,
       ...(dto.voucher_code && { voucher_code: dto.voucher_code }),
+      ...(dto.points_to_use !== undefined && {
+        points_to_use: dto.points_to_use,
+      }),
     };
 
     try {

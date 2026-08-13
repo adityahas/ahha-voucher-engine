@@ -1,31 +1,27 @@
 # Task 3 Report
 
-Status: Implemented.
+## Status
 
-Commit: `feat(cms): add reward source CRUD pages` (created after this report).
+BLOCKED: runtime response did not match the brief's exact HTTP status and deterministic code.
 
-Files:
+## Commands and Results
 
-- `apps/frontend-cms/src/components/RewardItemSourceForm.tsx`
-- `apps/frontend-cms/src/pages/RewardItemSourceList.tsx`
-- `apps/frontend-cms/src/pages/RewardItemSourceCreate.tsx`
-- `apps/frontend-cms/src/pages/RewardItemSourceEdit.tsx`
-- `apps/frontend-cms/src/components/RewardItemSourceForm.spec.tsx`
-- `apps/frontend-cms/src/pages/RewardItemSourceList.spec.tsx`
+- `yarn nest build loyalty-consumer`: PASS, exit 0.
+- `docker compose -f docker-compose.dev.yml up -d --build loyalty-consumer`: PASS. The existing Docker Compose loyalty-consumer service was rebuilt and restarted on port 9005.
+- Login request using `POST http://localhost:8080/user/login`, `x-api-key: client1-api-key`, `x-tenant-override: client1`, `user@client1.com` / `user123`: PASS, HTTP 201. The returned consumer user ID was `fc19febd-dff7-446d-a7dd-410f190338ae`.
+- Claim request using `POST http://localhost:8080/loyalty/rewards/claim/1b4262af-63a8-498d-a5b4-3fa20ce88fa7` with the authenticated token and `x-api-key: client1-api-key`: HTTP 201, body:
 
-Commands/results:
+  ```json
+  {"status":"SUCCESS","code":"SYNTHETIC-1b4262af-63a8-498d-a5b4-3fa20ce88fa7-fc19febd-dff7-446d-a7dd-410f190338ae"}
+  ```
 
-- Focused red test run: failed with expected missing-module errors before implementation.
-- `cd apps/frontend-cms && npx vitest run src/components/RewardItemSourceForm.spec.tsx src/pages/RewardItemSourceList.spec.tsx`: PASS, 2 files and 4 tests.
-- `cd apps/frontend-cms && npx tsc --noEmit`: PASS.
-- `graphify update .`: completed; reported pre-existing empty `extensions.json` and `skills-lock.json` graph warnings.
-- Review coverage follow-up: added focused assertions for optional endpoint, create/edit submission, masked edit API key omission, form/list API errors, key show/hide, cancelled delete, successful delete refresh, and failed delete row preservation.
-- `cd apps/frontend-cms && npx vitest run src/components/RewardItemSourceForm.spec.tsx src/pages/RewardItemSourceList.spec.tsx src/pages/RewardItemSourcePages.spec.tsx`: PASS, 3 files and 12 tests.
-- `cd apps/frontend-cms && npx tsc --noEmit`: PASS.
-- `graphify update .`: completed; same pre-existing empty `extensions.json` and `skills-lock.json` graph warnings.
+- Expected by brief: HTTP 200 and `SYNTHETIC-1b4262af-63a8-498d-a5b4-3fa20ce88fa7-fc19febd-dff7-446d-a7dd-401f190338ae`. Actual status was 201 and the seeded user ID ends in `410f`, not `401f`.
+- `docker compose -f docker-compose.dev.yml logs --no-color --since=10m loyalty-consumer | rg -i 'example\\.com/rewards|provider|synthetic|claim|error|exception'`: PASS. No `example.com/rewards` or provider-call evidence appeared; startup mapped the claim route and showed no error/exception.
+- `yarn test --runInBand apps/loyalty-consumer/src/reward`: PASS, 3 suites and 18 tests.
+- `yarn nest build loyalty-consumer`: PASS, exit 0.
+- `git diff --check`: PASS, no whitespace errors.
+- `git status --short`: no source-file changes from Task 3; pre-existing worktree changes remain untouched.
 
-Concerns:
+## Conclusion
 
-- Routes remain intentionally unchanged for Task 4.
-- Existing unrelated CMS baseline failures were not run or modified.
-- The API client exposes `apiKey` in detail/list responses, but edit forms intentionally leave the editable key blank and only submit a replacement.
+The synthetic strategy was loaded and returned locally without an external provider call. Final tests, build, and whitespace checks passed. The runtime acceptance check remains unresolved because the supplied expected HTTP 200 and exact code do not match the current endpoint behavior and seeded consumer ID.

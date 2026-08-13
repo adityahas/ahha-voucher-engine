@@ -26,6 +26,7 @@ export interface CalculateDiscountRequest {
   voucher_code: string;
   product_id: string;
   quantity: number;
+  points_to_use?: number;
 }
 
 export interface CalculateDiscountResponse {
@@ -33,6 +34,11 @@ export interface CalculateDiscountResponse {
   discountAmount: number;
   finalPrice: number;
   message: string;
+  subtotal?: number;
+  voucher_discount_amount?: number;
+  points_used?: number;
+  point_discount_amount?: number;
+  cash_amount?: number;
 }
 
 export interface VoucherBinding {

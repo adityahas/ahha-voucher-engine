@@ -24,6 +24,7 @@ export interface PointsProfile {
     level: number;
     min_points: number;
   } | null;
+  point_to_currency_rate?: number;
 }
 
 export const getPointsProfile = async (): Promise<PointsProfile> => {

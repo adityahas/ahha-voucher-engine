@@ -4,6 +4,7 @@ export interface CreatePurchaseDto {
   product_id: string;
   quantity: number;
   voucher_code?: string;
+  points_to_use?: number;
 }
 
 export const executePurchase = async (dto: CreatePurchaseDto): Promise<any> => {
