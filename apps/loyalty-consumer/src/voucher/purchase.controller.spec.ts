@@ -3,6 +3,8 @@ import { DataSource } from 'typeorm';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ProductEntity } from '@core/product/entities/product.entity';
+import { OrderEntity } from '@core/product/entities/order.entity';
+import { TierChangeReason } from '@core/loyalty/point/entities/tier-history.entity';
 
 describe('PurchaseController', () => {
   let controller: PurchaseController;
@@ -14,29 +16,32 @@ describe('PurchaseController', () => {
     is_active: true,
   };
 
-  const mockOrder = {
-    id: 'order-id',
-    total_price: 1000,
-  };
-
   const mockUserRepo = {
     findOne: jest.fn().mockResolvedValue(null),
     create: jest.fn((partial: any) => ({ ...partial })),
     save: jest.fn((user: any) => Promise.resolve(user)),
   };
 
+  const mockOrderRepo = {
+    create: jest.fn((partial: any) => ({ ...partial })),
+    save: jest.fn((order: any) =>
+      Promise.resolve({ ...order, id: 'order-id' }),
+    ),
+  };
+
   const mockEntityManager = {
     findOne: jest.fn().mockResolvedValue(mockProduct),
-    getRepository: jest.fn().mockReturnValue(mockUserRepo),
+    getRepository: jest.fn().mockImplementation((entity: any) => {
+      if (entity === OrderEntity) {
+        return mockOrderRepo;
+      }
+      return mockUserRepo;
+    }),
   };
 
   const mockVoucherService = {
     useVoucher: jest.fn(),
     validateAndCalculateDiscount: jest.fn(),
-  };
-
-  const mockOrderService = {
-    create: jest.fn().mockResolvedValue(mockOrder),
   };
 
   const mockTierService = {
@@ -65,9 +70,11 @@ describe('PurchaseController', () => {
     jest.clearAllMocks();
     mockEntityManager.findOne.mockResolvedValue(mockProduct);
     mockUserRepo.findOne.mockResolvedValue(null);
+    mockTierService.getMultiplierFor.mockResolvedValue(1);
+    mockTierService.findLowestActiveTier.mockResolvedValue(null);
+    mockTierService.findHighestTierAtOrBelow.mockResolvedValue(null);
     controller = new PurchaseController(
       mockVoucherService as any,
-      mockOrderService as any,
       mockDataSource as unknown as DataSource,
       mockTierService as any,
       mockPointService as any,
@@ -112,7 +119,7 @@ describe('PurchaseController', () => {
         'VOU-10',
         mockEntityManager,
       );
-      expect(mockOrderService.create).toHaveBeenCalled();
+      expect(mockOrderRepo.save).toHaveBeenCalled();
       expect(mockPointService.earn).toHaveBeenCalledWith(
         expect.anything(),
         0.9,
@@ -133,7 +140,7 @@ describe('PurchaseController', () => {
 
       // Assert
       expect(mockVoucherService.useVoucher).not.toHaveBeenCalled();
-      expect(mockOrderService.create).toHaveBeenCalled();
+      expect(mockOrderRepo.save).toHaveBeenCalled();
       expect(result.points_earned).toBe(1);
       expect(result.tier).toBeNull();
     });
@@ -160,7 +167,7 @@ describe('PurchaseController', () => {
         new BadRequestException('Voucher quota exhausted'),
       );
       expect(mockVoucherService.useVoucher).not.toHaveBeenCalled();
-      expect(mockOrderService.create).not.toHaveBeenCalled();
+      expect(mockOrderRepo.save).not.toHaveBeenCalled();
     });
 
     it('persists the complete price breakdown for a discounted purchase', async () => {
@@ -172,7 +179,7 @@ describe('PurchaseController', () => {
 
       await controller.purchase(mockReq, { ...purchaseDto, quantity: 2 });
 
-      expect(mockOrderService.create).toHaveBeenCalledWith({
+      expect(mockOrderRepo.save).toHaveBeenCalledWith({
         user_id: 'user-id',
         product_id: 'prod-id',
         quantity: 2,
@@ -192,7 +199,128 @@ describe('PurchaseController', () => {
           voucher_code: undefined,
         }),
       ).rejects.toThrow(NotFoundException);
-      expect(mockOrderService.create).not.toHaveBeenCalled();
+      expect(mockOrderRepo.save).not.toHaveBeenCalled();
+    });
+
+    it('stacks tier discount and tier multiplier into order and points', async () => {
+      const goldTier = {
+        id: 'g',
+        name: 'Gold',
+        extra_discount_percent: 10,
+      };
+      const goldUser = {
+        core_user_id: 'user-id',
+        lifetime_points: 500,
+        balance_points: 0,
+        tier: goldTier,
+      };
+      mockUserRepo.findOne.mockResolvedValue(goldUser);
+      mockTierService.getMultiplierFor.mockResolvedValue(2);
+
+      const result = await controller.purchase(mockReq, {
+        ...purchaseDto,
+        voucher_code: undefined,
+      });
+
+      expect(mockOrderRepo.save).toHaveBeenCalledWith({
+        user_id: 'user-id',
+        product_id: 'prod-id',
+        quantity: 1,
+        subtotal: 1000,
+        discount_amount: 100,
+        total_price: 900,
+        voucher_code: null,
+      });
+      expect(mockPointService.earn).toHaveBeenCalledWith(
+        goldUser,
+        1.8,
+        'ORDER',
+        'order-id',
+        mockEntityManager,
+      );
+      expect(result.points_earned).toBe(1.8);
+      expect(result.tier).toEqual({ id: 'g', name: 'Gold' });
+    });
+
+    it('caps the combined voucher + tier discount at max_combined_discount_percent', async () => {
+      const goldTier = {
+        id: 'g',
+        name: 'Gold',
+        extra_discount_percent: 10,
+      };
+      const goldUser = {
+        core_user_id: 'user-id',
+        lifetime_points: 500,
+        balance_points: 0,
+        tier: goldTier,
+      };
+      mockUserRepo.findOne.mockResolvedValue(goldUser);
+      mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
+        isValid: true,
+        discountAmount: 450,
+        finalPrice: 550,
+      });
+
+      const result = await controller.purchase(mockReq, purchaseDto);
+
+      expect(mockOrderRepo.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subtotal: 1000,
+          discount_amount: 500,
+          total_price: 500,
+        }),
+      );
+      expect(result.discount_amount).toBe(500);
+      expect(result.total_price).toBe(500);
+      expect(mockPointService.earn).toHaveBeenCalledWith(
+        goldUser,
+        0.5,
+        'ORDER',
+        'order-id',
+        mockEntityManager,
+      );
+      expect(result.points_earned).toBe(0.5);
+    });
+
+    it('levels the user up when earned points cross the next tier threshold', async () => {
+      const bronzeTier = {
+        id: 'b',
+        name: 'Bronze',
+        extra_discount_percent: 0,
+      };
+      const silverTier = {
+        id: 's',
+        name: 'Silver',
+        min_points: 1000,
+      };
+      const bronzeUser = {
+        core_user_id: 'user-id',
+        lifetime_points: 400,
+        balance_points: 400,
+        tier: bronzeTier,
+      };
+      mockUserRepo.findOne.mockResolvedValue(bronzeUser);
+      mockTierService.findHighestTierAtOrBelow.mockResolvedValue(silverTier);
+
+      const result = await controller.purchase(mockReq, {
+        ...purchaseDto,
+        voucher_code: undefined,
+      });
+
+      const savedUser =
+        mockUserRepo.save.mock.calls[
+          mockUserRepo.save.mock.calls.length - 1
+        ][0];
+      expect(mockUserRepo.save).toHaveBeenCalledTimes(1);
+      expect(savedUser.tier).toEqual(silverTier);
+      expect(mockPointService.recordTierChange).toHaveBeenCalledWith(
+        bronzeUser,
+        bronzeTier,
+        silverTier,
+        TierChangeReason.POINTS_THRESHOLD,
+        mockEntityManager,
+      );
+      expect(result.points_earned).toBe(1);
     });
   });
 });

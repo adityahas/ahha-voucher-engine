@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { ConsumerJwtGuard } from '@core/auth/guards/consumer-jwt.guard';
 import { VoucherService } from './voucher.service';
-import { OrderService } from '@core/product/order.service';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { DataSource, EntityManager } from 'typeorm';
 import { ProductEntity } from '@core/product/entities/product.entity';
+import { OrderEntity } from '@core/product/entities/order.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { LoyaltyTierEntity } from '@core/loyalty/tier/entities/loyalty-tier.entity';
 import { TierService } from '@core/loyalty/tier/tier.service';
@@ -27,7 +27,6 @@ import { computeTierDiscountAndPoints } from './discount-points.util';
 export class PurchaseController {
   constructor(
     @Inject('VOUCHER_SERVICE') private readonly voucherService: VoucherService,
-    private readonly orderService: OrderService,
     @Inject('LOYALTY_CONSUMER_CONNECTION')
     private readonly dataSource: DataSource,
     private readonly tierService: TierService,
@@ -116,15 +115,17 @@ export class PurchaseController {
         multiplier,
       });
 
-      const order = await this.orderService.create({
-        user_id: userId,
-        product_id: product.id,
-        quantity: dto.quantity,
-        subtotal: Number(subtotal),
-        discount_amount: Number(calc.combined_discount),
-        total_price: Number(calc.final_price),
-        voucher_code: dto.voucher_code || null,
-      });
+      const order = await manager.getRepository(OrderEntity).save(
+        manager.getRepository(OrderEntity).create({
+          user_id: userId,
+          product_id: product.id,
+          quantity: dto.quantity,
+          subtotal: Number(subtotal),
+          discount_amount: Number(calc.combined_discount),
+          total_price: Number(calc.final_price),
+          voucher_code: dto.voucher_code || null,
+        }),
+      );
 
       const pointsEarned = calc.points_earned;
       if (pointsEarned > 0) {
