@@ -53,11 +53,12 @@ export class PurchaseController {
       const subtotal = Number(product.price) * dto.quantity;
       let voucherDiscount = 0;
 
+      const productWithCategories = await manager.findOne(ProductEntity, {
+        where: { id: dto.product_id },
+        relations: ['categories'],
+      });
+
       if (dto.voucher_code) {
-        const productWithCategories = await manager.findOne(ProductEntity, {
-          where: { id: dto.product_id },
-          relations: ['categories'],
-        });
         const categoryNames =
           productWithCategories?.categories?.map((c) => c.name) || [];
         const calculation =
@@ -95,10 +96,6 @@ export class PurchaseController {
       const settings =
         await this.settingsService.getLoyaltySettings(databaseName);
 
-      const productWithCategories = await manager.findOne(ProductEntity, {
-        where: { id: dto.product_id },
-        relations: ['categories'],
-      });
       const categoryNames =
         productWithCategories?.categories?.map((c) => c.name) || [];
 

@@ -14,8 +14,9 @@ export const getRewards = async () => {
       ...(apiKey ? { 'x-api-key': apiKey } : {}),
     },
   });
-  if (!response.ok) throw new Error('Failed to fetch rewards');
-  return response.json();
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Failed to fetch rewards');
+  return data;
 };
 
 export const claimReward = async (rewardId: string) => {

@@ -46,6 +46,8 @@ export class RewardItemService {
       queryBuilder.orderBy(`rewardItem.${sort}`, order);
     }
     const [data, total] = await queryBuilder
+      .leftJoinAndSelect('rewardItem.source', 'source')
+      .leftJoinAndSelect('rewardItem.min_tier', 'min_tier')
       .skip(skip)
       .take(size)
       .getManyAndCount();

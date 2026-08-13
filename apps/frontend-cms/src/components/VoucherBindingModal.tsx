@@ -35,10 +35,11 @@ export const VoucherBindingModal: React.FC<VoucherBindingModalProps> = ({
   const [tiers, setTiers] = useState<Tier[]>([]);
 
   useEffect(() => {
+    if (!isOpen) return;
     getTiers()
       .then(setTiers)
       .catch(() => setTiers([]));
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {

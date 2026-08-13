@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { VoucherService } from './voucher.service';
 import { VoucherController } from './voucher.controller';
 import { PurchaseController } from './purchase.controller';
-import { OrderService } from '@core/product/order.service';
 import { TierService } from '@core/loyalty/tier/tier.service';
 import { PointService } from '@core/loyalty/point/point.service';
 import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
@@ -23,12 +22,6 @@ import { AuthModule } from '@core/auth';
     TierService,
     PointService,
     ClientSettingsService,
-    {
-      provide: OrderService,
-      scope: Scope.REQUEST,
-      useFactory: (dataSource: DataSource) => new OrderService(dataSource),
-      inject: ['LOYALTY_CONSUMER_CONNECTION'],
-    },
     {
       provide: 'VOUCHER_SERVICE',
       scope: Scope.REQUEST,

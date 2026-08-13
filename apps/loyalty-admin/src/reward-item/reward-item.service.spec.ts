@@ -9,6 +9,7 @@ describe('RewardItemService', () => {
   const mockQueryBuilder = {
     where: jest.fn().mockReturnThis(),
     orderBy: jest.fn().mockReturnThis(),
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
     getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
@@ -73,6 +74,14 @@ describe('RewardItemService', () => {
       const result = await service.findAll(paginationDto as any);
       expect(result.data).toHaveLength(1);
       expect(result.pagination.total).toBe(1);
+      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+        'rewardItem.source',
+        'source',
+      );
+      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+        'rewardItem.min_tier',
+        'min_tier',
+      );
     });
   });
 

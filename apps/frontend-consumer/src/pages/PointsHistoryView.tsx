@@ -6,7 +6,9 @@ export default function PointsHistoryView() {
   const [entries, setEntries] = useState<any[]>([]);
 
   useEffect(() => {
-    getPointsHistory().then((r) => setEntries(r.data ?? []));
+    getPointsHistory()
+      .then((r) => setEntries(r.data ?? []))
+      .catch(() => setEntries([]));
   }, []);
 
   return (

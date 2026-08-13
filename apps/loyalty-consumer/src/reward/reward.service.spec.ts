@@ -77,7 +77,6 @@ describe('RewardService', () => {
     const user = makeUser({ balance_points: 100 });
     rewardRepoMock.findOne.mockResolvedValue(rewardItem);
     userRepoMock.findOne.mockResolvedValue(user);
-    pointServiceMock.spend.mockRejectedValue(new Error('Insufficient points'));
 
     await expect(service.claimReward('c1', 'r1')).rejects.toThrow(
       'Insufficient points',
@@ -217,6 +216,19 @@ describe('RewardService', () => {
       new BadRequestException('Provider rejected'),
     );
     expect(pointServiceMock.spend).not.toHaveBeenCalled();
+  });
+
+  it('rolls back when spending points fails after a successful claim', async () => {
+    const rewardItem = makeReward();
+    rewardRepoMock.findOne.mockResolvedValue(rewardItem);
+    userRepoMock.findOne.mockResolvedValue(makeUser());
+    pointServiceMock.spend.mockRejectedValue(new Error('Ledger write failed'));
+
+    await expect(service.claimReward('c1', 'r1')).rejects.toThrow(
+      'Ledger write failed',
+    );
+    expect(strategyMock.claim).toHaveBeenCalled();
+    expect(pointServiceMock.spend).toHaveBeenCalled();
   });
 
   it('returns claim result code on success', async () => {

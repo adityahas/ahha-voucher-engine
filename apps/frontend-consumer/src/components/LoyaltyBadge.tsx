@@ -6,11 +6,14 @@ export default function LoyaltyBadge({ profile }: { profile: PointsProfile }) {
   const currentMin = tier ? Number(tier.min_points) || 0 : 0;
   const progress =
     next && next.min_points > currentMin
-      ? Math.min(
-          100,
-          ((profile.lifetime_points - currentMin) /
-            (next.min_points - currentMin)) *
+      ? Math.max(
+          0,
+          Math.min(
             100,
+            ((profile.lifetime_points - currentMin) /
+              (next.min_points - currentMin)) *
+              100,
+          ),
         )
       : 100;
 

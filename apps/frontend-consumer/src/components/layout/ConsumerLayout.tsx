@@ -156,7 +156,7 @@ export function ConsumerLayout({ children }: ConsumerLayoutProps) {
             className={({ isActive }) =>
               `flex flex-col items-center justify-center w-full py-2 gap-1 rounded-xl transition-all ${
                 isActive
-                  ? 'text-emerald-400 bg-emerald-500/10'
+                  ? 'text-amber-400 bg-amber-500/10'
                   : 'text-slate-400 hover:text-slate-300 hover:bg-white/5'
               }`
             }

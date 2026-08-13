@@ -3,16 +3,35 @@ import { useNavigate, useParams } from 'react-router-dom';
 import RewardForm from '../components/RewardForm';
 import { getReward, updateReward } from '../api/rewards';
 import { Button } from '../components/ui/Button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function RewardEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [initial, setInitial] = useState<any>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id) getReward(id).then((r) => setInitial(r));
+    if (id)
+      getReward(id)
+        .then((r) => setInitial(r))
+        .catch((err: any) => setError(err.message || 'Failed to load reward'));
   }, [id]);
+
+  if (error)
+    return (
+      <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-500">
+        <div className="max-w-md p-6 rounded-2xl bg-red-500/5 border border-red-500/20 text-center">
+          <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-red-200 mb-2">
+            Failed to Load Reward
+          </h3>
+          <p className="text-sm text-red-400/80 leading-relaxed font-medium">
+            {error}
+          </p>
+        </div>
+      </div>
+    );
 
   if (!initial)
     return (

@@ -295,11 +295,15 @@ describe('PurchaseController', () => {
       };
       const bronzeUser = {
         core_user_id: 'user-id',
-        lifetime_points: 400,
-        balance_points: 400,
+        lifetime_points: 999,
+        balance_points: 999,
         tier: bronzeTier,
       };
       mockUserRepo.findOne.mockResolvedValue(bronzeUser);
+      mockPointService.earn.mockImplementation((user: any) => {
+        user.lifetime_points = (Number(user.lifetime_points) || 0) + 1;
+        return Promise.resolve(0);
+      });
       mockTierService.findHighestTierAtOrBelow.mockResolvedValue(silverTier);
 
       const result = await controller.purchase(mockReq, {

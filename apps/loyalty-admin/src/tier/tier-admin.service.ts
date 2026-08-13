@@ -14,6 +14,7 @@ const SORTABLE_COLUMNS = new Set([
   'min_points',
   'point_multiplier',
   'extra_discount_percent',
+  'exclusive_window_hours',
   'is_active',
   'created_at',
   'updated_at',
