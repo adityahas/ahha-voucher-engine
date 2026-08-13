@@ -22,6 +22,7 @@ import { LoyaltyConsumerController } from './loyalty-consumer.controller';
 import { LoyaltyConsumerService } from './loyalty-consumer.service';
 import { VoucherModule } from './voucher/voucher.module';
 import { RewardModule } from './reward/reward.module';
+import { PointsModule } from './points/points.module';
 import { HealthController } from '@core/base';
 
 dotenv.config();
@@ -50,6 +51,7 @@ dotenv.config();
     AuthModule,
     VoucherModule,
     RewardModule,
+    PointsModule,
   ],
   providers: [
     JwtStrategy,
