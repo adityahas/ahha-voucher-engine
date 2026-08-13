@@ -78,6 +78,7 @@ dotenv.config();
         return await databaseService.getConnection(
           databaseName,
           __dirname + '/../../../**/*.entity{.ts,.js}',
+          __dirname + '/migrations/*{.ts,.js}',
         );
       },
       inject: [REQUEST, DatabaseService],

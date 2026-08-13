@@ -12,11 +12,11 @@ describe('RewardItemSourceApiKeyNullable20260813', () => {
 
     expect(query).toHaveBeenNthCalledWith(
       1,
-      'ALTER TABLE reward_item_sources ALTER COLUMN "apiKey" DROP NOT NULL',
+      'ALTER TABLE reward_item_sources ALTER COLUMN "api_key" DROP NOT NULL',
     );
     expect(query).toHaveBeenNthCalledWith(
       2,
-      'ALTER TABLE reward_item_sources ALTER COLUMN "apiKey" SET NOT NULL',
+      'ALTER TABLE reward_item_sources ALTER COLUMN "api_key" SET NOT NULL',
     );
   });
 });

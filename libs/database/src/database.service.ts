@@ -34,6 +34,9 @@ export class DatabaseService {
     }
 
     entityPath.push(__dirname + '/**/*.entity{.ts,.js}');
+    const migrationPath = entityPath.filter((path) =>
+      path.includes('/migrations/'),
+    );
 
     if (!this._dataSources.has(databaseName)) {
       await this.createConnection(databaseName, (client, password) => {
@@ -45,7 +48,9 @@ export class DatabaseService {
           password: password,
           database: client.database_name,
           namingStrategy: new SnakeNamingStrategy(),
-          entities: entityPath,
+          entities: entityPath.filter((path) => !path.includes('/migrations/')),
+          migrations: migrationPath,
+          migrationsRun: migrationPath.length > 0,
           synchronize: process.env.DB_SYNC === 'true',
         });
       });

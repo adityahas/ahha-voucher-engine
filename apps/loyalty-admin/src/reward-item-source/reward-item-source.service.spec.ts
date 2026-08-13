@@ -4,6 +4,7 @@ import { RewardItemSourceService } from './reward-item-source.service';
 import { RewardItemSourceEntity } from '@core/loyalty/reward-item-source/entities/reward-item-source.entity';
 import { CreateRewardItemSourceDto } from './dto/create-reward-item-source.dto';
 import { validate } from 'class-validator';
+import { ValidationPipe } from '@nestjs/common';
 
 describe('RewardItemSourceService', () => {
   let service: RewardItemSourceService;
@@ -76,6 +77,21 @@ describe('RewardItemSourceService', () => {
 
       expect(result.apiKey).toBe('abc***456');
       expect(created.apiKey).toBe('abc123456');
+    });
+
+    it.each([
+      [null, null],
+      ['', null],
+      ['123456', '***'],
+      ['1234567', '123***567'],
+    ])('masks api key boundary %j', async (apiKey, masked) => {
+      const created = { id: '1', name: 'Test Source', apiKey };
+      mockRepository.create.mockReturnValue(created);
+      mockRepository.save.mockResolvedValue(created);
+
+      const result = await service.create({ name: 'Test Source' } as any);
+
+      expect(result.apiKey).toBe(masked);
     });
   });
 
@@ -155,5 +171,17 @@ describe('CreateRewardItemSourceDto validation', () => {
         api_endpoint: 'not-a-url',
       }),
     ).resolves.not.toHaveLength(0);
+  });
+
+  it('accepts the fields used by the runtime validation pipe', async () => {
+    const pipe = new ValidationPipe({
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const value = await pipe.transform(
+      { name: 'Synthetic', source_type: 'synthetic', apiKey: 'secret' },
+      { type: 'body', metatype: CreateRewardItemSourceDto },
+    );
+    expect(value).toBeInstanceOf(CreateRewardItemSourceDto);
   });
 });
