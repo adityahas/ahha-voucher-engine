@@ -12,7 +12,7 @@ import { RewardService } from './reward.service';
 import { ConsumerJwtGuard } from '@core/auth/guards/consumer-jwt.guard';
 import { Request } from 'express';
 
-@Controller('rewards')
+@Controller('/loyalty/rewards')
 export class RewardController extends BaseController {
   constructor(
     @Inject('REWARD_SERVICE')
