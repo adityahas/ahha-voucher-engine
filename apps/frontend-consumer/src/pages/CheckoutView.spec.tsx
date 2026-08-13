@@ -5,6 +5,7 @@ import { CheckoutView } from './CheckoutView';
 import * as productsApi from '../api/products';
 import * as purchaseApi from '../api/purchase';
 import * as vouchersApi from '../api/vouchers';
+import * as pointsApi from '../api/points';
 import type { Product } from '../types/product';
 
 // Mock framer-motion to avoid animation issues in tests
@@ -41,6 +42,10 @@ vi.mock('../api/purchase', () => ({
 vi.mock('../api/vouchers', () => ({
   calculateDiscount: vi.fn(),
   getClaimedVouchers: vi.fn(),
+}));
+
+vi.mock('../api/points', () => ({
+  getPointsProfile: vi.fn(),
 }));
 
 // Mock react-router-dom hooks
@@ -84,6 +89,12 @@ const mockClaimedVoucher = {
 describe('CheckoutView Automation Suite', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (pointsApi.getPointsProfile as any).mockResolvedValue({
+      tier: null,
+      lifetime_points: 150,
+      balance_points: 150,
+      next_tier: null,
+    });
   });
 
   const renderComponent = () =>

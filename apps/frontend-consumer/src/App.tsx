@@ -5,6 +5,7 @@ import LoginView from './pages/LoginView';
 import VoucherDashboardView from './pages/VoucherDashboardView';
 import MyVouchersView from './pages/MyVouchersView';
 import VoucherDetailView from './pages/VoucherDetailView';
+import PointsHistoryView from './pages/PointsHistoryView';
 import { ProductShowcaseView } from './pages/ProductShowcaseView';
 import { CheckoutView } from './pages/CheckoutView';
 import { CurrencySettingsProvider } from './context/currency-settings';
@@ -38,6 +39,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyVouchersView />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/points-history"
+            element={
+              <ProtectedRoute>
+                <PointsHistoryView />
               </ProtectedRoute>
             }
           />

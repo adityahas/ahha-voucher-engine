@@ -5,6 +5,7 @@ import { ArrowLeft, CreditCard, Info, ShoppingBag, Tag } from 'lucide-react';
 import { getProductById } from '../api/products';
 import { executePurchase } from '../api/purchase';
 import { calculateDiscount, getClaimedVouchers } from '../api/vouchers';
+import { getPointsProfile } from '../api/points';
 import { FeedbackOverlay } from '../components/FeedbackOverlay';
 import type { Product } from '../types/product';
 import type {
@@ -54,6 +55,13 @@ export const CheckoutView: React.FC = () => {
     'idle' | 'processing' | 'success' | 'error'
   >('idle');
   const [txnMessage, setTxnMessage] = useState('');
+  const [balancePoints, setBalancePoints] = useState(0);
+
+  useEffect(() => {
+    getPointsProfile()
+      .then((p) => setBalancePoints(p.balance_points))
+      .catch(() => setBalancePoints(0));
+  }, []);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -463,6 +471,17 @@ export const CheckoutView: React.FC = () => {
                 >
                   {formatCurrency(total, currencySettings)}
                 </span>
+              </div>
+              <div className="pt-2 border-t border-white/5 space-y-1">
+                <p className="text-xs text-slate-500">
+                  Points balance: {balancePoints} pts
+                </p>
+                {total > 0 && (
+                  <p className="text-xs text-cyan-400/80">
+                    You will earn ~{Math.floor(total / 1000)} pts with this
+                    purchase
+                  </p>
+                )}
               </div>
             </div>
 
