@@ -19,6 +19,10 @@ Commands/results:
 - `cd apps/frontend-cms && npx vitest run src/components/RewardItemSourceForm.spec.tsx src/pages/RewardItemSourceList.spec.tsx`: PASS, 2 files and 4 tests.
 - `cd apps/frontend-cms && npx tsc --noEmit`: PASS.
 - `graphify update .`: completed; reported pre-existing empty `extensions.json` and `skills-lock.json` graph warnings.
+- Review coverage follow-up: added focused assertions for optional endpoint, create/edit submission, masked edit API key omission, form/list API errors, key show/hide, cancelled delete, successful delete refresh, and failed delete row preservation.
+- `cd apps/frontend-cms && npx vitest run src/components/RewardItemSourceForm.spec.tsx src/pages/RewardItemSourceList.spec.tsx src/pages/RewardItemSourcePages.spec.tsx`: PASS, 3 files and 12 tests.
+- `cd apps/frontend-cms && npx tsc --noEmit`: PASS.
+- `graphify update .`: completed; same pre-existing empty `extensions.json` and `skills-lock.json` graph warnings.
 
 Concerns:
 
