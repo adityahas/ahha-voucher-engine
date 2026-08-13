@@ -44,7 +44,11 @@ export default function RewardForm({
           ...form,
           point_price: Number(form.point_price) || 0,
           exclusive_days: Number(form.exclusive_days) || 0,
-          ...(minTierId ? { min_tier_id: minTierId } : {}),
+          ...(minTierId
+            ? { min_tier_id: minTierId }
+            : initial?.min_tier
+              ? { min_tier_id: '' }
+              : {}),
         });
       }}
       className="max-w-xl space-y-4"
