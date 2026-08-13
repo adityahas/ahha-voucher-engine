@@ -135,6 +135,9 @@ describe('ClientSettingsService loyalty settings', () => {
     expect(result.max_combined_discount_percent).toBe(
       DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
     );
+    expect(result.point_to_currency_rate).toBe(
+      DEFAULT_LOYALTY_SETTINGS.point_to_currency_rate,
+    );
   });
 
   it('returns defaults when a row exists but the new columns are null', async () => {
@@ -142,6 +145,7 @@ describe('ClientSettingsService loyalty settings', () => {
       client_database_name: 'client1_db',
       point_base_rate: null,
       max_combined_discount_percent: null,
+      point_to_currency_rate: null,
     });
 
     const result = await service.getLoyaltySettings('client1_db');
@@ -152,6 +156,9 @@ describe('ClientSettingsService loyalty settings', () => {
     expect(result.max_combined_discount_percent).toBe(
       DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
     );
+    expect(result.point_to_currency_rate).toBe(
+      DEFAULT_LOYALTY_SETTINGS.point_to_currency_rate,
+    );
   });
 
   it('returns stored values when the new columns are populated', async () => {
@@ -159,12 +166,35 @@ describe('ClientSettingsService loyalty settings', () => {
       client_database_name: 'client1_db',
       point_base_rate: '2500',
       max_combined_discount_percent: '30',
+      point_to_currency_rate: '0.5',
     });
 
     const result = await service.getLoyaltySettings('client1_db');
     expect(result).toEqual({
       point_base_rate: 2500,
       max_combined_discount_percent: 30,
+      point_to_currency_rate: 0.5,
     });
+  });
+
+  it('returns and persists a custom point-to-currency rate', async () => {
+    repoMock.findOne.mockResolvedValueOnce(null);
+    repoMock.findOne.mockResolvedValueOnce({
+      point_base_rate: 1000,
+      max_combined_discount_percent: 50,
+      point_to_currency_rate: 0.25,
+    });
+
+    await expect(
+      service.updateLoyaltySettings('client1_db', {
+        point_to_currency_rate: 0.25,
+      }),
+    ).resolves.toEqual({
+      ...DEFAULT_LOYALTY_SETTINGS,
+      point_to_currency_rate: 0.25,
+    });
+    expect(repoMock.save).toHaveBeenCalledWith(
+      expect.objectContaining({ point_to_currency_rate: 0.25 }),
+    );
   });
 });

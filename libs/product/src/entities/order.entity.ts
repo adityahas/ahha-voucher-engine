@@ -7,6 +7,11 @@ export enum OrderStatus {
   CANCELED = 'CANCELED',
 }
 
+export enum OrderPaymentStatus {
+  PAID = 'PAID',
+  PENDING_PAYMENT = 'PENDING_PAYMENT',
+}
+
 @Entity('orders')
 export class OrderEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -27,6 +32,18 @@ export class OrderEntity extends BaseEntity {
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   discount_amount: number;
 
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  voucher_discount_amount: number;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  points_used: number;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  point_discount_amount: number;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  cash_amount: number;
+
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   total_price: number;
 
@@ -36,6 +53,13 @@ export class OrderEntity extends BaseEntity {
     default: OrderStatus.PENDING,
   })
   status: OrderStatus;
+
+  @Column({
+    type: 'enum',
+    enum: OrderPaymentStatus,
+    default: OrderPaymentStatus.PENDING_PAYMENT,
+  })
+  payment_status: OrderPaymentStatus;
 
   @Column({ type: 'varchar', nullable: true })
   voucher_code: string;

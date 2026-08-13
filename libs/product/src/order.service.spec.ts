@@ -1,13 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource, Repository } from 'typeorm';
 import { OrderService } from './order.service';
-import { OrderEntity, OrderStatus } from './entities/order.entity';
+import {
+  OrderEntity,
+  OrderPaymentStatus,
+  OrderStatus,
+} from './entities/order.entity';
 import { NotFoundException } from '@nestjs/common';
 
 describe('OrderService', () => {
   let service: OrderService;
   let repository: Repository<OrderEntity>;
-  let dataSource: DataSource;
 
   const mockOrder = {
     id: 'test-id',
@@ -42,11 +45,37 @@ describe('OrderService', () => {
 
     service = module.get<OrderService>(OrderService);
     repository = mockRepository as any;
-    dataSource = module.get<DataSource>(DataSource);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('accepts the hybrid payment breakdown and only supported payment statuses', () => {
+    const order = new OrderEntity();
+    Object.assign(order, {
+      subtotal: 100,
+      voucher_discount_amount: 10,
+      points_used: 20,
+      point_discount_amount: 5,
+      cash_amount: 85,
+      payment_status: OrderPaymentStatus.PAID,
+      voucher_code: 'VOUCHER-1',
+    });
+
+    expect(order).toMatchObject({
+      subtotal: 100,
+      voucher_discount_amount: 10,
+      points_used: 20,
+      point_discount_amount: 5,
+      cash_amount: 85,
+      payment_status: OrderPaymentStatus.PAID,
+      voucher_code: 'VOUCHER-1',
+    });
+    expect(Object.values(OrderPaymentStatus)).toEqual([
+      'PAID',
+      'PENDING_PAYMENT',
+    ]);
   });
 
   describe('create', () => {

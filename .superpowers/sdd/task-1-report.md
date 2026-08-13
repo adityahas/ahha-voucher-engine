@@ -1,51 +1,31 @@
 # Task 1 Report
 
-Status: DONE_WITH_CONCERNS
+## Status
+
+Complete for the shared calculator and preview DTO/service flow.
 
 ## Commit
 
-- `e1b79a8` - `fix(loyalty): align reward item source contract`
+`0556684 feat(loyalty): calculate hybrid points payments`
 
-## Files Changed
+## Files
 
-- `apps/loyalty-admin/src/reward-item-source/dto/create-reward-item-source.dto.ts`
-- `apps/loyalty-admin/src/reward-item-source/reward-item-source.controller.ts`
-- `apps/loyalty-admin/src/reward-item-source/reward-item-source.service.spec.ts`
-- `apps/loyalty-admin/src/reward-item-source/reward-item-source.service.ts`
-- `apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.ts`
-- `apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.spec.ts`
-- `libs/loyalty/src/reward-item-source/entities/reward-item-source.entity.ts`
+- `apps/loyalty-consumer/src/voucher/point-payment.calculator.ts`
+- `apps/loyalty-consumer/src/voucher/point-payment.calculator.spec.ts`
+- `apps/loyalty-consumer/src/voucher/dto/calculate-discount.dto.ts`
+- `apps/loyalty-consumer/src/voucher/dto/create-purchase.dto.ts`
+- `apps/loyalty-consumer/src/voucher/voucher.service.ts`
 
-## Verification
+## Commands and Results
 
-- `yarn test --runInBand apps/loyalty-admin/src/reward-item-source/reward-item-source.service.spec.ts apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.spec.ts`
-  - Passed: 2 suites, 10 tests.
-- `yarn nest build loyalty-admin`
-  - Passed: exit 0.
-- `yarn tsc --noEmit --target ES2021 --module commonjs --experimentalDecorators --emitDecoratorMetadata --skipLibCheck apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.ts`
-  - Passed: exit 0.
-- `git diff --check HEAD^ HEAD`
-  - Passed: no whitespace errors.
+- `yarn test --runInBand apps/loyalty-consumer/src/voucher/point-payment.calculator.spec.ts`: RED first, then PASS (7 tests).
+- `yarn test --runInBand apps/loyalty-consumer/src/voucher/point-payment.calculator.spec.ts apps/loyalty-consumer/src/voucher/voucher.service.spec.ts`: PASS, 2 suites and 56 tests.
+- `yarn nest build loyalty-consumer`: PASS.
+- `git diff --check`: PASS before commit.
+- `graphify update .`: completed; 3,200 nodes and 5,993 edges.
 
 ## Concerns
 
-- No pre-existing tenant migration registry or migration configuration was present in the repository. The required migration was created at the requested loyalty-admin migration path and has direct SQL tests, but runtime migration discovery/registration could not be verified from existing configuration.
-- Pre-existing unrelated untracked files remain untouched in the worktree.
-
-## Review Fix Report
-
-Status: FIXED
-
-## Fixes
-
-- Wired the loyalty-admin tenant migration glob into `DatabaseService` runtime discovery and enabled `migrationsRun` for that connection.
-- Corrected migration SQL to target the SnakeNamingStrategy column `api_key`.
-- Added a `ValidationPipe`/`forbidNonWhitelisted` compatibility test matching the loyalty-admin app configuration.
-- Added masking boundary coverage for null, empty, length 6, and length 7 values.
-
-## Verification
-
-- `yarn test --runInBand apps/loyalty-admin/src/reward-item-source/reward-item-source.service.spec.ts apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.spec.ts` — Passed: 2 suites, 15 tests.
-- `yarn tsc --noEmit --target ES2021 --module commonjs --experimentalDecorators --emitDecoratorMetadata --skipLibCheck apps/loyalty-admin/src/migrations/20260813-reward-item-source-api-key-nullable.ts` — Passed: exit 0.
-- `yarn nest build loyalty-admin` — Passed: exit 0.
-- `git diff --check` — Passed: no whitespace errors.
+- Preview remains read-only and does not call usage, ledger, stock, or order writes.
+- The preview currently uses calculator default rate `1`; tenant-specific rate injection is deferred with tenant settings/order-flow ownership.
+- Unrelated pre-existing changes and untracked files remain outside the commit.

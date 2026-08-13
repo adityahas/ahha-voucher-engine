@@ -26,6 +26,9 @@ export class ClientSettingsEntity {
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 50 })
   max_combined_discount_percent: number;
 
+  @Column({ type: 'decimal', precision: 12, scale: 4, default: 1 })
+  point_to_currency_rate: number;
+
   @CreateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',

@@ -130,6 +130,10 @@ export class ClientSettingsService {
         row.max_combined_discount_percent,
         DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
       ),
+      point_to_currency_rate: numericOrDefault(
+        row.point_to_currency_rate,
+        DEFAULT_LOYALTY_SETTINGS.point_to_currency_rate,
+      ),
     };
   }
 
@@ -148,6 +152,9 @@ export class ClientSettingsService {
     }
     if (input.max_combined_discount_percent !== undefined) {
       row.max_combined_discount_percent = input.max_combined_discount_percent;
+    }
+    if (input.point_to_currency_rate !== undefined) {
+      row.point_to_currency_rate = input.point_to_currency_rate;
     }
     await this.repository.save(row);
     return this.getLoyaltySettings(databaseName);
