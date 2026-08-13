@@ -13,11 +13,11 @@ export default function TierForm({
 }) {
   const [form, setForm] = useState<TierInput>({
     name: initial?.name ?? '',
-    level: initial?.level ?? 1,
-    min_points: initial?.min_points ?? 0,
-    point_multiplier: initial?.point_multiplier ?? 1,
-    extra_discount_percent: initial?.extra_discount_percent ?? 0,
-    exclusive_window_hours: initial?.exclusive_window_hours ?? 0,
+    level: Number(initial?.level ?? 1),
+    min_points: Number(initial?.min_points ?? 0),
+    point_multiplier: Number(initial?.point_multiplier ?? 1),
+    extra_discount_percent: Number(initial?.extra_discount_percent ?? 0),
+    exclusive_window_hours: Number(initial?.exclusive_window_hours ?? 0),
     is_active: initial?.is_active ?? true,
     category_overrides: initial?.category_overrides ?? [],
   });
