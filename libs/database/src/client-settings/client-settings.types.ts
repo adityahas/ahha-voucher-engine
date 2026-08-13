@@ -9,3 +9,13 @@ export const DEFAULT_CURRENCY_SETTINGS: CurrencySettings = {
   locale: 'id-ID',
   number_format_options: {},
 };
+
+export interface LoyaltySettings {
+  point_base_rate: number;
+  max_combined_discount_percent: number;
+}
+
+export const DEFAULT_LOYALTY_SETTINGS: LoyaltySettings = {
+  point_base_rate: 1000,
+  max_combined_discount_percent: 50,
+};

@@ -5,6 +5,8 @@ import { ClientSettingsEntity } from '../entities/client-settings.entity';
 import {
   CurrencySettings,
   DEFAULT_CURRENCY_SETTINGS,
+  LoyaltySettings,
+  DEFAULT_LOYALTY_SETTINGS,
 } from './client-settings.types';
 
 export type UpdateCurrencySettingsInput = Partial<CurrencySettings>;
@@ -108,6 +110,40 @@ export class ClientSettingsService {
       ...next,
     });
     return next;
+  }
+
+  async getLoyaltySettings(databaseName: string): Promise<LoyaltySettings> {
+    const row = await this.repository.findOne({
+      where: { client_database_name: databaseName },
+    });
+    if (!row) return { ...DEFAULT_LOYALTY_SETTINGS };
+    return {
+      point_base_rate:
+        Number(row.point_base_rate) ?? DEFAULT_LOYALTY_SETTINGS.point_base_rate,
+      max_combined_discount_percent:
+        Number(row.max_combined_discount_percent) ??
+        DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
+    };
+  }
+
+  async updateLoyaltySettings(
+    databaseName: string,
+    input: Partial<LoyaltySettings>,
+  ): Promise<LoyaltySettings> {
+    let row = await this.repository.findOne({
+      where: { client_database_name: databaseName },
+    });
+    if (!row) {
+      row = this.repository.create({ client_database_name: databaseName });
+    }
+    if (input.point_base_rate !== undefined) {
+      row.point_base_rate = input.point_base_rate;
+    }
+    if (input.max_combined_discount_percent !== undefined) {
+      row.max_combined_discount_percent = input.max_combined_discount_percent;
+    }
+    await this.repository.save(row);
+    return this.getLoyaltySettings(databaseName);
   }
 
   private toSettings(entity: ClientSettingsEntity): CurrencySettings {

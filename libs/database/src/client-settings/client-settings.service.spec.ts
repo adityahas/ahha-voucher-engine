@@ -1,5 +1,8 @@
 import { ClientSettingsEntity } from '../entities/client-settings.entity';
-import { DEFAULT_CURRENCY_SETTINGS } from './client-settings.types';
+import {
+  DEFAULT_CURRENCY_SETTINGS,
+  DEFAULT_LOYALTY_SETTINGS,
+} from './client-settings.types';
 import { ClientSettingsService } from './client-settings.service';
 
 describe('ClientSettingsService', () => {
@@ -108,6 +111,29 @@ describe('ClientSettingsService', () => {
     });
     expect(repository.save).toHaveBeenCalledWith(
       expect.objectContaining({ number_format_options: {} }),
+    );
+  });
+});
+
+describe('ClientSettingsService loyalty settings', () => {
+  let service: ClientSettingsService;
+  const repoMock = {
+    findOne: jest.fn().mockResolvedValue(null),
+    save: jest.fn().mockImplementation((e) => Promise.resolve(e)),
+    create: jest.fn((d) => d),
+  };
+
+  beforeEach(() => {
+    service = new ClientSettingsService(repoMock as any);
+  });
+
+  it('returns defaults when no row exists', async () => {
+    const result = await service.getLoyaltySettings('client1_db');
+    expect(result.point_base_rate).toBe(
+      DEFAULT_LOYALTY_SETTINGS.point_base_rate,
+    );
+    expect(result.max_combined_discount_percent).toBe(
+      DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
     );
   });
 });

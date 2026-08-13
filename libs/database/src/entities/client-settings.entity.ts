@@ -20,6 +20,12 @@ export class ClientSettingsEntity {
   @Column({ type: 'jsonb', default: {} })
   number_format_options: Intl.NumberFormatOptions;
 
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 1000 })
+  point_base_rate: number;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 50 })
+  max_combined_discount_percent: number;
+
   @CreateDateColumn({
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
