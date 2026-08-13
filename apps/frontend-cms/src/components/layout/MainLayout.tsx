@@ -9,6 +9,8 @@ import {
   Ticket,
   LayoutGrid,
   Package,
+  Gift,
+  Layers,
 } from 'lucide-react';
 
 export const MainLayout: React.FC = () => {
@@ -106,6 +108,35 @@ export const MainLayout: React.FC = () => {
             >
               <Package size={20} />
               <span>Product Management</span>
+            </NavLink>
+            <p className="px-4 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+              Loyalty
+            </p>
+            <NavLink
+              to="/tiers"
+              className={({ isActive }) =>
+                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
+                }`
+              }
+            >
+              <Layers size={20} />
+              <span>Tier Management</span>
+            </NavLink>
+            <NavLink
+              to="/rewards"
+              className={({ isActive }) =>
+                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
+                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
+                }`
+              }
+            >
+              <Gift size={20} />
+              <span>Reward Management</span>
             </NavLink>
             <NavLink
               to="/settings/currency"
