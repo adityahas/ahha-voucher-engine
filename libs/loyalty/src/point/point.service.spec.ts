@@ -76,6 +76,25 @@ describe('PointService', () => {
     ).rejects.toThrow('Insufficient points');
   });
 
+  it('rollback writes ROLLBACK ledger without mutating balance', async () => {
+    user.lifetime_points = 150;
+    user.balance_points = 100;
+    const service = new PointService();
+    const balance = await service.rollback(
+      user,
+      50,
+      'ORDER',
+      'ord-1',
+      managerMock,
+    );
+    expect(ledgerSaves[0].event_type).toBe(PointEventType.ROLLBACK);
+    expect(ledgerSaves[0].amount).toBe(50);
+    expect(ledgerSaves[0].balance_after).toBe(100);
+    expect(ledgerSaves[0].reference_id).toBe('ord-1');
+    expect(user.balance_points).toBe(100);
+    expect(balance).toBe(100);
+  });
+
   it('recordTierChange writes tier history', async () => {
     const to = new LoyaltyTierEntity();
     to.id = 'silver';
