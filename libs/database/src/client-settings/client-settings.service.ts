@@ -67,6 +67,10 @@ function isIntegerInRange(
   );
 }
 
+function numericOrDefault(raw: unknown, fallback: number): number {
+  return raw == null || raw === '' ? fallback : Number(raw);
+}
+
 @Injectable()
 export class ClientSettingsService {
   constructor(
@@ -118,11 +122,14 @@ export class ClientSettingsService {
     });
     if (!row) return { ...DEFAULT_LOYALTY_SETTINGS };
     return {
-      point_base_rate:
-        Number(row.point_base_rate) ?? DEFAULT_LOYALTY_SETTINGS.point_base_rate,
-      max_combined_discount_percent:
-        Number(row.max_combined_discount_percent) ??
+      point_base_rate: numericOrDefault(
+        row.point_base_rate,
+        DEFAULT_LOYALTY_SETTINGS.point_base_rate,
+      ),
+      max_combined_discount_percent: numericOrDefault(
+        row.max_combined_discount_percent,
         DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
+      ),
     };
   }
 

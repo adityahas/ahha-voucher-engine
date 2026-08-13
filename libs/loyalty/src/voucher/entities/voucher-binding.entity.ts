@@ -22,6 +22,7 @@ export enum VoucherBindingType {
   USER_GROUP = 'user_group',
   PRODUCT = 'product',
   CATEGORY = 'category',
+  TIER = 'tier',
 }
 
 @Entity('voucher_bindings')

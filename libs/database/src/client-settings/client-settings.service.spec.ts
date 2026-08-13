@@ -136,4 +136,35 @@ describe('ClientSettingsService loyalty settings', () => {
       DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
     );
   });
+
+  it('returns defaults when a row exists but the new columns are null', async () => {
+    repoMock.findOne.mockResolvedValueOnce({
+      client_database_name: 'client1_db',
+      point_base_rate: null,
+      max_combined_discount_percent: null,
+    });
+
+    const result = await service.getLoyaltySettings('client1_db');
+    expect(result).toEqual(DEFAULT_LOYALTY_SETTINGS);
+    expect(result.point_base_rate).toBe(
+      DEFAULT_LOYALTY_SETTINGS.point_base_rate,
+    );
+    expect(result.max_combined_discount_percent).toBe(
+      DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
+    );
+  });
+
+  it('returns stored values when the new columns are populated', async () => {
+    repoMock.findOne.mockResolvedValueOnce({
+      client_database_name: 'client1_db',
+      point_base_rate: '2500',
+      max_combined_discount_percent: '30',
+    });
+
+    const result = await service.getLoyaltySettings('client1_db');
+    expect(result).toEqual({
+      point_base_rate: 2500,
+      max_combined_discount_percent: 30,
+    });
+  });
 });

@@ -302,9 +302,12 @@ export class VoucherService {
       }
     }
 
-    // 4. Check Bindings (Product/Category)
-    if (voucher.bindings.length > 0) {
-      const isBound = voucher.bindings.some((b) => {
+    // 4. Check Bindings (Product/Category) — tier bindings handled in 3b
+    const nonTierBindings = voucher.bindings.filter(
+      (b) => b.bind_type !== 'tier',
+    );
+    if (nonTierBindings.length > 0) {
+      const isBound = nonTierBindings.some((b) => {
         if (
           b.bind_type === 'product' &&
           productId &&

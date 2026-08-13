@@ -47,7 +47,7 @@ export default function RewardForm({
           ...(minTierId
             ? { min_tier_id: minTierId }
             : initial?.min_tier
-              ? { min_tier_id: '' }
+              ? { min_tier_id: null }
               : {}),
         });
       }}
