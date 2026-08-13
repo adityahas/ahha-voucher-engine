@@ -1,7 +1,0 @@
-# Obsidian app + plugin config — never commit
-.obsidian/
-
-# Secrets
-*.key
-*.pem
-.env
