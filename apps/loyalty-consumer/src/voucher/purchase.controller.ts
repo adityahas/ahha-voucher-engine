@@ -13,7 +13,10 @@ import { VoucherService } from './voucher.service';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { DataSource, EntityManager } from 'typeorm';
 import { ProductEntity } from '@core/product/entities/product.entity';
-import { OrderEntity } from '@core/product/entities/order.entity';
+import {
+  OrderEntity,
+  OrderPaymentStatus,
+} from '@core/product/entities/order.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { LoyaltyTierEntity } from '@core/loyalty/tier/entities/loyalty-tier.entity';
 import { TierService } from '@core/loyalty/tier/tier.service';
@@ -21,6 +24,7 @@ import { PointService } from '@core/loyalty/point/point.service';
 import { TierChangeReason } from '@core/loyalty/point/entities/tier-history.entity';
 import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
 import { computeTierDiscountAndPoints } from './discount-points.util';
+import { calculateHybridPayment } from './point-payment.calculator';
 
 @Controller('/loyalty/purchase')
 @UseGuards(ConsumerJwtGuard)
@@ -112,6 +116,23 @@ export class PurchaseController {
         multiplier,
       });
 
+      // Layer points on top of the existing voucher + tier discount. The
+      // shared calculator revalidates balance/limits against the live user
+      // balance inside the transaction; frontend values are never trusted.
+      const hybrid = calculateHybridPayment({
+        subtotal,
+        voucher_discount_amount: calc.combined_discount,
+        user_balance_points: Number(user.balance_points ?? 0),
+        point_to_currency_rate: Number(settings.point_to_currency_rate),
+        points_to_use: dto.points_to_use,
+      });
+
+      const cashAmount = hybrid.cash_amount;
+      const paymentStatus =
+        cashAmount === 0
+          ? OrderPaymentStatus.PAID
+          : OrderPaymentStatus.PENDING_PAYMENT;
+
       const order = await manager.getRepository(OrderEntity).save(
         manager.getRepository(OrderEntity).create({
           user_id: userId,
@@ -119,12 +140,32 @@ export class PurchaseController {
           quantity: dto.quantity,
           subtotal: Number(subtotal),
           discount_amount: Number(calc.combined_discount),
-          total_price: Number(calc.final_price),
+          voucher_discount_amount: hybrid.voucher_discount_amount,
+          points_used: hybrid.points_used,
+          point_discount_amount: hybrid.point_discount_amount,
+          cash_amount: cashAmount,
+          total_price: cashAmount,
+          payment_status: paymentStatus,
           voucher_code: dto.voucher_code || null,
         }),
       );
 
-      const pointsEarned = calc.points_earned;
+      // Spend requested points against the order, recording a negative
+      // ledger entry with a PRODUCT_PURCHASE reference to the order ID.
+      if (hybrid.points_used > 0) {
+        await this.pointService.spend(
+          user,
+          hybrid.points_used,
+          'PRODUCT_PURCHASE',
+          order.id,
+          manager,
+        );
+      }
+
+      // Points are earned on the cash actually paid so point-funded orders
+      // do not earn on the portion settled with points.
+      const pointsEarned =
+        (cashAmount / Number(settings.point_base_rate)) * multiplier;
       if (pointsEarned > 0) {
         await this.pointService.earn(
           user,

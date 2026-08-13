@@ -3,7 +3,10 @@ import { DataSource } from 'typeorm';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ProductEntity } from '@core/product/entities/product.entity';
-import { OrderEntity } from '@core/product/entities/order.entity';
+import {
+  OrderEntity,
+  OrderPaymentStatus,
+} from '@core/product/entities/order.entity';
 import { TierChangeReason } from '@core/loyalty/point/entities/tier-history.entity';
 
 describe('PurchaseController', () => {
@@ -52,6 +55,7 @@ describe('PurchaseController', () => {
 
   const mockPointService = {
     earn: jest.fn().mockResolvedValue(0),
+    spend: jest.fn().mockResolvedValue(0),
     recordTierChange: jest.fn(),
   };
 
@@ -59,6 +63,7 @@ describe('PurchaseController', () => {
     getLoyaltySettings: jest.fn().mockResolvedValue({
       point_base_rate: 1000,
       max_combined_discount_percent: 50,
+      point_to_currency_rate: 1,
     }),
   };
 
@@ -185,7 +190,12 @@ describe('PurchaseController', () => {
         quantity: 2,
         subtotal: 2000,
         discount_amount: 300,
+        voucher_discount_amount: 300,
+        points_used: 0,
+        point_discount_amount: 0,
+        cash_amount: 1700,
         total_price: 1700,
+        payment_status: OrderPaymentStatus.PENDING_PAYMENT,
         voucher_code: 'VOU-10',
       });
     });
@@ -228,7 +238,12 @@ describe('PurchaseController', () => {
         quantity: 1,
         subtotal: 1000,
         discount_amount: 100,
+        voucher_discount_amount: 100,
+        points_used: 0,
+        point_discount_amount: 0,
+        cash_amount: 900,
         total_price: 900,
+        payment_status: OrderPaymentStatus.PENDING_PAYMENT,
         voucher_code: null,
       });
       expect(mockPointService.earn).toHaveBeenCalledWith(
@@ -325,6 +340,208 @@ describe('PurchaseController', () => {
         mockEntityManager,
       );
       expect(result.points_earned).toBe(1);
+    });
+
+    // ---------------------------------------------------------------
+    // Hybrid points payment
+    // ---------------------------------------------------------------
+    describe('hybrid points payment', () => {
+      const userWithBalance = {
+        core_user_id: 'user-id',
+        lifetime_points: 5000,
+        balance_points: 2000,
+        tier: null,
+      };
+
+      beforeEach(() => {
+        mockUserRepo.findOne.mockResolvedValue(userWithBalance);
+      });
+
+      it('creates a PAID order when points fully cover the price', async () => {
+        const result = await controller.purchase(mockReq, {
+          product_id: 'prod-id',
+          quantity: 1,
+          points_to_use: 1000,
+        });
+
+        expect(mockOrderRepo.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            subtotal: 1000,
+            discount_amount: 0,
+            voucher_discount_amount: 0,
+            points_used: 1000,
+            point_discount_amount: 1000,
+            cash_amount: 0,
+            total_price: 0,
+            payment_status: OrderPaymentStatus.PAID,
+            voucher_code: null,
+          }),
+        );
+        expect(mockPointService.spend).toHaveBeenCalledWith(
+          userWithBalance,
+          1000,
+          'PRODUCT_PURCHASE',
+          'order-id',
+          mockEntityManager,
+        );
+        expect(result.payment_status).toBe(OrderPaymentStatus.PAID);
+        expect(result.cash_amount).toBe(0);
+        expect(result.points_earned).toBe(0);
+      });
+
+      it('creates a PENDING_PAYMENT order for a hybrid cash remainder', async () => {
+        const result = await controller.purchase(mockReq, {
+          product_id: 'prod-id',
+          quantity: 1,
+          points_to_use: 400,
+        });
+
+        expect(mockOrderRepo.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            points_used: 400,
+            point_discount_amount: 400,
+            cash_amount: 600,
+            total_price: 600,
+            payment_status: OrderPaymentStatus.PENDING_PAYMENT,
+          }),
+        );
+        expect(mockPointService.spend).toHaveBeenCalledWith(
+          userWithBalance,
+          400,
+          'PRODUCT_PURCHASE',
+          'order-id',
+          mockEntityManager,
+        );
+        expect(result.points_earned).toBe(0.6);
+      });
+
+      it('combines voucher and points in the order breakdown', async () => {
+        mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
+          isValid: true,
+          discountAmount: 250,
+          finalPrice: 750,
+        });
+
+        const result = await controller.purchase(mockReq, {
+          product_id: 'prod-id',
+          quantity: 1,
+          voucher_code: 'VOU-10',
+          points_to_use: 750,
+        });
+
+        expect(mockOrderRepo.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            subtotal: 1000,
+            discount_amount: 250,
+            voucher_discount_amount: 250,
+            points_used: 750,
+            point_discount_amount: 750,
+            cash_amount: 0,
+            payment_status: OrderPaymentStatus.PAID,
+          }),
+        );
+        expect(mockVoucherService.useVoucher).toHaveBeenCalledWith(
+          'user-id',
+          'VOU-10',
+          mockEntityManager,
+        );
+        expect(mockPointService.spend).toHaveBeenCalledWith(
+          userWithBalance,
+          750,
+          'PRODUCT_PURCHASE',
+          'order-id',
+          mockEntityManager,
+        );
+        expect(result.payment_status).toBe(OrderPaymentStatus.PAID);
+      });
+
+      it('rejects points above the user balance', async () => {
+        await expect(
+          controller.purchase(mockReq, {
+            product_id: 'prod-id',
+            quantity: 1,
+            points_to_use: 3000,
+          }),
+        ).rejects.toThrow(
+          new BadRequestException('points_to_use exceeds point balance'),
+        );
+        expect(mockOrderRepo.save).not.toHaveBeenCalled();
+        expect(mockPointService.spend).not.toHaveBeenCalled();
+      });
+
+      it('rejects points whose value exceeds the post-discount subtotal', async () => {
+        mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
+          isValid: true,
+          discountAmount: 100,
+          finalPrice: 900,
+        });
+
+        await expect(
+          controller.purchase(mockReq, {
+            product_id: 'prod-id',
+            quantity: 1,
+            voucher_code: 'VOU-10',
+            points_to_use: 1000,
+          }),
+        ).rejects.toThrow(
+          new BadRequestException(
+            'points_to_use exceeds the post-voucher subtotal',
+          ),
+        );
+        expect(mockOrderRepo.save).not.toHaveBeenCalled();
+        expect(mockVoucherService.useVoucher).toHaveBeenCalled();
+        expect(mockPointService.spend).not.toHaveBeenCalled();
+      });
+
+      it('rejects fractional points', async () => {
+        await expect(
+          controller.purchase(mockReq, {
+            product_id: 'prod-id',
+            quantity: 1,
+            points_to_use: 12.5,
+          }),
+        ).rejects.toThrow(BadRequestException);
+        expect(mockOrderRepo.save).not.toHaveBeenCalled();
+      });
+
+      it('aborts the purchase when spending points fails', async () => {
+        mockPointService.spend.mockRejectedValueOnce(
+          new BadRequestException('Insufficient points'),
+        );
+
+        await expect(
+          controller.purchase(mockReq, {
+            product_id: 'prod-id',
+            quantity: 1,
+            points_to_use: 400,
+          }),
+        ).rejects.toThrow(new BadRequestException('Insufficient points'));
+        expect(mockPointService.earn).not.toHaveBeenCalled();
+      });
+
+      it('honours a custom tenant point rate', async () => {
+        mockSettingsService.getLoyaltySettings.mockResolvedValue({
+          point_base_rate: 1000,
+          max_combined_discount_percent: 50,
+          point_to_currency_rate: 2,
+        });
+
+        const result = await controller.purchase(mockReq, {
+          product_id: 'prod-id',
+          quantity: 1,
+          points_to_use: 400,
+        });
+
+        expect(mockOrderRepo.save).toHaveBeenCalledWith(
+          expect.objectContaining({
+            point_discount_amount: 800,
+            cash_amount: 200,
+            total_price: 200,
+            payment_status: OrderPaymentStatus.PENDING_PAYMENT,
+          }),
+        );
+        expect(result.cash_amount).toBe(200);
+      });
     });
   });
 });

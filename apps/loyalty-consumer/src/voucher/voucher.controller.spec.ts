@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VoucherController } from './voucher.controller';
+import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
 
 describe('Consumer VoucherController', () => {
   let controller: VoucherController;
   let service: any;
+  let settingsService: any;
 
   beforeEach(async () => {
     service = {
@@ -13,10 +15,18 @@ describe('Consumer VoucherController', () => {
       calculateDiscount: jest.fn(),
       useVoucher: jest.fn(),
     };
+    settingsService = {
+      getLoyaltySettings: jest
+        .fn()
+        .mockResolvedValue({ point_to_currency_rate: 1 }),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [VoucherController],
-      providers: [{ provide: 'VOUCHER_SERVICE', useValue: service }],
+      providers: [
+        { provide: 'VOUCHER_SERVICE', useValue: service },
+        { provide: ClientSettingsService, useValue: settingsService },
+      ],
     }).compile();
 
     controller = module.get(VoucherController);
@@ -66,7 +76,7 @@ describe('Consumer VoucherController', () => {
     expect(service.claimVoucher).toHaveBeenCalledWith('user-1', 'VOU-1');
   });
 
-  it('calculates a discount for the authenticated user', async () => {
+  it('calculates a discount for the authenticated user with the tenant rate', async () => {
     const dto: any = {
       voucher_code: 'VOU-1',
       product_id: 'prod-1',
@@ -76,9 +86,13 @@ describe('Consumer VoucherController', () => {
 
     await controller.calculateDiscount(dto, {
       user: { userId: 'user-1' },
+      client: { database_name: 'tenant-db' },
     } as any);
 
-    expect(service.calculateDiscount).toHaveBeenCalledWith(dto, 'user-1');
+    expect(settingsService.getLoyaltySettings).toHaveBeenCalledWith(
+      'tenant-db',
+    );
+    expect(service.calculateDiscount).toHaveBeenCalledWith(dto, 'user-1', 1);
   });
 
   it('redeems a voucher for the authenticated user', async () => {
