@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import LoyaltyView from './LoyaltyView';
@@ -60,5 +60,30 @@ describe('LoyaltyView', () => {
     expect(
       await screen.findByText(/unable to load your loyalty profile/i),
     ).toBeTruthy();
+  });
+
+  it('still renders the ledger section when the profile fetch fails', async () => {
+    (pointsApi.getPointsProfile as any).mockRejectedValue(
+      new Error('Network error'),
+    );
+    render(
+      <MemoryRouter>
+        <LoyaltyView />
+      </MemoryRouter>,
+    );
+    expect(
+      await screen.findByText(/unable to load your loyalty profile/i),
+    ).toBeTruthy();
+    expect(await screen.findByText('EARN')).toBeTruthy();
+  });
+
+  it('fetches the five most recent ledger entries', async () => {
+    render(
+      <MemoryRouter>
+        <LoyaltyView />
+      </MemoryRouter>,
+    );
+    await screen.findByText('Gold Member');
+    expect(pointsApi.getPointsHistory).toHaveBeenCalledWith(0, 5);
   });
 });

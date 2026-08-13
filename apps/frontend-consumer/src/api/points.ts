@@ -15,10 +15,15 @@ const getHeaders = () => {
 };
 
 export interface PointsProfile {
-  tier: { id: string; name: string; min_points: number } | null;
+  tier: { id: string; name: string; level: number; min_points: number } | null;
   lifetime_points: number;
   balance_points: number;
-  next_tier: { id: string; name: string; min_points: number } | null;
+  next_tier: {
+    id: string;
+    name: string;
+    level: number;
+    min_points: number;
+  } | null;
 }
 
 export const getPointsProfile = async (): Promise<PointsProfile> => {

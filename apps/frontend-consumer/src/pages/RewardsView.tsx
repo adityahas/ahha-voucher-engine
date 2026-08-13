@@ -12,7 +12,7 @@ interface Reward {
   exclusive_days: number;
   source_id: string;
   created_at: string;
-  min_tier?: { id: string; name: string } | null;
+  min_tier?: { id: string; name: string; level: number } | null;
 }
 
 interface ClaimState {
@@ -35,7 +35,7 @@ function tierRequirementMet(
       reward.exclusive_days * 24 * 60 * 60 * 1000;
     // Tier gate applies only during the exclusive window (I1 semantics)
     if (new Date().getTime() < exclusiveUntil) {
-      return profile.tier.id === reward.min_tier.id;
+      return Number(profile.tier.level) >= Number(reward.min_tier.level);
     }
     // window elapsed → gate released
     return true;
@@ -86,6 +86,7 @@ export default function RewardsView() {
   }, []);
 
   const handleClaim = async (reward: Reward) => {
+    if (claim.inFlight) return;
     setClaim({
       inFlight: reward.id,
       success: null,
@@ -102,9 +103,12 @@ export default function RewardsView() {
         error: null,
         errorRewardId: null,
       });
-      // Refresh balance after a successful spend
-      getPointsProfile()
-        .then(setProfile)
+      // Refresh balance and stock after a successful spend
+      Promise.all([getPointsProfile(), getRewards()])
+        .then(([p, r]) => {
+          setProfile(p);
+          setRewards(r);
+        })
         .catch(() => {});
     } catch (e: any) {
       setClaim({
