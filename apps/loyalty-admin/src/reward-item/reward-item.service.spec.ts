@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
 import { RewardItemService } from './reward-item.service';
 import { RewardItemEntity } from '@core/loyalty/reward-item/entities/reward-item.entity';
+import { LoyaltyTierEntity } from '@core/loyalty/tier/entities/loyalty-tier.entity';
 
 describe('RewardItemService', () => {
   let service: RewardItemService;
@@ -99,8 +100,40 @@ describe('RewardItemService', () => {
   describe('remove', () => {
     it('should remove a reward item', async () => {
       mockRepository.delete.mockResolvedValue({ affected: 1 });
-      await service.remove(1);
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+      await service.remove('1');
+      expect(mockRepository.delete).toHaveBeenCalledWith('1');
     });
+  });
+});
+
+describe('RewardItemService point pricing', () => {
+  const tierRepoMock = { findOne: jest.fn() };
+  const rewardRepoMock = {
+    create: jest.fn((d) => Object.assign(new RewardItemEntity(), d)),
+    save: jest.fn((e) => Promise.resolve(e)),
+    findOne: jest.fn(),
+    update: jest.fn(),
+  };
+  const dataSourceMock = {
+    getRepository: jest.fn((entity: any) => {
+      if (entity === LoyaltyTierEntity) return tierRepoMock;
+      return rewardRepoMock;
+    }),
+  } as any;
+
+  it('resolves min_tier relation on create', async () => {
+    tierRepoMock.findOne.mockResolvedValue({ id: 't1', name: 'Gold' });
+    const service = new RewardItemService(dataSourceMock);
+    const dto: any = {
+      name: 'GoPay 10k',
+      type: 'gopay',
+      source_id: 's1',
+      stock: 5,
+      point_price: 1000,
+      min_tier_id: 't1',
+      exclusive_days: 1,
+    };
+    await service.create(dto);
+    expect(tierRepoMock.findOne).toHaveBeenCalledWith({ where: { id: 't1' } });
   });
 });
