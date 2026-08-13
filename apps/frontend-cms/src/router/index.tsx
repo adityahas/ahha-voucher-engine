@@ -21,6 +21,9 @@ import { ProductCreate } from '../pages/ProductCreate';
 import { ProductEdit } from '../pages/ProductEdit';
 import { ErrorElement } from '../components/ErrorElement';
 import CurrencySettings from '../pages/CurrencySettings';
+import TierList from '../pages/TierList';
+import TierCreate from '../pages/TierCreate';
+import TierEdit from '../pages/TierEdit';
 
 export const router = createBrowserRouter([
   {
@@ -113,6 +116,18 @@ export const router = createBrowserRouter([
       {
         path: '/settings/currency',
         element: <CurrencySettings />,
+      },
+      {
+        path: '/tiers',
+        element: <TierList />,
+      },
+      {
+        path: '/tiers/create',
+        element: <TierCreate />,
+      },
+      {
+        path: '/tiers/:id/edit',
+        element: <TierEdit />,
       },
       // add more authenticated feature routes here
     ],
