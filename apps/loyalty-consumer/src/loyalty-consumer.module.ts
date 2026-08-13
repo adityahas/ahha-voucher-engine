@@ -15,6 +15,8 @@ import { REQUEST } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { ClientEntity } from '@core/database/entities/client.entity';
+import { ClientSettingsEntity } from '@core/database/entities/client-settings.entity';
+import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
 import { jwtConstants } from '@core/auth/constants';
 import * as dotenv from 'dotenv';
 import { CredentialMiddleware, SubdomainMiddleware } from '@core/middleware';
@@ -41,7 +43,7 @@ dotenv.config();
       dropSchema: process.env.DB_DROP_SCHEMA == 'true',
       logging: process.env.DB_LOGGING != 'false',
       autoLoadEntities: false,
-      entities: [ClientEntity],
+      entities: [ClientEntity, ClientSettingsEntity],
     }),
     JwtModule.register({
       secret: jwtConstants.secret,
@@ -49,6 +51,7 @@ dotenv.config();
     }),
     DatabaseModule,
     AuthModule,
+    TypeOrmModule.forFeature([ClientSettingsEntity]),
     VoucherModule,
     RewardModule,
     PointsModule,
@@ -56,6 +59,7 @@ dotenv.config();
   providers: [
     JwtStrategy,
     LoyaltyConsumerService,
+    ClientSettingsService,
     {
       provide: 'LOYALTY_CONSUMER_CONNECTION',
       scope: Scope.REQUEST,

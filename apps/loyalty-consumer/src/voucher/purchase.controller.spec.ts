@@ -1,14 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { PurchaseController } from './purchase.controller';
 import { DataSource } from 'typeorm';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ProductEntity } from '@core/product/entities/product.entity';
-import { OrderService } from '@core/product/order.service';
 
 describe('PurchaseController', () => {
   let controller: PurchaseController;
-  let dataSource: DataSource;
 
   const mockProduct = {
     id: 'prod-id',
@@ -22,8 +19,15 @@ describe('PurchaseController', () => {
     total_price: 1000,
   };
 
+  const mockUserRepo = {
+    findOne: jest.fn().mockResolvedValue(null),
+    create: jest.fn((partial: any) => ({ ...partial })),
+    save: jest.fn((user: any) => Promise.resolve(user)),
+  };
+
   const mockEntityManager = {
     findOne: jest.fn().mockResolvedValue(mockProduct),
+    getRepository: jest.fn().mockReturnValue(mockUserRepo),
   };
 
   const mockVoucherService = {
@@ -35,32 +39,40 @@ describe('PurchaseController', () => {
     create: jest.fn().mockResolvedValue(mockOrder),
   };
 
-  const mockDataSource = {
-    transaction: jest.fn((cb) => cb(mockEntityManager)),
+  const mockTierService = {
+    getMultiplierFor: jest.fn().mockResolvedValue(1),
+    findLowestActiveTier: jest.fn().mockResolvedValue(null),
+    findHighestTierAtOrBelow: jest.fn().mockResolvedValue(null),
   };
 
-  beforeEach(async () => {
-    jest.clearAllMocks();
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [PurchaseController],
-      providers: [
-        {
-          provide: 'VOUCHER_SERVICE',
-          useValue: mockVoucherService,
-        },
-        {
-          provide: OrderService,
-          useValue: mockOrderService,
-        },
-        {
-          provide: 'LOYALTY_CONSUMER_CONNECTION',
-          useValue: mockDataSource,
-        },
-      ],
-    }).compile();
+  const mockPointService = {
+    earn: jest.fn().mockResolvedValue(0),
+    recordTierChange: jest.fn(),
+  };
 
-    controller = module.get<PurchaseController>(PurchaseController);
-    dataSource = module.get<DataSource>('LOYALTY_CONSUMER_CONNECTION');
+  const mockSettingsService = {
+    getLoyaltySettings: jest.fn().mockResolvedValue({
+      point_base_rate: 1000,
+      max_combined_discount_percent: 50,
+    }),
+  };
+
+  const mockDataSource = {
+    transaction: jest.fn((cb: (em: any) => any) => cb(mockEntityManager)),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockEntityManager.findOne.mockResolvedValue(mockProduct);
+    mockUserRepo.findOne.mockResolvedValue(null);
+    controller = new PurchaseController(
+      mockVoucherService as any,
+      mockOrderService as any,
+      mockDataSource as unknown as DataSource,
+      mockTierService as any,
+      mockPointService as any,
+      mockSettingsService as any,
+    );
   });
 
   it('should be defined', () => {
@@ -76,6 +88,7 @@ describe('PurchaseController', () => {
 
     const mockReq = {
       user: { userId: 'user-id' },
+      client: { database_name: 'tenant-db' },
     };
 
     it('should successfully orchestrate a purchase with a voucher', async () => {
@@ -89,7 +102,7 @@ describe('PurchaseController', () => {
       const result = await controller.purchase(mockReq, purchaseDto);
 
       // Assert
-      expect(dataSource.transaction).toHaveBeenCalled();
+      expect(mockDataSource.transaction).toHaveBeenCalled();
       expect(mockEntityManager.findOne).toHaveBeenCalledWith(
         ProductEntity,
         expect.any(Object),
@@ -100,7 +113,15 @@ describe('PurchaseController', () => {
         mockEntityManager,
       );
       expect(mockOrderService.create).toHaveBeenCalled();
-      expect(result).toEqual(mockOrder);
+      expect(mockPointService.earn).toHaveBeenCalledWith(
+        expect.anything(),
+        0.9,
+        'ORDER',
+        'order-id',
+        mockEntityManager,
+      );
+      expect(result.points_earned).toBe(0.9);
+      expect(result.tier).toBeNull();
     });
 
     it('should successfully purchase without a voucher', async () => {
@@ -113,7 +134,8 @@ describe('PurchaseController', () => {
       // Assert
       expect(mockVoucherService.useVoucher).not.toHaveBeenCalled();
       expect(mockOrderService.create).toHaveBeenCalled();
-      expect(result).toEqual(mockOrder);
+      expect(result.points_earned).toBe(1);
+      expect(result.tier).toBeNull();
     });
 
     it('should throw NotFoundException if product is missing', async () => {

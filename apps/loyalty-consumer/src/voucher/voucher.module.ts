@@ -1,8 +1,13 @@
 import { Module, forwardRef, Scope } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { VoucherService } from './voucher.service';
 import { VoucherController } from './voucher.controller';
 import { PurchaseController } from './purchase.controller';
 import { OrderService } from '@core/product/order.service';
+import { TierService } from '@core/loyalty/tier/tier.service';
+import { PointService } from '@core/loyalty/point/point.service';
+import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
+import { ClientSettingsEntity } from '@core/database/entities/client-settings.entity';
 import { DataSource } from 'typeorm';
 import { LoyaltyConsumerModule } from '../loyalty-consumer.module';
 import { AuthModule } from '@core/auth';
@@ -11,9 +16,13 @@ import { AuthModule } from '@core/auth';
   imports: [
     forwardRef(() => AuthModule),
     forwardRef(() => LoyaltyConsumerModule),
+    TypeOrmModule.forFeature([ClientSettingsEntity]),
   ],
   controllers: [VoucherController, PurchaseController],
   providers: [
+    TierService,
+    PointService,
+    ClientSettingsService,
     {
       provide: OrderService,
       scope: Scope.REQUEST,
