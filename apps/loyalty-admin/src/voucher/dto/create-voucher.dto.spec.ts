@@ -48,6 +48,23 @@ describe('CreateVoucherDto validation', () => {
     expect((await validate(dto)).length).toBeGreaterThan(0);
   });
 
+  it('rejects invalid claim_period enum values', async () => {
+    const dto = plainToClass(CreateVoucherDto, {
+      ...minimalPayload,
+      claim_period: 'INVALID',
+    });
+    expect((await validate(dto)).length).toBeGreaterThan(0);
+  });
+
+  it('accepts a valid claim_period enum value', async () => {
+    const dto = plainToClass(CreateVoucherDto, {
+      ...minimalPayload,
+      claim_period: 'DAILY',
+    });
+    const errors = await validate(dto);
+    expect(errors).toEqual([]);
+  });
+
   it('rejects non-integer quota and non-numeric discount values', async () => {
     const dto = plainToClass(CreateVoucherDto, {
       ...minimalPayload,
