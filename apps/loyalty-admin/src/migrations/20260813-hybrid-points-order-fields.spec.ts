@@ -1,10 +1,9 @@
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { MigrationExecutor } from 'typeorm/migration/MigrationExecutor';
-import { QueryRunner } from 'typeorm';
 import { HybridPointsOrderFields1786641866502 } from './20260813-hybrid-points-order-fields';
 
 describe('HybridPointsOrderFields1786641866502', () => {
-  it('adds and removes point rate and payment columns', async () => {
+  it('adds and removes payment columns', async () => {
     const query = jest.fn();
     const migration = new HybridPointsOrderFields1786641866502();
     const runner = { query } as unknown as QueryRunner;
@@ -13,12 +12,12 @@ describe('HybridPointsOrderFields1786641866502', () => {
     await migration.down(runner);
 
     expect(query).toHaveBeenCalledWith(
-      expect.stringContaining('point_to_currency_rate'),
-    );
-    expect(query).toHaveBeenCalledWith(
       expect.stringContaining('payment_status'),
     );
     expect(query).toHaveBeenCalledWith(expect.stringContaining('DROP TYPE'));
+    expect(
+      query.mock.calls.some(([sql]) => String(sql).includes('client_settings')),
+    ).toBe(false);
   });
 
   it('uses a TypeORM-compatible timestamp name', () => {
