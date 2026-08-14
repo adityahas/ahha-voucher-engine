@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { LoyaltyTierEntity } from './entities/loyalty-tier.entity';
 import { TierCategoryOverrideEntity } from './entities/tier-category-override.entity';
+import { LoyaltyUserEntity } from '../entities/loyalty-user.entity';
+import { VoucherEntity } from '../voucher/entities/voucher.entity';
+import { VoucherClaimEntity } from '../voucher/entities/voucher-claim.entity';
 
 @Injectable()
 export class TierService {
@@ -51,4 +54,55 @@ export class TierService {
       order: { min_points: 'ASC' },
     });
   }
+
+  async grantLevelUpVoucher(
+    user: LoyaltyUserEntity,
+    targetTier: LoyaltyTierEntity,
+    manager: EntityManager,
+  ): Promise<LevelUpGrantResult> {
+    const code = targetTier.level_up_voucher_code;
+    if (!code) {
+      return { granted: false, message: 'no-voucher-configured' };
+    }
+
+    const voucherRepo = manager.getRepository(VoucherEntity);
+    const claimRepo = manager.getRepository(VoucherClaimEntity);
+
+    const existing = await claimRepo.findOne({
+      where: { voucher: { code }, user: { id: user.id } },
+    });
+    if (existing) {
+      return { granted: false, message: 'already-claimed' };
+    }
+
+    const voucher = await voucherRepo.findOne({
+      where: { code },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (!voucher) {
+      return { granted: false, message: 'voucher-missing' };
+    }
+    if (voucher.quota <= 0) {
+      return { granted: false, message: 'quota-exhausted' };
+    }
+
+    const claim = claimRepo.create({ voucher: { code }, user });
+    voucher.quota -= 1;
+
+    await claimRepo.save(claim);
+    await voucherRepo.save(voucher);
+
+    return { granted: true, voucherCode: code, message: 'granted' };
+  }
 }
+
+export type LevelUpGrantResult = {
+  granted: boolean;
+  voucherCode?: string;
+  message:
+    | 'no-voucher-configured'
+    | 'already-claimed'
+    | 'voucher-missing'
+    | 'quota-exhausted'
+    | 'granted';
+};
