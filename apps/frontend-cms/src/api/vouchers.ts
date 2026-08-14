@@ -6,8 +6,11 @@ export { DiscountType };
 
 export type VoucherType = 'CLAIMABLE' | 'UNIQUE_CODE';
 
+export type ClaimPeriod = 'FREE' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ONCE';
+
 export interface Voucher {
   voucher_type: VoucherType;
+  claim_period: ClaimPeriod;
   code: string;
   name: string;
   description: string | null;
