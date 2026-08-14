@@ -11,7 +11,7 @@ import {
   ClaimPeriod,
 } from '@core/loyalty/voucher/entities/voucher.entity';
 import { isWithinCurrentPeriod, resolveTimezone } from './claim-period.util';
-import { DataSource, Repository, EntityManager } from 'typeorm';
+import { DataSource, Not, In, Repository, EntityManager } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { ProductEntity } from '@core/product/entities/product.entity';
@@ -91,13 +91,30 @@ export class VoucherService {
       throw new Error('User ID is required to fetch claimed vouchers');
     }
 
+    const usedClaims = await this.usageRepository.find({
+      where: {
+        user: {
+          core_user_id: userId,
+        },
+      },
+      relations: ['claim'],
+    });
+    const usedClaimIds = usedClaims
+      .map((usage) => usage.claim?.id)
+      .filter((id): id is number => id !== undefined && id !== null);
+
+    const where: any = {
+      user: {
+        core_user_id: userId,
+      },
+    };
+    if (usedClaimIds.length > 0) {
+      where.id = Not(In(usedClaimIds));
+    }
+
     const [vouchers, total] = await this.claimedVouchersRepository.findAndCount(
       {
-        where: {
-          user: {
-            core_user_id: userId,
-          },
-        },
+        where,
         relations: ['voucher', 'voucher.validities', 'user'],
         skip: paginationDto.page * paginationDto.size,
         take: paginationDto.size,

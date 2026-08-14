@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DataSource, Repository, EntityManager } from 'typeorm';
+import { DataSource, Repository, EntityManager, Not, In } from 'typeorm';
 import { VoucherService } from './voucher.service';
 import {
   VoucherEntity,
@@ -226,6 +226,11 @@ describe('VoucherService', () => {
   // getClaimedVouchers
   // ---------------------------------------------------------------
   describe('getClaimedVouchers', () => {
+    beforeEach(() => {
+      (claimRepo.find as jest.Mock).mockReset();
+      (claimRepo.find as jest.Mock).mockResolvedValue([]);
+    });
+
     it('throws an error when userId is missing', async () => {
       await expect(
         service.getClaimedVouchers('', {
@@ -280,6 +285,54 @@ describe('VoucherService', () => {
 
     it('returns empty data when no claims exist', async () => {
       (claimRepo.findAndCount as jest.Mock).mockResolvedValue([[], 0]);
+
+      const result = await service.getClaimedVouchers('user-id', {
+        page: 0,
+        size: 10,
+      } as any);
+
+      expect(result.data).toEqual([]);
+      expect(result.pagination.total).toBe(0);
+    });
+
+    it('excludes claims that have already been consumed by a usage', async () => {
+      (claimRepo.find as jest.Mock).mockResolvedValueOnce([
+        { id: 1, claim: { id: 1 } },
+        { id: 2, claim: { id: 5 } },
+      ]);
+      const unusedClaim = {
+        id: 9,
+        voucher: makeVoucher({ code: 'VOU-KEEP' }),
+        user: mockUser,
+      };
+      (claimRepo.findAndCount as jest.Mock).mockResolvedValueOnce([
+        [unusedClaim],
+        1,
+      ]);
+
+      const result = await service.getClaimedVouchers('user-id', {
+        page: 0,
+        size: 10,
+      } as any);
+
+      expect(claimRepo.findAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            user: { core_user_id: 'user-id' },
+            id: Not(In([1, 5])),
+          },
+        }),
+      );
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].voucher.code).toBe('VOU-KEEP');
+    });
+
+    it('hides a voucher entirely when every claim is used', async () => {
+      (claimRepo.find as jest.Mock).mockResolvedValueOnce([
+        { id: 1, claim: { id: 1 } },
+        { id: 2, claim: { id: 5 } },
+      ]);
+      (claimRepo.findAndCount as jest.Mock).mockResolvedValueOnce([[], 0]);
 
       const result = await service.getClaimedVouchers('user-id', {
         page: 0,
