@@ -515,53 +515,79 @@ describe('VoucherService', () => {
   // ---------------------------------------------------------------
   describe('useVoucher', () => {
     let mockEntityManager: Partial<EntityManager>;
+    let claimRepository: { find: jest.Mock };
+    let usageRepository: { find: jest.Mock };
 
     beforeEach(() => {
+      claimRepository = { find: jest.fn() };
+      usageRepository = { find: jest.fn() };
       mockEntityManager = {
-        getRepository: jest.fn().mockReturnValue({
-          findOne: jest.fn().mockResolvedValue(mockUser),
-        }),
-        findOne: jest.fn(),
+        getRepository: jest.fn((entity) => {
+          if (entity === LoyaltyUserEntity) {
+            return { findOne: jest.fn().mockResolvedValue(mockUser) };
+          }
+          if (entity === VoucherClaimEntity) return claimRepository;
+          if (entity === VoucherUsageEntity) return usageRepository;
+          return {};
+        }) as unknown as EntityManager['getRepository'],
         create: jest.fn(),
         save: jest.fn(),
       };
     });
 
-    it('should successfully record usage if claim exists and not used', async () => {
-      (mockRepository.findOne as jest.Mock).mockResolvedValueOnce(mockUser); // getOrCreateLoyaltyUser
-      (mockEntityManager.findOne as jest.Mock)
-        .mockResolvedValueOnce(mockClaim()) // find claim
-        .mockResolvedValueOnce(null); // find usage (none)
-      (mockEntityManager.create as jest.Mock).mockReturnValue({
-        id: 1,
-        voucher: { code: 'VOU-10' },
-        user: mockUser,
-      });
-      (mockEntityManager.save as jest.Mock).mockResolvedValue({ id: 1 });
+    it('consumes the oldest unused claim and links the usage to it', async () => {
+      claimRepository.find.mockResolvedValue([
+        mockClaim({ id: 1 }),
+        mockClaim({ id: 2 }),
+      ]);
+      usageRepository.find.mockResolvedValue([
+        { id: 10, claim: { id: 1 } }, // older claim already consumed
+      ]);
+      (mockEntityManager.create as jest.Mock).mockImplementation(
+        (_, data) => data,
+      );
+      (mockEntityManager.save as jest.Mock).mockImplementation((_, data) =>
+        Promise.resolve(data),
+      );
 
-      await service.useVoucher('user-id', 'VOU-10', mockEntityManager as any);
+      const result = await service.useVoucher(
+        'user-id',
+        'VOU-10',
+        mockEntityManager as any,
+      );
 
+      expect(result.user).toEqual(mockUser);
+      expect(result.claim).toEqual({ id: 2 });
       expect(mockEntityManager.save).toHaveBeenCalled();
     });
 
-    it('should throw BadRequestException if voucher not claimed', async () => {
-      (mockRepository.findOne as jest.Mock).mockResolvedValueOnce(mockUser);
-      (mockEntityManager.findOne as jest.Mock).mockResolvedValueOnce(null); // find claim (not found)
+    it('allows re-use when a fresh claim exists after a previous use', async () => {
+      claimRepository.find.mockResolvedValue([
+        mockClaim({ id: 1 }),
+        mockClaim({ id: 2 }),
+      ]);
+      usageRepository.find.mockResolvedValue([
+        { id: 10, claim: { id: 1 } },
+        { id: 11, claim: { id: 2 } },
+      ]);
+      (mockEntityManager.create as jest.Mock).mockImplementation(
+        (_, data) => data,
+      );
+      (mockEntityManager.save as jest.Mock).mockImplementation((_, data) =>
+        Promise.resolve(data),
+      );
 
       await expect(
         service.useVoucher('user-id', 'VOU-10', mockEntityManager as any),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow('Voucher has already been used');
     });
 
-    it('should throw BadRequestException if voucher already used', async () => {
-      (mockRepository.findOne as jest.Mock).mockResolvedValueOnce(mockUser);
-      (mockEntityManager.findOne as jest.Mock)
-        .mockResolvedValueOnce(mockClaim()) // find claim
-        .mockResolvedValueOnce({ id: 1 }); // find usage (already exists)
+    it('should throw BadRequestException if voucher not claimed', async () => {
+      claimRepository.find.mockResolvedValue([]);
 
       await expect(
         service.useVoucher('user-id', 'VOU-10', mockEntityManager as any),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow('You have not claimed this voucher yet');
     });
   });
 
@@ -572,6 +598,9 @@ describe('VoucherService', () => {
     beforeEach(() => {
       (voucherRepo.findOne as jest.Mock).mockReset();
       (voucherRepo.findOne as jest.Mock).mockResolvedValue(makeVoucher());
+      // Default: user has one unused claim (1 use per claim)
+      (voucherRepo.find as jest.Mock).mockReset();
+      (voucherRepo.find as jest.Mock).mockResolvedValue([mockClaim({ id: 1 })]);
     });
 
     it('returns invalid when voucher is not found', async () => {
@@ -603,6 +632,34 @@ describe('VoucherService', () => {
       );
 
       expect(result.message).toBe('Voucher quota exhausted');
+      expect(result.isValid).toBe(false);
+    });
+
+    it('returns invalid when the user has not claimed the voucher', async () => {
+      (voucherRepo.find as jest.Mock).mockResolvedValueOnce([]);
+
+      const result = await service.validateAndCalculateDiscount(
+        'VOU-10',
+        1000,
+        'user-id',
+      );
+
+      expect(result.message).toBe('You have not claimed this voucher yet');
+      expect(result.isValid).toBe(false);
+    });
+
+    it('returns invalid when every claim has already been used', async () => {
+      (voucherRepo.find as jest.Mock)
+        .mockResolvedValueOnce([mockClaim({ id: 1 })])
+        .mockResolvedValueOnce([{ id: 100, claim: { id: 1 }, claim_id: 1 }]);
+
+      const result = await service.validateAndCalculateDiscount(
+        'VOU-10',
+        1000,
+        'user-id',
+      );
+
+      expect(result.message).toBe('Voucher has already been used');
       expect(result.isValid).toBe(false);
     });
 

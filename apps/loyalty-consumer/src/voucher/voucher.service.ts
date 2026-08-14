@@ -230,31 +230,43 @@ export class VoucherService {
     const entityManager = manager || this.voucherRepository.manager;
     const user = await this.getOrCreateLoyaltyUser(coreUserId, entityManager);
 
-    const claim = await entityManager.findOne(VoucherClaimEntity, {
+    const claims = await entityManager.getRepository(VoucherClaimEntity).find({
       where: {
         voucher: { code: voucherCode },
         user: { id: user.id },
       },
+      order: { created_at: 'ASC' },
     });
 
-    if (!claim) {
+    if (claims.length === 0) {
       throw new BadRequestException('You have not claimed this voucher yet');
     }
 
-    const existingUsage = await entityManager.findOne(VoucherUsageEntity, {
+    const usages = await entityManager.getRepository(VoucherUsageEntity).find({
       where: {
         voucher: { code: voucherCode },
         user: { id: user.id },
       },
+      relations: ['claim'],
     });
 
-    if (existingUsage) {
+    const usedClaimIds = new Set(
+      usages.map((u) => u.claim?.id).filter((id): id is number => !!id),
+    );
+
+    // Each claim is one usable ticket: consume the oldest unused one.
+    // The unique index on voucher_usages.claim_id guards against two
+    // concurrent purchases consuming the same claim (DB-enforced).
+    const availableClaim = claims.find((c) => !usedClaimIds.has(c.id));
+
+    if (!availableClaim) {
       throw new BadRequestException('Voucher has already been used');
     }
 
     const usage = entityManager.create(VoucherUsageEntity, {
       voucher: { code: voucherCode },
       user: user,
+      claim: { id: availableClaim.id },
     });
 
     return entityManager.save(VoucherUsageEntity, usage);
@@ -372,6 +384,43 @@ export class VoucherService {
           message: 'Voucher is not valid for this product or category',
         };
       }
+    }
+
+    // 4b. Require an unused claim (1 use per claim)
+    const claims = await this.claimedVouchersRepository.find({
+      where: {
+        voucher: { code: voucherCode },
+        user: { core_user_id: userId },
+      },
+    });
+
+    if (claims.length === 0) {
+      return {
+        isValid: false,
+        discountAmount: 0,
+        finalPrice: subtotal,
+        message: 'You have not claimed this voucher yet',
+      };
+    }
+
+    const usages = await this.usageRepository.find({
+      where: {
+        voucher: { code: voucherCode },
+        user: { core_user_id: userId },
+      },
+      relations: ['claim'],
+    });
+    const usedClaimIds = new Set(
+      usages.map((u) => u.claim?.id).filter((id): id is number => !!id),
+    );
+    const hasAvailableClaim = claims.some((c) => !usedClaimIds.has(c.id));
+    if (!hasAvailableClaim) {
+      return {
+        isValid: false,
+        discountAmount: 0,
+        finalPrice: subtotal,
+        message: 'Voucher has already been used',
+      };
     }
 
     // 5. Calculate Discount
