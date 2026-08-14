@@ -15,12 +15,17 @@ import { IsUUID, IsEnum, IsNumber } from 'class-validator';
 import {
   VoucherType,
   DiscountType,
+  ClaimPeriod,
 } from '@core/loyalty/voucher/entities/voucher.entity';
 
 export class CreateVoucherDto {
   @IsEnum(VoucherType)
   @IsOptional()
   voucher_type?: VoucherType;
+
+  @IsEnum(ClaimPeriod)
+  @IsOptional()
+  claim_period?: ClaimPeriod;
 
   @IsString()
   @IsNotEmpty()

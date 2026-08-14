@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VoucherService } from './voucher.service';
 import { DataSource } from 'typeorm';
-import { VoucherEntity } from '@core/loyalty/voucher/entities/voucher.entity';
+import {
+  VoucherEntity,
+  ClaimPeriod,
+} from '@core/loyalty/voucher/entities/voucher.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { VoucherCategoryEntity } from '@core/loyalty/voucher/entities/voucher-category.entity';
 import { NotFoundException } from '@nestjs/common';
@@ -258,6 +261,18 @@ describe('VoucherService', () => {
       expect(result.categories).toEqual(categories);
       expect(result.allow_combine_categories).toEqual(combineCategories);
       expect(mockVoucherCategoryRepository.findBy).toHaveBeenCalledTimes(2);
+    });
+
+    it('persists claim_period from the DTO', async () => {
+      mockVoucherRepository.save.mockImplementation((v) => Promise.resolve(v));
+
+      const result = await service.create({
+        code: 'DAILYV',
+        claim_period: ClaimPeriod.DAILY,
+      } as any);
+
+      expect(result.claim_period).toBe(ClaimPeriod.DAILY);
+      expect(mockVoucherRepository.save).toHaveBeenCalled();
     });
   });
 

@@ -5,11 +5,15 @@ import { ResponseLoyaltyUserDto } from './response-loyalty-user.dto';
 import {
   VoucherType,
   DiscountType,
+  ClaimPeriod,
 } from '@core/loyalty/voucher/entities/voucher.entity';
 
 export class ResponseVoucherDto {
   @Expose()
   voucher_type: VoucherType;
+
+  @Expose()
+  claim_period: ClaimPeriod;
 
   @Expose()
   code: string;
