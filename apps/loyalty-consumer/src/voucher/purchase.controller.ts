@@ -19,7 +19,10 @@ import {
 } from '@core/product/entities/order.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
 import { LoyaltyTierEntity } from '@core/loyalty/tier/entities/loyalty-tier.entity';
-import { TierService } from '@core/loyalty/tier/tier.service';
+import {
+  TierService,
+  LevelUpGrantResult,
+} from '@core/loyalty/tier/tier.service';
 import { PointService } from '@core/loyalty/point/point.service';
 import { TierChangeReason } from '@core/loyalty/point/entities/tier-history.entity';
 import { ClientSettingsService } from '@core/database/client-settings/client-settings.service';
@@ -162,6 +165,8 @@ export class PurchaseController {
         );
       }
 
+      let levelUpGrant: LevelUpGrantResult | null = null;
+
       // Points are earned on the cash actually paid so point-funded orders
       // do not earn on the portion settled with points.
       const pointsEarned =
@@ -174,13 +179,14 @@ export class PurchaseController {
           order.id,
           manager,
         );
-        await this.maybeLevelUp(user, manager);
+        levelUpGrant = await this.maybeLevelUp(user, manager);
       }
 
       return {
         ...order,
         points_earned: pointsEarned,
         tier: tier ? { id: tier.id, name: tier.name } : null,
+        level_up_grant: levelUpGrant,
       };
     });
   }
@@ -188,7 +194,7 @@ export class PurchaseController {
   private async maybeLevelUp(
     user: LoyaltyUserEntity,
     manager: EntityManager,
-  ): Promise<void> {
+  ): Promise<LevelUpGrantResult | null> {
     const target = await this.tierService.findHighestTierAtOrBelow(
       Number(user.lifetime_points),
       manager,
@@ -204,6 +210,8 @@ export class PurchaseController {
         TierChangeReason.POINTS_THRESHOLD,
         manager,
       );
+      return this.tierService.grantLevelUpVoucher(user, target, manager);
     }
+    return null;
   }
 }

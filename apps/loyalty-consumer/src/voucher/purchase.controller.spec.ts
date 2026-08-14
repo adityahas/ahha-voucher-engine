@@ -51,6 +51,7 @@ describe('PurchaseController', () => {
     getMultiplierFor: jest.fn().mockResolvedValue(1),
     findLowestActiveTier: jest.fn().mockResolvedValue(null),
     findHighestTierAtOrBelow: jest.fn().mockResolvedValue(null),
+    grantLevelUpVoucher: jest.fn(),
   };
 
   const mockPointService = {
@@ -78,6 +79,11 @@ describe('PurchaseController', () => {
     mockTierService.getMultiplierFor.mockResolvedValue(1);
     mockTierService.findLowestActiveTier.mockResolvedValue(null);
     mockTierService.findHighestTierAtOrBelow.mockResolvedValue(null);
+    mockTierService.grantLevelUpVoucher.mockResolvedValue({
+      granted: true,
+      voucherCode: 'GOLD2030',
+      message: 'granted',
+    });
     controller = new PurchaseController(
       mockVoucherService as any,
       mockDataSource as unknown as DataSource,
@@ -340,6 +346,47 @@ describe('PurchaseController', () => {
         mockEntityManager,
       );
       expect(result.points_earned).toBe(1);
+    });
+
+    it('grants the tier level-up voucher and returns level_up_grant', async () => {
+      mockTierService.findHighestTierAtOrBelow.mockResolvedValue({
+        id: 'gold',
+        name: 'Gold',
+        level_up_voucher_code: 'GOLD2030',
+      });
+      mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
+        isValid: true,
+        discountAmount: 0,
+        finalPrice: 1000,
+      });
+
+      const result = await controller.purchase(mockReq, {
+        product_id: 'prod-id',
+        quantity: 1,
+      });
+
+      expect(mockPointService.recordTierChange).toHaveBeenCalledWith(
+        expect.anything(),
+        null,
+        expect.objectContaining({ id: 'gold' }),
+        TierChangeReason.POINTS_THRESHOLD,
+        mockEntityManager,
+      );
+      expect(mockTierService.grantLevelUpVoucher).toHaveBeenCalled();
+      expect(result.level_up_grant).toEqual({
+        granted: true,
+        voucherCode: 'GOLD2030',
+        message: 'granted',
+      });
+    });
+
+    it('returns level_up_grant: null when no level-up occurs', async () => {
+      const result = await controller.purchase(mockReq, {
+        product_id: 'prod-id',
+        quantity: 1,
+      });
+      expect(mockTierService.grantLevelUpVoucher).not.toHaveBeenCalled();
+      expect(result.level_up_grant).toBeNull();
     });
 
     // ---------------------------------------------------------------
