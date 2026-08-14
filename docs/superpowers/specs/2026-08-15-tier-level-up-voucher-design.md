@@ -100,8 +100,8 @@ rolled-back with the tier change.
 
 Location: `apps/loyalty-consumer/src/voucher/purchase.controller.ts` (~line 188)
 
-- On level-up detected, `getProvider(PurchaseService).grantLevelUpVoucher(...)` (or direct call
-  within service) inside the transaction.
+- On level-up detected, the controller calls `TierService.grantLevelUpVoucher(...)` inside the
+  transaction (the controller already holds an injected `TierService` instance).
 - Purchase response gains a new field:
   ```
   level_up_grant?: { granted: boolean; voucher_code?: string; message: string } | null
@@ -175,9 +175,9 @@ Location: `apps/loyalty-consumer/src/voucher/purchase.controller.ts` (~line 188)
 ## 7. Open decisions to pin in plan
 
 1. `level_up_grant` shape on the purchase response: omit vs `null` when no level-up.
-2. Exact claim-idempotency key (voucher code per user; scope to tier id too?).
+2. Idempotency key: voucher code per loyalty user (single `voucher_claims` row). Scope to tier
+   id too if a code is reused across tiers — pin in plan.
 3. UX wording for the toast.
-4. CSR → loyalty-user resolution for the admin endpoint (reuse `getProfile` path).
 5. Whether admin grant feedback needs a UI surface beyond a toast/alert in `UserDetail`.
 
 ---
