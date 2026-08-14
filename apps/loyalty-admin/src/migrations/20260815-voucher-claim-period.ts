@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class VoucherClaimPeriod20260815 implements MigrationInterface {
-  name = 'VoucherClaimPeriod20260815';
+export class VoucherClaimPeriod1786745960244 implements MigrationInterface {
+  name = 'VoucherClaimPeriod1786745960244';
 
   async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(

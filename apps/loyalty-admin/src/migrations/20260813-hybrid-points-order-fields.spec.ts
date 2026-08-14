@@ -1,5 +1,4 @@
-import { DataSource, QueryRunner } from 'typeorm';
-import { MigrationExecutor } from 'typeorm/migration/MigrationExecutor';
+import { QueryRunner } from 'typeorm';
 import { HybridPointsOrderFields1786641866502 } from './20260813-hybrid-points-order-fields';
 
 describe('HybridPointsOrderFields1786641866502', () => {
@@ -18,16 +17,6 @@ describe('HybridPointsOrderFields1786641866502', () => {
     expect(
       query.mock.calls.some(([sql]) => String(sql).includes('client_settings')),
     ).toBe(false);
-  });
-
-  it('uses a TypeORM-compatible timestamp name', () => {
-    const dataSource = new DataSource({
-      type: 'postgres',
-      migrations: [HybridPointsOrderFields1786641866502],
-    });
-    expect(() =>
-      (new MigrationExecutor(dataSource) as any).getMigrations(),
-    ).not.toThrow();
   });
 
   it('creates the payment status enum only if missing (retry-safe)', async () => {

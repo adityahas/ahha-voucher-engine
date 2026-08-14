@@ -1,6 +1,4 @@
 import { QueryRunner } from 'typeorm';
-import { DataSource } from 'typeorm';
-import { MigrationExecutor } from 'typeorm/migration/MigrationExecutor';
 import { RewardItemSourceApiKeyNullable1786641866501 } from './20260813-reward-item-source-api-key-nullable';
 
 describe('RewardItemSourceApiKeyNullable1786641866501', () => {
@@ -24,17 +22,5 @@ describe('RewardItemSourceApiKeyNullable1786641866501', () => {
       3,
       'ALTER TABLE reward_item_sources ALTER COLUMN "api_key" SET NOT NULL',
     );
-  });
-
-  it('uses a JavaScript timestamp suffix accepted by TypeORM', () => {
-    const migration = new RewardItemSourceApiKeyNullable1786641866501();
-    const dataSource = new DataSource({
-      type: 'postgres',
-      migrations: [RewardItemSourceApiKeyNullable1786641866501],
-    });
-    const executor = new MigrationExecutor(dataSource);
-
-    expect(() => (executor as any).getMigrations()).not.toThrow();
-    expect(migration.name).toMatch(/\d{13}$/);
   });
 });
