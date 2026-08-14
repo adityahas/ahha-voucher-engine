@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "html-visual": {
+      "source": "2ykwang/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/html-visual/SKILL.md",
+      "computedHash": "13c989681fe38b520b19508b83abfc62f36199b06b112d2a495996cfd6f7390f"
+    }
+  }
+}
