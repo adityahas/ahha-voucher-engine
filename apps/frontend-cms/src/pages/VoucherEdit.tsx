@@ -9,12 +9,18 @@ import {
 } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { getVoucherByCode, updateVoucher, VoucherType } from '../api/vouchers';
+import {
+  getVoucherByCode,
+  updateVoucher,
+  VoucherType,
+  ClaimPeriod,
+} from '../api/vouchers';
 import {
   DiscountType,
   DISCOUNT_TYPE_MAP,
   formatDiscountType,
 } from '../lib/discount-type';
+import { CLAIM_PERIOD_MAP } from '../lib/claim-period';
 import {
   getVoucherCategories,
   VoucherCategory,
@@ -29,6 +35,7 @@ import {
   Image as ImageIcon,
   Loader2,
   Plus,
+  Repeat,
   Save,
   Tag,
   Ticket,
@@ -41,6 +48,7 @@ export const VoucherEdit: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     voucher_type: 'CLAIMABLE' as VoucherType,
+    claim_period: 'ONCE' as ClaimPeriod,
     description: '',
     quota: 0,
     image: '',
@@ -73,6 +81,7 @@ export const VoucherEdit: React.FC = () => {
         setAvailableUsers(usersData);
         setFormData({
           voucher_type: voucherData.voucher_type || 'CLAIMABLE',
+          claim_period: voucherData.claim_period || 'ONCE',
           description: voucherData.description || '',
           quota: voucherData.quota,
           image: voucherData.image || '',
@@ -234,12 +243,17 @@ export const VoucherEdit: React.FC = () => {
                         id="voucher_type"
                         name="voucher_type"
                         value={formData.voucher_type}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const nextType = e.target.value as VoucherType;
                           setFormData((prev) => ({
                             ...prev,
-                            voucher_type: e.target.value as VoucherType,
-                          }))
-                        }
+                            voucher_type: nextType,
+                            claim_period:
+                              nextType === 'UNIQUE_CODE'
+                                ? 'ONCE'
+                                : prev.claim_period,
+                          }));
+                        }}
                         className="w-full h-10 rounded-md bg-slate-800/50 border border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10 pr-4 text-sm text-slate-100 appearance-none focus:outline-none focus:ring-1 focus:ring-primary-500/50"
                       >
                         <option value="CLAIMABLE">
@@ -248,6 +262,40 @@ export const VoucherEdit: React.FC = () => {
                         <option value="UNIQUE_CODE">
                           UNIQUE CODE (Single-claim)
                         </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="claim_period"
+                      className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1"
+                    >
+                      Claim Period
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Repeat className="h-4 w-4 text-slate-500" />
+                      </div>
+                      <select
+                        id="claim_period"
+                        name="claim_period"
+                        value={formData.claim_period}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            claim_period: e.target.value as ClaimPeriod,
+                          }))
+                        }
+                        disabled={formData.voucher_type === 'UNIQUE_CODE'}
+                        className="w-full h-10 rounded-md bg-slate-800/50 border border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 pl-10 pr-4 text-sm text-slate-100 appearance-none focus:outline-none focus:ring-1 focus:ring-primary-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {Object.entries(CLAIM_PERIOD_MAP).map(
+                          ([value, info]) => (
+                            <option key={value} value={value}>
+                              {value} — {info.label.id}
+                            </option>
+                          ),
+                        )}
                       </select>
                     </div>
                   </div>
