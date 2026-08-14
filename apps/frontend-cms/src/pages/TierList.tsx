@@ -138,6 +138,9 @@ export default function TierList() {
                       Extra Disc %
                     </TableHead>
                     <TableHead className="font-bold text-slate-300">
+                      Level-Up Voucher
+                    </TableHead>
+                    <TableHead className="font-bold text-slate-300">
                       Active
                     </TableHead>
                     <TableHead className="text-right font-bold text-slate-300">
@@ -166,6 +169,9 @@ export default function TierList() {
                       </TableCell>
                       <TableCell className="font-mono text-slate-300">
                         {t.extra_discount_percent}%
+                      </TableCell>
+                      <TableCell className="font-mono text-slate-300">
+                        {t.level_up_voucher_code || '—'}
                       </TableCell>
                       <TableCell>
                         {t.is_active ? (

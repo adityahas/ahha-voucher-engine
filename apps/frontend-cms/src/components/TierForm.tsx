@@ -18,6 +18,7 @@ export default function TierForm({
     point_multiplier: Number(initial?.point_multiplier ?? 1),
     extra_discount_percent: Number(initial?.extra_discount_percent ?? 0),
     exclusive_window_hours: Number(initial?.exclusive_window_hours ?? 0),
+    level_up_voucher_code: initial?.level_up_voucher_code ?? '',
     is_active: initial?.is_active ?? true,
     category_overrides: initial?.category_overrides ?? [],
   });
@@ -75,6 +76,13 @@ export default function TierForm({
         type="number"
         value={form.exclusive_window_hours}
         onChange={(e) => set('exclusive_window_hours', Number(e.target.value))}
+      />
+      <Input
+        label="Level-Up Voucher Code"
+        value={form.level_up_voucher_code ?? ''}
+        onChange={(e) => set('level_up_voucher_code', e.target.value)}
+        placeholder="e.g. GOLD2030"
+        helperText="Auto-granted free voucher when a user reaches this tier."
       />
       <label className="flex items-center gap-3 cursor-pointer select-none">
         <input

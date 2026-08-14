@@ -9,6 +9,7 @@ export interface Tier {
   extra_discount_percent: number;
   is_active: boolean;
   exclusive_window_hours: number;
+  level_up_voucher_code?: string | null;
   category_overrides?: {
     id: string;
     category: { id: string; name: string };
@@ -24,6 +25,7 @@ export interface TierInput {
   extra_discount_percent?: number;
   is_active?: boolean;
   exclusive_window_hours?: number;
+  level_up_voucher_code?: string | null;
   category_overrides?: { category_id: string; point_multiplier: number }[];
 }
 
