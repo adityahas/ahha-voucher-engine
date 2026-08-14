@@ -24,6 +24,14 @@ export enum DiscountType {
   FIXED_AMOUNT = 'FIXED_AMOUNT',
 }
 
+export enum ClaimPeriod {
+  FREE = 'FREE',
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  ONCE = 'ONCE',
+}
+
 /**
  * Voucher adalah entitas utama yang merepresentasikan kupon yang dapat diklaim oleh user.
  * Setiap voucher memiliki kategori, masa berlaku, binding, dan daftar target user.
@@ -39,6 +47,13 @@ export class VoucherEntity extends BaseEntity {
     default: VoucherType.CLAIMABLE,
   })
   voucher_type: VoucherType;
+
+  @Column({
+    type: 'enum',
+    enum: ClaimPeriod,
+    default: ClaimPeriod.ONCE,
+  })
+  claim_period: ClaimPeriod;
 
   @Column({ type: 'text', nullable: true })
   description: string;

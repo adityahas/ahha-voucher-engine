@@ -24,4 +24,7 @@ export class LoyaltyUserEntity {
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   balance_points: number;
+
+  @Column({ type: 'varchar', nullable: true, default: 'Asia/Jakarta' })
+  timezone: string;
 }
