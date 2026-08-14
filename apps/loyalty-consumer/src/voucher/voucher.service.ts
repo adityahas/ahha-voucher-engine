@@ -7,7 +7,10 @@ import { GetEligibleVoucherDto } from './dto/get-eligible-voucher.dto';
 import {
   VoucherEntity,
   DiscountType,
+  VoucherType,
+  ClaimPeriod,
 } from '@core/loyalty/voucher/entities/voucher.entity';
+import { isWithinCurrentPeriod, resolveTimezone } from './claim-period.util';
 import { DataSource, Repository, EntityManager } from 'typeorm';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 import { LoyaltyUserEntity } from '@core/loyalty/entities/loyalty-user.entity';
@@ -150,16 +153,7 @@ export class VoucherService {
         throw new BadRequestException('Voucher is not valid for this user');
       }
 
-      const existingClaim = await manager.findOne(VoucherClaimEntity, {
-        where: {
-          voucher: { code: voucherCode },
-          user: { id: user.id },
-        },
-      });
-
-      if (existingClaim) {
-        throw new BadRequestException('You have already claimed this voucher');
-      }
+      await this.assertCanClaim(manager, voucher, user);
 
       const newClaim = manager.create(VoucherClaimEntity, {
         voucher: { code: voucherCode },
@@ -176,6 +170,56 @@ export class VoucherService {
         message: 'Voucher claimed successfully!',
       };
     });
+  }
+
+  private async assertCanClaim(
+    manager: EntityManager,
+    voucher: VoucherEntity,
+    user: LoyaltyUserEntity,
+  ): Promise<void> {
+    const period = voucher.claim_period ?? ClaimPeriod.ONCE;
+
+    if (
+      voucher.voucher_type === VoucherType.UNIQUE_CODE ||
+      period === ClaimPeriod.ONCE
+    ) {
+      const existingClaim = await manager.findOne(VoucherClaimEntity, {
+        where: {
+          voucher: { code: voucher.code },
+          user: { id: user.id },
+        },
+      });
+      if (existingClaim) {
+        throw new BadRequestException('You have already claimed this voucher');
+      }
+      return;
+    }
+
+    if (period === ClaimPeriod.FREE) {
+      return;
+    }
+
+    const latestClaim = await manager.findOne(VoucherClaimEntity, {
+      where: {
+        voucher: { code: voucher.code },
+        user: { id: user.id },
+      },
+      order: { created_at: 'DESC' },
+    });
+
+    if (
+      latestClaim &&
+      isWithinCurrentPeriod(
+        period,
+        latestClaim.created_at,
+        new Date(),
+        resolveTimezone(user.timezone),
+      )
+    ) {
+      throw new BadRequestException(
+        'You have already claimed this voucher within the current period',
+      );
+    }
   }
 
   async useVoucher(

@@ -5,6 +5,7 @@ import {
   VoucherEntity,
   DiscountType,
   VoucherType,
+  ClaimPeriod,
 } from '@core/loyalty/voucher/entities/voucher.entity';
 import { VoucherClaimEntity } from '@core/loyalty/voucher/entities/voucher-claim.entity';
 import { VoucherUsageEntity } from '@core/loyalty/voucher/entities/voucher-usage.entity';
@@ -28,6 +29,7 @@ describe('VoucherService', () => {
     ({
       code: 'VOU-10',
       voucher_type: VoucherType.CLAIMABLE,
+      claim_period: ClaimPeriod.ONCE,
       description: 'desc',
       quota: 10,
       image: null,
@@ -326,6 +328,10 @@ describe('VoucherService', () => {
       );
     });
 
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('throws NotFoundException when voucher does not exist', async () => {
       txManager.findOne.mockResolvedValueOnce(null);
 
@@ -361,11 +367,122 @@ describe('VoucherService', () => {
       );
     });
 
-    it('throws BadRequestException when voucher already claimed', async () => {
+    it('throws BadRequestException when voucher already claimed (ONCE)', async () => {
       const voucher = makeVoucher();
       txManager.findOne.mockResolvedValueOnce(voucher);
       txManager.findOne.mockResolvedValueOnce({ id: 9 }); // existing claim
+      await expect(service.claimVoucher('user-id', 'VOU-10')).rejects.toThrow(
+        'You have already claimed this voucher',
+      );
+    });
 
+    it('allows re-claiming a FREE voucher even when a claim exists', async () => {
+      const voucher = makeVoucher({ claim_period: ClaimPeriod.FREE, quota: 5 });
+      txManager.findOne.mockResolvedValueOnce(voucher);
+      txManager.findOne.mockResolvedValueOnce({ id: 9 }); // existing claim exists
+      txManager.create.mockImplementation((_, data) => data);
+      txManager.save.mockImplementation((_, data) => Promise.resolve(data));
+
+      const result = await service.claimVoucher('user-id', 'VOU-10');
+
+      expect(result).toEqual({
+        success: true,
+        message: 'Voucher claimed successfully!',
+      });
+      expect(voucher.quota).toBe(4);
+    });
+
+    it('blocks DAILY re-claim within the current local day', async () => {
+      jest.useFakeTimers().setSystemTime(new Date('2026-08-15T17:00:00.000Z'));
+      const voucher = makeVoucher({
+        claim_period: ClaimPeriod.DAILY,
+        quota: 5,
+      });
+      const todayWibClaim = new Date('2026-08-15T17:00:00.000Z'); // 00:00 WIB
+      txManager.findOne.mockResolvedValueOnce(voucher);
+      txManager.findOne.mockResolvedValueOnce({
+        id: 9,
+        created_at: todayWibClaim,
+      });
+      await expect(service.claimVoucher('user-id', 'VOU-10')).rejects.toThrow(
+        'You have already claimed this voucher within the current period',
+      );
+    });
+
+    it('allows DAILY re-claim on a new local day', async () => {
+      jest.useFakeTimers().setSystemTime(new Date('2026-08-15T17:00:00.000Z'));
+      const voucher = makeVoucher({
+        claim_period: ClaimPeriod.DAILY,
+        quota: 5,
+      });
+      const yesterdayWib = new Date('2026-08-15T16:59:59.999Z');
+      txManager.findOne.mockResolvedValueOnce(voucher);
+      txManager.findOne.mockResolvedValueOnce({
+        id: 9,
+        created_at: yesterdayWib,
+      });
+      txManager.create.mockImplementation((_, data) => data);
+      txManager.save.mockImplementation((_, data) => Promise.resolve(data));
+
+      const result = await service.claimVoucher('user-id', 'VOU-10');
+      expect(result.success).toBe(true);
+      expect(voucher.quota).toBe(4);
+    });
+
+    it('blocks WEEKLY re-claim within the same Monday-Sunday week', async () => {
+      jest.useFakeTimers().setSystemTime(new Date('2026-08-15T17:00:00.000Z'));
+      const voucher = makeVoucher({
+        claim_period: ClaimPeriod.WEEKLY,
+        quota: 5,
+      });
+      const mondayWib = new Date('2026-08-09T17:00:00.000Z'); // Mon 00:00 WIB
+      txManager.findOne.mockResolvedValueOnce(voucher);
+      txManager.findOne.mockResolvedValueOnce({ id: 9, created_at: mondayWib });
+      await expect(service.claimVoucher('user-id', 'VOU-10')).rejects.toThrow(
+        'You have already claimed this voucher within the current period',
+      );
+    });
+
+    it('allows WEEKLY re-claim the following Monday', async () => {
+      jest.useFakeTimers().setSystemTime(new Date('2026-08-16T17:00:00.000Z'));
+      const voucher = makeVoucher({
+        claim_period: ClaimPeriod.WEEKLY,
+        quota: 5,
+      });
+      const lastMonday = new Date('2026-08-09T17:00:00.000Z');
+      txManager.findOne.mockResolvedValueOnce(voucher);
+      txManager.findOne.mockResolvedValueOnce({
+        id: 9,
+        created_at: lastMonday,
+      });
+      txManager.create.mockImplementation((_, data) => data);
+      txManager.save.mockImplementation((_, data) => Promise.resolve(data));
+
+      const result = await service.claimVoucher('user-id', 'VOU-10');
+      expect(result.success).toBe(true);
+    });
+
+    it('blocks MONTHLY re-claim within the same month', async () => {
+      jest.useFakeTimers().setSystemTime(new Date('2026-08-15T17:00:00.000Z'));
+      const voucher = makeVoucher({
+        claim_period: ClaimPeriod.MONTHLY,
+        quota: 5,
+      });
+      const aug1Wib = new Date('2026-07-31T17:00:00.000Z'); // Aug 1 00:00 WIB
+      txManager.findOne.mockResolvedValueOnce(voucher);
+      txManager.findOne.mockResolvedValueOnce({ id: 9, created_at: aug1Wib });
+      await expect(service.claimVoucher('user-id', 'VOU-10')).rejects.toThrow(
+        'You have already claimed this voucher within the current period',
+      );
+    });
+
+    it('keeps UNIQUE_CODE as 1x-forever regardless of claim_period', async () => {
+      const voucher = makeVoucher({
+        voucher_type: VoucherType.UNIQUE_CODE,
+        claim_period: ClaimPeriod.FREE,
+      });
+      txManager.findOne.mockResolvedValueOnce(voucher);
+      txManager.findOne.mockResolvedValueOnce({ id: 9 }); // existing claim
       await expect(service.claimVoucher('user-id', 'VOU-10')).rejects.toThrow(
         'You have already claimed this voucher',
       );
