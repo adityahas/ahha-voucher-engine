@@ -12,6 +12,56 @@ import {
   Gift,
   Layers,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+interface NavItem {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+interface NavSection {
+  heading: string;
+  items: NavItem[];
+}
+
+const NAV_SECTIONS: NavSection[] = [
+  {
+    heading: 'Overview',
+    items: [{ to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard }],
+  },
+  {
+    heading: 'Users',
+    items: [{ to: '/users', label: 'User Management', icon: Users }],
+  },
+  {
+    heading: 'Vouchers',
+    items: [
+      { to: '/vouchers', label: 'Voucher Management', icon: Ticket },
+      {
+        to: '/voucher-categories',
+        label: 'Voucher Categories',
+        icon: LayoutGrid,
+      },
+    ],
+  },
+  {
+    heading: 'Catalog',
+    items: [{ to: '/products', label: 'Product Management', icon: Package }],
+  },
+  {
+    heading: 'Loyalty',
+    items: [
+      { to: '/tiers', label: 'Tier Management', icon: Layers },
+      { to: '/rewards', label: 'Reward Management', icon: Gift },
+      { to: '/reward-sources', label: 'Reward Sources', icon: Gift },
+    ],
+  },
+  {
+    heading: 'System',
+    items: [{ to: '/settings/currency', label: 'Settings', icon: Settings }],
+  },
+];
 
 export const MainLayout: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
@@ -43,127 +93,32 @@ export const MainLayout: React.FC = () => {
             </p>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2">
-            <NavLink
-              to="/dashboard"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <LayoutDashboard size={20} />
-              <span>Dashboard</span>
-            </NavLink>
-            <NavLink
-              to="/users"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <Users size={20} />
-              <span>User Management</span>
-            </NavLink>
-            <NavLink
-              to="/vouchers"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <Ticket size={20} />
-              <span>Voucher Management</span>
-            </NavLink>
-            <NavLink
-              to="/voucher-categories"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <LayoutGrid size={20} />
-              <span>Voucher Categories</span>
-            </NavLink>
-            <NavLink
-              to="/products"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <Package size={20} />
-              <span>Product Management</span>
-            </NavLink>
-            <p className="px-4 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-              Loyalty
-            </p>
-            <NavLink
-              to="/tiers"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <Layers size={20} />
-              <span>Tier Management</span>
-            </NavLink>
-            <NavLink
-              to="/rewards"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <Gift size={20} />
-              <span>Reward Management</span>
-            </NavLink>
-            <NavLink
-              to="/reward-sources"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <Gift size={20} />
-              <span>Reward Sources</span>
-            </NavLink>
-            <NavLink
-              to="/settings/currency"
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
-                }`
-              }
-            >
-              <Settings size={20} />
-              <span>Settings</span>
-            </NavLink>
+          <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
+            {NAV_SECTIONS.map((section) => (
+              <div key={section.heading}>
+                <p className="px-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  {section.heading}
+                </p>
+                <div className="space-y-1">
+                  {section.items.map(({ to, label, icon: Icon }) => (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      className={({ isActive }) =>
+                        `flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-colors ${
+                          isActive
+                            ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
+                            : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent'
+                        }`
+                      }
+                    >
+                      <Icon size={20} />
+                      <span>{label}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            ))}
           </nav>
 
           <div className="p-4 border-t border-slate-700/50">
