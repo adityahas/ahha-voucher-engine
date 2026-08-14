@@ -54,6 +54,10 @@ export class CreateTierDto {
   exclusive_window_hours?: number;
 
   @IsOptional()
+  @IsString()
+  level_up_voucher_code?: string;
+
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateTierCategoryOverrideDto)

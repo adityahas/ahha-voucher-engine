@@ -28,6 +28,9 @@ export class LoyaltyTierEntity extends BaseEntity {
   @Column({ type: 'int', default: 0 })
   exclusive_window_hours: number;
 
+  @Column({ type: 'varchar', nullable: true })
+  level_up_voucher_code: string | null;
+
   @OneToMany(() => TierCategoryOverrideEntity, (o) => o.tier, {
     cascade: true,
   })
