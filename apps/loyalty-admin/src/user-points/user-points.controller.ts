@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserPointsService } from './user-points.service';
 import { AdjustPointsDto } from './dto/adjust-points.dto';
+import { AssignTierDto } from './dto/assign-tier.dto';
 import { AdminJwtGuard } from '@core/auth/guards/admin-jwt.guard';
 import { AclGuard } from '@core/auth/guards/acl.guard';
 import { Permissions } from '@core/auth/decorators/permissions.decorator';
@@ -53,5 +54,14 @@ export class UserPointsController {
       dto.delta,
       dto.reason,
     );
+  }
+
+  @Post(':coreUserId/tier')
+  @Permissions('manage:points')
+  assignTier(
+    @Param('coreUserId') coreUserId: string,
+    @Body() dto: AssignTierDto,
+  ) {
+    return this.userPointsService.assignTier(coreUserId, dto.tier_id);
   }
 }
