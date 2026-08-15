@@ -8,6 +8,8 @@ import {
   CardTitle,
 } from '../components/ui/Card';
 import { getUserById, User } from '../api/users';
+import { getTiers, Tier } from '../api/tiers';
+import { assignUserTier } from '../api/user-points';
 import {
   Activity,
   AlertCircle,
@@ -27,6 +29,11 @@ export const UserDetail: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [tiers, setTiers] = useState<Tier[]>([]);
+  const [selectedTierId, setSelectedTierId] = useState('');
+  const [assignStatus, setAssignStatus] = useState<string | null>(null);
+  const [assignError, setAssignError] = useState<string | null>(null);
 
   const fetchUser = async () => {
     if (!id) return;
@@ -48,6 +55,29 @@ export const UserDetail: React.FC = () => {
   useEffect(() => {
     fetchUser();
   }, [id]);
+
+  useEffect(() => {
+    getTiers()
+      .then(setTiers)
+      .catch(() => setTiers([]));
+  }, []);
+
+  const handleAssignTier = async () => {
+    if (!id || !selectedTierId) return;
+    setAssignError(null);
+    setAssignStatus(null);
+    try {
+      const result = await assignUserTier(id, selectedTierId);
+      const selected = tiers.find((t) => t.id === selectedTierId);
+      setAssignStatus(
+        result.granted
+          ? `Assigned ${selected?.name}. Grants free voucher ${result.voucherCode}!`
+          : `Assigned ${selected?.name}. No grant: ${result.message}.`,
+      );
+    } catch (err: any) {
+      setAssignError(err.message || 'Failed to assign tier');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -192,6 +222,58 @@ export const UserDetail: React.FC = () => {
                 </p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate-700/50">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <UserCog className="w-5 h-5 text-primary-400" />
+              Loyalty Tier
+            </CardTitle>
+            <CardDescription>
+              Assign a loyalty tier and auto-grant its level-up voucher.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <label className="flex-1 space-y-1.5">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider ml-1">
+                  Assign Tier
+                </span>
+                <select
+                  className="w-full py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white px-4 focus:ring-2 focus:ring-primary-500"
+                  value={selectedTierId}
+                  onChange={(e) => setSelectedTierId(e.target.value)}
+                >
+                  <option value="">Select tier...</option>
+                  {tiers.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleAssignTier}
+                disabled={!selectedTierId}
+                className="sm:w-40"
+              >
+                Assign Tier
+              </Button>
+            </div>
+            {assignStatus && (
+              <p className="text-sm font-semibold text-primary-300">
+                {assignStatus}
+              </p>
+            )}
+            {assignError && (
+              <p className="text-sm font-semibold text-red-400">
+                {assignError}
+              </p>
+            )}
           </CardContent>
         </Card>
 

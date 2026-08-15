@@ -10,13 +10,19 @@ vi.mock('../api/users', () => {
   };
 });
 
+vi.mock('../api/user-points', () => ({ assignUserTier: vi.fn() }));
+vi.mock('../api/tiers', () => ({ getTiers: vi.fn() }));
+
 import { getUserById } from '../api/users';
+import { assignUserTier } from '../api/user-points';
+import { getTiers } from '../api/tiers';
 
 describe('UserDetail component tests', () => {
   const mockNavigate = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    (getTiers as any).mockResolvedValue([]);
   });
 
   // Since we use modern React Router useNavigate internally, we inject MemoryRouter for test layouts
@@ -90,5 +96,37 @@ describe('UserDetail component tests', () => {
       expect(screen.getByText('User Not Found')).toBeInTheDocument();
       expect(screen.getByText('Unauthorized Access')).toBeInTheDocument();
     });
+  });
+
+  it('assigns a tier and shows the grant email-style feedback', async () => {
+    (getUserById as any).mockResolvedValue({
+      id: 'test-uuid-123',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'admin',
+      phone: '555-0100',
+      is_active: true,
+      is_deleted: false,
+      created_at: '2025-01-01T12:00:00.000Z',
+      updated_at: '2025-01-02T12:00:00.000Z',
+    });
+    (getTiers as any).mockResolvedValue([
+      { id: 'gold', name: 'Gold' },
+      { id: 'bronze', name: 'Bronze' },
+    ]);
+    (assignUserTier as any).mockResolvedValue({
+      granted: true,
+      voucherCode: 'GOLD2030',
+      message: 'granted',
+    });
+
+    renderWithRouter(<UserDetail />);
+
+    const select = await screen.findByLabelText('Assign Tier');
+    fireEvent.change(select, { target: { value: 'gold' } });
+    fireEvent.click(screen.getByRole('button', { name: /assign tier/i }));
+
+    expect(await screen.findByText(/GOLD2030/)).toBeTruthy();
+    expect(assignUserTier).toHaveBeenCalledWith('test-uuid-123', 'gold');
   });
 });
