@@ -5,6 +5,8 @@ import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { Save } from 'lucide-react';
 
+const isEligible = (v: Voucher) => v.deleted_at === null && v.quota !== 0;
+
 export default function TierForm({
   initial,
   onSubmit,
@@ -26,12 +28,23 @@ export default function TierForm({
 
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [vouchersError, setVouchersError] = useState(false);
+  const [vouchersLoading, setVouchersLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
     getVouchers()
-      .then((value) => active && setVouchers(value))
-      .catch(() => active && setVouchersError(true));
+      .then((value) => {
+        if (active) {
+          setVouchers(value);
+          setVouchersLoading(false);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setVouchersError(true);
+          setVouchersLoading(false);
+        }
+      });
     return () => {
       active = false;
     };
@@ -106,19 +119,15 @@ export default function TierForm({
           className="w-full h-12 rounded-xl bg-slate-900/50 border border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 px-4 text-sm text-slate-100 appearance-none focus:outline-none focus:ring-1 focus:ring-primary-500/50 disabled:opacity-60"
         >
           <option value="">No voucher</option>
-          {vouchers
-            .filter((v) => v.deleted_at === null && v.quota !== 0)
-            .map((v) => (
-              <option key={v.code} value={v.code}>
-                {v.code} — {v.name}
-              </option>
-            ))}
-          {form.level_up_voucher_code &&
+          {vouchers.filter(isEligible).map((v) => (
+            <option key={v.code} value={v.code}>
+              {v.code} — {v.name}
+            </option>
+          ))}
+          {!vouchersLoading &&
+            form.level_up_voucher_code &&
             !vouchers.some(
-              (v) =>
-                v.code === form.level_up_voucher_code &&
-                v.deleted_at === null &&
-                v.quota !== 0,
+              (v) => v.code === form.level_up_voucher_code && isEligible(v),
             ) && (
               <option value={form.level_up_voucher_code}>
                 {form.level_up_voucher_code} — (inactive)

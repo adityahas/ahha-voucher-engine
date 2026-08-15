@@ -131,4 +131,24 @@ describe('TierForm', () => {
       ),
     );
   });
+
+  it('shows only No Voucher when no eligible vouchers exist', async () => {
+    (vouchersApi.getVouchers as any).mockResolvedValue([
+      { code: 'GONE', name: 'Gone', quota: 5, deleted_at: '2026-01-01' },
+      { code: 'SOLD', name: 'Sold out', quota: 0, deleted_at: null },
+    ]);
+    render(<TierForm initial={{ name: 'Gold' }} onSubmit={onSubmit} />);
+
+    const select = await screen.findByLabelText(/Level-Up Voucher Code/i);
+    expect(select).toBeInTheDocument();
+    expect(
+      screen.getByRole('option', { name: /No voucher/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('option', { name: /GONE/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('option', { name: /SOLD/i }),
+    ).not.toBeInTheDocument();
+  });
 });
