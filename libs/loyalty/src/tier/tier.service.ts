@@ -68,13 +68,6 @@ export class TierService {
     const voucherRepo = manager.getRepository(VoucherEntity);
     const claimRepo = manager.getRepository(VoucherClaimEntity);
 
-    const existing = await claimRepo.findOne({
-      where: { voucher: { code }, user: { id: user.id } },
-    });
-    if (existing) {
-      return { granted: false, message: 'already-claimed' };
-    }
-
     const voucher = await voucherRepo.findOne({
       where: { code },
       lock: { mode: 'pessimistic_write' },
@@ -84,6 +77,13 @@ export class TierService {
     }
     if (voucher.quota <= 0) {
       return { granted: false, message: 'quota-exhausted' };
+    }
+
+    const existing = await claimRepo.findOne({
+      where: { voucher: { code }, user: { id: user.id } },
+    });
+    if (existing) {
+      return { granted: false, message: 'already-claimed' };
     }
 
     const claim = claimRepo.create({ voucher: { code }, user });

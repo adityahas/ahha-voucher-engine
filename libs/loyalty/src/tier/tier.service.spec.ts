@@ -100,8 +100,11 @@ describe('TierService.grantLevelUpVoucher', () => {
   });
 
   it('returns already-claimed when a claim row already exists for the code', async () => {
+    const voucherRepo = {
+      findOne: jest.fn().mockResolvedValue({ code: 'GOLD2030', quota: 5 }),
+    };
     const claimRepo = { findOne: jest.fn().mockResolvedValue({ id: 9 }) };
-    const { service, manager } = makeService({}, claimRepo);
+    const { service, manager } = makeService(voucherRepo, claimRepo);
     const tier = new LoyaltyTierEntity();
     tier.level_up_voucher_code = 'GOLD2030';
 
@@ -115,6 +118,32 @@ describe('TierService.grantLevelUpVoucher', () => {
       where: { voucher: { code: 'GOLD2030' }, user: { id: 'u1' } },
     });
     expect(result).toEqual({ granted: false, message: 'already-claimed' });
+  });
+
+  it('locks the voucher row with pessimistic_write before checking claims', async () => {
+    const voucher = { code: 'GOLD2030', quota: 5 };
+    const voucherRepo = {
+      findOne: jest.fn().mockResolvedValue(voucher),
+      save: jest.fn().mockResolvedValue(voucher),
+    };
+    const claimRepo = {
+      findOne: jest.fn().mockResolvedValue(null),
+      create: jest.fn((partial: any) => partial),
+      save: jest.fn().mockResolvedValue({}),
+    };
+    const { service, manager } = makeService(voucherRepo, claimRepo);
+    const tier = new LoyaltyTierEntity();
+    tier.level_up_voucher_code = 'GOLD2030';
+
+    await service.grantLevelUpVoucher(user, tier, manager as any);
+
+    expect(voucherRepo.findOne).toHaveBeenCalledWith({
+      where: { code: 'GOLD2030' },
+      lock: { mode: 'pessimistic_write' },
+    });
+    expect(voucherRepo.findOne.mock.invocationCallOrder[0]).toBeLessThan(
+      claimRepo.findOne.mock.invocationCallOrder[0],
+    );
   });
 
   it('returns voucher-missing when the configured code no longer exists', async () => {

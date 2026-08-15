@@ -185,7 +185,7 @@ export class PurchaseController {
       return {
         ...order,
         points_earned: pointsEarned,
-        tier: tier ? { id: tier.id, name: tier.name } : null,
+        tier: user.tier ? { id: user.tier.id, name: user.tier.name } : null,
         level_up_grant: levelUpGrant,
       };
     });

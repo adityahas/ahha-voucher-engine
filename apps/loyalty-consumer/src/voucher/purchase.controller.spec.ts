@@ -346,6 +346,7 @@ describe('PurchaseController', () => {
         mockEntityManager,
       );
       expect(result.points_earned).toBe(1);
+      expect(result.tier).toEqual({ id: 's', name: 'Silver' });
     });
 
     it('grants the tier level-up voucher and returns level_up_grant', async () => {
