@@ -256,16 +256,19 @@ export const CheckoutView: React.FC = () => {
 
     try {
       setTxnStatus('processing');
-      await executePurchase({
+      const result = await executePurchase({
         product_id: product.id,
         quantity,
         voucher_code: voucherCode || undefined,
         points_to_use: pointsToUse > 0 ? pointsToUse : undefined,
       });
       setTxnStatus('success');
-      setTxnMessage(
-        `You've successfully purchased ${quantity}x ${product.name}!`,
-      );
+      let message = `You've successfully purchased ${quantity}x ${product.name}!`;
+      if (result?.level_up_grant?.granted) {
+        const tierName = result.tier?.name ?? 'new';
+        message += ` You reached ${tierName} tier! Here's your free voucher: ${result.level_up_grant.voucherCode}`;
+      }
+      setTxnMessage(message);
     } catch (err: any) {
       setTxnStatus('error');
       setTxnMessage(

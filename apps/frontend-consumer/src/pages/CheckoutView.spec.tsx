@@ -235,6 +235,31 @@ describe('CheckoutView Automation Suite', () => {
     });
   });
 
+  it('shows a level-up grant message when the purchase grants a free voucher', async () => {
+    (productsApi.getProductById as any).mockResolvedValue(mockProduct);
+    (purchaseApi.executePurchase as any).mockResolvedValue({
+      success: true,
+      tier: { id: 'gold', name: 'Gold' },
+      level_up_grant: {
+        granted: true,
+        voucherCode: 'GOLD2030',
+        message: 'granted',
+      },
+    });
+    renderComponent();
+    await waitFor(() =>
+      expect(screen.getByText('Holiday Gift Card')).toBeInTheDocument(),
+    );
+
+    fireEvent.click(screen.getByText(/Complete Purchase/i));
+
+    expect(
+      await screen.findByText(
+        /You reached Gold tier! Here's your free voucher: GOLD2030/,
+      ),
+    ).toBeTruthy();
+  });
+
   it('Verifies aesthetic directives: glassmorphism presence', async () => {
     (productsApi.getProductById as any).mockResolvedValue(mockProduct);
     renderComponent();
