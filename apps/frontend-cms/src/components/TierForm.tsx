@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getVouchers, Voucher } from '../api/vouchers';
 import { TierInput } from '../api/tiers';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
@@ -22,6 +23,20 @@ export default function TierForm({
     is_active: initial?.is_active ?? true,
     category_overrides: initial?.category_overrides ?? [],
   });
+
+  const [vouchers, setVouchers] = useState<Voucher[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    getVouchers()
+      .then((value) => active && setVouchers(value))
+      .catch(() => {
+        // handled in Task 2
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const set = (key: keyof TierInput, value: any) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -77,13 +92,43 @@ export default function TierForm({
         value={form.exclusive_window_hours}
         onChange={(e) => set('exclusive_window_hours', Number(e.target.value))}
       />
-      <Input
-        label="Level-Up Voucher Code"
-        value={form.level_up_voucher_code ?? ''}
-        onChange={(e) => set('level_up_voucher_code', e.target.value)}
-        placeholder="e.g. GOLD2030"
-        helperText="Auto-granted free voucher when a user reaches this tier."
-      />
+      <div className="space-y-1.5">
+        <label
+          htmlFor="level_up_voucher_code"
+          className="text-xs font-bold text-slate-300 uppercase tracking-wider ml-1"
+        >
+          Level-Up Voucher Code
+        </label>
+        <select
+          id="level_up_voucher_code"
+          value={form.level_up_voucher_code ?? ''}
+          onChange={(e) => set('level_up_voucher_code', e.target.value)}
+          className="w-full h-12 rounded-xl bg-slate-900/50 border border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 px-4 text-sm text-slate-100 appearance-none focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+        >
+          <option value="">No voucher</option>
+          {vouchers
+            .filter((v) => v.deleted_at === null && v.quota !== 0)
+            .map((v) => (
+              <option key={v.code} value={v.code}>
+                {v.code} — {v.name}
+              </option>
+            ))}
+          {form.level_up_voucher_code &&
+            !vouchers.some(
+              (v) =>
+                v.code === form.level_up_voucher_code &&
+                v.deleted_at === null &&
+                v.quota !== 0,
+            ) && (
+              <option value={form.level_up_voucher_code}>
+                {form.level_up_voucher_code} — (inactive)
+              </option>
+            )}
+        </select>
+        <p className="text-xs text-slate-500 ml-1 mt-1">
+          Auto-granted free voucher when a user reaches this tier.
+        </p>
+      </div>
       <label className="flex items-center gap-3 cursor-pointer select-none">
         <input
           type="checkbox"
