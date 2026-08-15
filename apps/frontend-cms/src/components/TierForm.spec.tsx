@@ -104,4 +104,31 @@ describe('TierForm', () => {
       ),
     );
   });
+
+  it('disables the dropdown and shows a failure note when vouchers fail to load', async () => {
+    (vouchersApi.getVouchers as any).mockRejectedValueOnce(
+      new Error('network failure'),
+    );
+    render(
+      <TierForm
+        initial={{ name: 'Gold', level_up_voucher_code: 'GOLD2030' }}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    const select = screen.getByLabelText(/Level-Up Voucher Code/i);
+    // Wait for the rejection to settle (error text appears) before asserting
+    // the disabled state.
+    expect(
+      await screen.findByText(/Failed to load vouchers/i),
+    ).toBeInTheDocument();
+    expect(select).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ level_up_voucher_code: 'GOLD2030' }),
+      ),
+    );
+  });
 });

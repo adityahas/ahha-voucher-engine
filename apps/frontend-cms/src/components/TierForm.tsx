@@ -25,14 +25,13 @@ export default function TierForm({
   });
 
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [vouchersError, setVouchersError] = useState(false);
 
   useEffect(() => {
     let active = true;
     getVouchers()
       .then((value) => active && setVouchers(value))
-      .catch(() => {
-        // handled in Task 2
-      });
+      .catch(() => active && setVouchersError(true));
     return () => {
       active = false;
     };
@@ -103,7 +102,8 @@ export default function TierForm({
           id="level_up_voucher_code"
           value={form.level_up_voucher_code ?? ''}
           onChange={(e) => set('level_up_voucher_code', e.target.value)}
-          className="w-full h-12 rounded-xl bg-slate-900/50 border border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 px-4 text-sm text-slate-100 appearance-none focus:outline-none focus:ring-1 focus:ring-primary-500/50"
+          disabled={vouchersError}
+          className="w-full h-12 rounded-xl bg-slate-900/50 border border-slate-700/50 focus:border-primary-500/50 transition-all duration-300 px-4 text-sm text-slate-100 appearance-none focus:outline-none focus:ring-1 focus:ring-primary-500/50 disabled:opacity-60"
         >
           <option value="">No voucher</option>
           {vouchers
@@ -125,8 +125,10 @@ export default function TierForm({
               </option>
             )}
         </select>
-        <p className="text-xs text-slate-500 ml-1 mt-1">
-          Auto-granted free voucher when a user reaches this tier.
+        <p className="text-xs ml-1 mt-1 text-slate-500">
+          {vouchersError
+            ? 'Failed to load vouchers'
+            : 'Auto-granted free voucher when a user reaches this tier.'}
         </p>
       </div>
       <label className="flex items-center gap-3 cursor-pointer select-none">
