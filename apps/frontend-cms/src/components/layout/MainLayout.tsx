@@ -35,6 +35,10 @@ const NAV_SECTIONS: NavSection[] = [
     items: [{ to: '/users', label: 'User Management', icon: Users }],
   },
   {
+    heading: 'Catalog',
+    items: [{ to: '/products', label: 'Product Management', icon: Package }],
+  },
+  {
     heading: 'Vouchers',
     items: [
       { to: '/vouchers', label: 'Voucher Management', icon: Ticket },
@@ -44,10 +48,6 @@ const NAV_SECTIONS: NavSection[] = [
         icon: LayoutGrid,
       },
     ],
-  },
-  {
-    heading: 'Catalog',
-    items: [{ to: '/products', label: 'Product Management', icon: Package }],
   },
   {
     heading: 'Loyalty',
