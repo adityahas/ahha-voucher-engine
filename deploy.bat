@@ -7,7 +7,7 @@ set LOG_DIR=%DEPLOY_DIR%logs
 
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
-if not exist "%DEPLOY_DIR%.env" if exist "D:\Projects\NodeJs\ahha-voucher-engine\.env" copy /y "D:\Projects\NodeJs\ahha-voucher-engine\.env" "%DEPLOY_DIR%.env" >nul
+if exist "D:\Projects\NodeJs\ahha-voucher-engine\.env" copy /y "D:\Projects\NodeJs\ahha-voucher-engine\.env" "%DEPLOY_DIR%.env" >nul
 
 echo Stopping existing app instances...
 powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*dist\apps*main.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
