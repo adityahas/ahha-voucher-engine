@@ -109,6 +109,11 @@
     ],
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/apps/frontend-cms/",
+      "/apps/frontend-consumer/"
+    ],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
