@@ -12,9 +12,18 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  if (process.env.NODE_ENV === 'production') {
-    app.enableCors();
-  }
+  app.enableCors({
+    origin: true,
+    credentials: true,
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-api-key',
+      'x-tenant-override',
+      'x-subdomain',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
 
   const config = new DocumentBuilder()
     .setTitle('AHHA Loyalty API')

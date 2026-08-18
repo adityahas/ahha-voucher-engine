@@ -15,6 +15,19 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: true,
+    credentials: true,
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-api-key',
+      'x-tenant-override',
+      'x-subdomain',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
+
   const config = new DocumentBuilder()
     .setTitle('AHHA Product Consumer API')
     .setDescription('Consumer-facing product catalog API')

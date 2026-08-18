@@ -14,6 +14,19 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: true,
+    credentials: true,
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-api-key',
+      'x-tenant-override',
+      'x-subdomain',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
+
   const port = process.env.PORT_PRODUCT_ADMIN || 9007;
   await app.listen(port, () => {
     console.log(`Product Admin Service running on port ${port}`);
