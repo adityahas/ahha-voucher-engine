@@ -26,6 +26,13 @@ pipeline {
             }
         }
 
+        stage('Build Frontend') {
+            steps {
+                bat 'cd apps/frontend-cms && npx vite build'
+                bat 'cd apps/frontend-consumer && npx vite build'
+            }
+        }
+
         stage('Test') {
             environment {
                 NODE_OPTIONS = '--max-old-space-size=1024'
