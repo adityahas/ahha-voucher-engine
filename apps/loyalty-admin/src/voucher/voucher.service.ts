@@ -36,21 +36,16 @@ export class VoucherService {
       voucher.target_users = await this.getOrCreateLoyaltyUsers(target_users);
     }
 
-    if (createVoucherDto.categories && createVoucherDto.categories.length > 0) {
+    if (categories && categories.length > 0) {
       voucher.categories = await this.voucherCategoryRepository.findBy({
-        slug: In(createVoucherDto.categories.map((c) => c.slug)),
+        slug: In(categories.map((c) => c.slug)),
       });
     }
 
-    if (
-      createVoucherDto.allow_combine_categories &&
-      createVoucherDto.allow_combine_categories.length > 0
-    ) {
+    if (allow_combine_categories && allow_combine_categories.length > 0) {
       voucher.allow_combine_categories =
         await this.voucherCategoryRepository.findBy({
-          slug: In(
-            createVoucherDto.allow_combine_categories.map((c) => c.slug),
-          ),
+          slug: In(allow_combine_categories.map((c) => c.slug)),
         });
     }
 

@@ -14,7 +14,7 @@ export class QuestService {
     this.repository = dataSource.getRepository(QuestEntity);
   }
 
-  create(createQuestDto: CreateQuestDto) {
+  create(_createQuestDto: CreateQuestDto) {
     return 'This action adds a new quest';
   }
 
@@ -55,7 +55,7 @@ export class QuestService {
     return `This action returns a #${id} quest`;
   }
 
-  update(id: number, updateQuestDto: UpdateQuestDto) {
+  update(id: number, _updateQuestDto: UpdateQuestDto) {
     return `This action updates a #${id} quest`;
   }
 

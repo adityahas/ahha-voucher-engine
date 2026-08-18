@@ -48,7 +48,7 @@ export class AdminService {
     return { admin, token };
   }
 
-  create(createAdminDto: CreateAdminDto) {
+  create(_createAdminDto: CreateAdminDto) {
     return 'This action adds a new admin';
   }
 
@@ -60,7 +60,7 @@ export class AdminService {
     return `This action returns a #${id} admin`;
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
+  update(id: number, _updateAdminDto: UpdateAdminDto) {
     return `This action updates a #${id} admin`;
   }
 
