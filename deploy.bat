@@ -23,7 +23,19 @@ if exist "D:\Projects\NodeJs\ahha-voucher-engine\.env" copy /y "D:\Projects\Node
 
 echo Stopping existing app instances...
 powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*dist\apps*main.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
+powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*frontend-servers.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
 powershell -NoProfile -Command "Start-Sleep -Seconds 3"
+
+REM Copy frontend dists into stable deploy dir
+if exist "%SRC_DIR%apps\frontend-cms\dist" (
+  if exist "%DEPLOY_DIR%\frontend-cms-dist" rmdir /s /q "%DEPLOY_DIR%\frontend-cms-dist"
+  xcopy /e /i /y /q "%SRC_DIR%apps\frontend-cms\dist" "%DEPLOY_DIR%\frontend-cms-dist" >nul
+)
+if exist "%SRC_DIR%apps\frontend-consumer\dist" (
+  if exist "%DEPLOY_DIR%\frontend-consumer-dist" rmdir /s /q "%DEPLOY_DIR%\frontend-consumer-dist"
+  xcopy /e /i /y /q "%SRC_DIR%apps\frontend-consumer\dist" "%DEPLOY_DIR%\frontend-consumer-dist" >nul
+)
+if exist "%SRC_DIR%frontend-servers.js" copy /y "%SRC_DIR%frontend-servers.js" "%DEPLOY_DIR%\frontend-servers.js" >nul
 
 echo Starting admin on 9002...
 powershell -NoProfile -Command "Start-Process -FilePath 'node' -ArgumentList 'dist\apps\admin\src\main.js' -WorkingDirectory '%DEPLOY_DIR%' -RedirectStandardOutput '%LOG_DIR%\admin.log' -RedirectStandardError '%LOG_DIR%\admin.err.log' -WindowStyle Hidden"
@@ -48,6 +60,9 @@ powershell -NoProfile -Command "Start-Process -FilePath 'node' -ArgumentList 'di
 
 echo Starting redistro on 9009...
 powershell -NoProfile -Command "Start-Process -FilePath 'node' -ArgumentList 'dist\apps\redistro\src\main.js' -WorkingDirectory '%DEPLOY_DIR%' -RedirectStandardOutput '%LOG_DIR%\redistro.log' -RedirectStandardError '%LOG_DIR%\redistro.err.log' -WindowStyle Hidden"
+
+echo Starting frontend servers (cms 5173, consumer 5174)...
+powershell -NoProfile -Command "Start-Process -FilePath 'node' -ArgumentList 'frontend-servers.js' -WorkingDirectory '%DEPLOY_DIR%' -RedirectStandardOutput '%LOG_DIR%\frontend.log' -RedirectStandardError '%LOG_DIR%\frontend.err.log' -WindowStyle Hidden"
 
 echo Deploy complete. Logs in %LOG_DIR%
 exit /b 0
