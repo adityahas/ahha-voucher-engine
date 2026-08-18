@@ -76,4 +76,10 @@ module.exports = defineConfig([
       ],
     },
   },
+  {
+    files: ['apps/admin/src/seeder/**/*.ts'],
+    rules: {
+      'no-restricted-imports': 'off',
+    },
+  },
 ]);

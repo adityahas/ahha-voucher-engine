@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { seedAdmins } from './admins.seeder';
 import { seedClients } from './clients.seeder';
 import { seedTenantUsers } from './users.seeder';
+import { seedTenantData } from './tenant-data.seeder';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { ClientEntity } from '@core/database/entities/client.entity';
 import { AdminEntity } from '../entities/admin.entity';
@@ -26,6 +27,7 @@ dataSource
     await seedClients(dataSource);
     await seedAdmins(dataSource);
     await seedTenantUsers();
+    await seedTenantData();
     process.exit(0);
   })
   .catch((err) => {
