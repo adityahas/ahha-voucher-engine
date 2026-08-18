@@ -28,7 +28,9 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
+                bat 'cd apps/frontend-cms && yarn install --ignore-engines --network-timeout 600000'
                 bat 'cd apps/frontend-cms && npx vite build'
+                bat 'cd apps/frontend-consumer && npm install --no-audit --no-fund'
                 bat 'cd apps/frontend-consumer && npx vite build'
             }
         }
