@@ -12,6 +12,10 @@ export class SubdomainMiddleware implements NestMiddleware {
   constructor(private readonly dataSource: DataSource) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
+    if (req.method === 'OPTIONS') {
+      return next();
+    }
+
     const host = req.headers.host || '';
     const override =
       (req.headers['x-tenant-override'] as string) ||

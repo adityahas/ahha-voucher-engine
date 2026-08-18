@@ -12,6 +12,10 @@ import { NextFunction, Request, Response } from 'express';
 @Injectable()
 export class CredentialMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
+    if (req.method === 'OPTIONS') {
+      return next();
+    }
+
     const client = req['client'];
     const apiKey = req.headers['x-api-key'];
 
