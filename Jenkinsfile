@@ -27,8 +27,11 @@ pipeline {
         }
 
         stage('Test') {
+            environment {
+                NODE_OPTIONS = '--max-old-space-size=1024'
+            }
             steps {
-                bat 'yarn test --passWithNoTests'
+                bat 'set NODE_OPTIONS=--max-old-space-size=1024 && yarn test --maxWorkers=1 --passWithNoTests'
             }
         }
 
