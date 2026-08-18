@@ -12,11 +12,7 @@ import { getVoucherByCode, Voucher } from '../api/vouchers';
 import { getUsers, User } from '../api/users';
 import { VoucherBindingList } from '../components/VoucherBindingList';
 import { VoucherValidityList } from '../components/VoucherValidityList';
-import {
-  DiscountType,
-  formatDiscountType,
-  getDiscountSymbol,
-} from '../lib/discount-type';
+import { DiscountType, formatDiscountType } from '../lib/discount-type';
 import {
   AlertCircle,
   ArrowLeft,

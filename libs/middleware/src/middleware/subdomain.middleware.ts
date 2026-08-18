@@ -22,7 +22,8 @@ export class SubdomainMiddleware implements NestMiddleware {
       override ||
       (extracted === 'localhost' ||
       extracted === '127' ||
-      extracted === 'api-gateway'
+      extracted === 'api-gateway' ||
+      extracted === 'api'
         ? 'client1'
         : extracted);
 

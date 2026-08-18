@@ -15,11 +15,7 @@ import {
   VoucherType,
   ClaimPeriod,
 } from '../api/vouchers';
-import {
-  DiscountType,
-  DISCOUNT_TYPE_MAP,
-  formatDiscountType,
-} from '../lib/discount-type';
+import { DiscountType, DISCOUNT_TYPE_MAP } from '../lib/discount-type';
 import { CLAIM_PERIOD_MAP } from '../lib/claim-period';
 import {
   getVoucherCategories,
