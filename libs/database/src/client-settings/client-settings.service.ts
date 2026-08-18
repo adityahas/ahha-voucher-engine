@@ -79,21 +79,30 @@ export class ClientSettingsService {
   ) {}
 
   async getForTenant(databaseName: string): Promise<CurrencySettings> {
-    const settings = await this.repository.findOne({
-      where: { client_database_name: databaseName },
-    });
-    return settings
-      ? this.toSettings(settings)
-      : { ...DEFAULT_CURRENCY_SETTINGS, number_format_options: {} };
+    try {
+      const settings = await this.repository.findOne({
+        where: { client_database_name: databaseName },
+      });
+      return settings
+        ? this.toSettings(settings)
+        : { ...DEFAULT_CURRENCY_SETTINGS, number_format_options: {} };
+    } catch {
+      return { ...DEFAULT_CURRENCY_SETTINGS, number_format_options: {} };
+    }
   }
 
   async updateForTenant(
     databaseName: string,
     input: UpdateCurrencySettingsInput,
   ): Promise<CurrencySettings> {
-    const current = await this.repository.findOne({
-      where: { client_database_name: databaseName },
-    });
+    let current: ClientSettingsEntity | null = null;
+    try {
+      current = await this.repository.findOne({
+        where: { client_database_name: databaseName },
+      });
+    } catch {
+      current = null;
+    }
     const next = {
       ...DEFAULT_CURRENCY_SETTINGS,
       ...(current ? this.toSettings(current) : {}),
@@ -117,24 +126,28 @@ export class ClientSettingsService {
   }
 
   async getLoyaltySettings(databaseName: string): Promise<LoyaltySettings> {
-    const row = await this.repository.findOne({
-      where: { client_database_name: databaseName },
-    });
-    if (!row) return { ...DEFAULT_LOYALTY_SETTINGS };
-    return {
-      point_base_rate: numericOrDefault(
-        row.point_base_rate,
-        DEFAULT_LOYALTY_SETTINGS.point_base_rate,
-      ),
-      max_combined_discount_percent: numericOrDefault(
-        row.max_combined_discount_percent,
-        DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
-      ),
-      point_to_currency_rate: numericOrDefault(
-        row.point_to_currency_rate,
-        DEFAULT_LOYALTY_SETTINGS.point_to_currency_rate,
-      ),
-    };
+    try {
+      const row = await this.repository.findOne({
+        where: { client_database_name: databaseName },
+      });
+      if (!row) return { ...DEFAULT_LOYALTY_SETTINGS };
+      return {
+        point_base_rate: numericOrDefault(
+          row.point_base_rate,
+          DEFAULT_LOYALTY_SETTINGS.point_base_rate,
+        ),
+        max_combined_discount_percent: numericOrDefault(
+          row.max_combined_discount_percent,
+          DEFAULT_LOYALTY_SETTINGS.max_combined_discount_percent,
+        ),
+        point_to_currency_rate: numericOrDefault(
+          row.point_to_currency_rate,
+          DEFAULT_LOYALTY_SETTINGS.point_to_currency_rate,
+        ),
+      };
+    } catch {
+      return { ...DEFAULT_LOYALTY_SETTINGS };
+    }
   }
 
   async updateLoyaltySettings(

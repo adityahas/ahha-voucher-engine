@@ -21,12 +21,31 @@ export async function seedClients(dataSource: DataSource) {
   const clientRepo = dataSource.getRepository(ClientEntity);
   const encryptionService = new EncryptionService();
 
+  await dataSource.query(`
+    CREATE TABLE IF NOT EXISTS client_settings (
+      client_database_name VARCHAR PRIMARY KEY REFERENCES clients(database_name) ON DELETE CASCADE,
+      currency_code VARCHAR(3) NOT NULL DEFAULT 'IDR',
+      locale VARCHAR(35) NOT NULL DEFAULT 'id-ID',
+      number_format_options JSONB NOT NULL DEFAULT '{}'::jsonb,
+      point_base_rate DECIMAL(12,2) NOT NULL DEFAULT 1000,
+      max_combined_discount_percent DECIMAL(12,2) NOT NULL DEFAULT 50,
+      point_to_currency_rate DECIMAL(12,4) NOT NULL DEFAULT 1,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
+    );
+  `);
+
   for (const clientData of clientsSeeder) {
     const exists = await clientRepo.findOneBy({
       subdomain: clientData.subdomain,
     });
     if (exists) {
       console.log(`Client ${clientData.subdomain} already seeded`);
+      await dataSource.query(`
+        INSERT INTO client_settings (client_database_name)
+        VALUES ('${clientData.database_name}')
+        ON CONFLICT (client_database_name) DO NOTHING;
+      `);
       continue;
     }
 
@@ -45,6 +64,11 @@ export async function seedClients(dataSource: DataSource) {
     });
 
     await clientRepo.save(client);
+    await dataSource.query(`
+      INSERT INTO client_settings (client_database_name)
+      VALUES ('${clientData.database_name}')
+      ON CONFLICT (client_database_name) DO NOTHING;
+    `);
     console.log(`Clients ${clientData.subdomain} seeded`);
   }
   console.log('Client seeded');
