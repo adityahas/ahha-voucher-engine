@@ -36,10 +36,14 @@ export class VoucherUsageClaim1786747256750 implements MigrationInterface {
       'CREATE UNIQUE INDEX IF NOT EXISTS "uq_voucher_usages_claim_id" ON voucher_usages ("claim_id")',
     );
     await queryRunner.query(`
-      ALTER TABLE voucher_usages
-      ADD CONSTRAINT "fk_voucher_usages_claim_id"
-      FOREIGN KEY ("claim_id") REFERENCES voucher_claims("id")
-      ON DELETE SET NULL
+      DO $$ BEGIN
+        ALTER TABLE voucher_usages
+        ADD CONSTRAINT "fk_voucher_usages_claim_id"
+        FOREIGN KEY ("claim_id") REFERENCES voucher_claims("id")
+        ON DELETE SET NULL;
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
     `);
   }
 
