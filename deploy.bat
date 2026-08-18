@@ -1,13 +1,25 @@
 @echo off
-REM Deploy script for Ahha Voucher Engine (runs detached from Jenkins)
-REM Uses the script's own directory so it deploys the freshly-built code from the Jenkins workspace
+REM Deploy script for Ahha Voucher Engine
+REM Copies the freshly-built dist to a stable location and starts apps detached
 setlocal
-set DEPLOY_DIR=%~dp0
-set LOG_DIR=%DEPLOY_DIR%logs
 
+REM Where this script runs (Jenkins workspace)
+set SRC_DIR=%~dp0
+REM Stable deploy location (survives workspace cleanup)
+set DEPLOY_DIR=C:\ahha-deploy
+set LOG_DIR=%DEPLOY_DIR%\logs
+
+if not exist "%DEPLOY_DIR%" mkdir "%DEPLOY_DIR%"
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
-if exist "D:\Projects\NodeJs\ahha-voucher-engine\.env" copy /y "D:\Projects\NodeJs\ahha-voucher-engine\.env" "%DEPLOY_DIR%.env" >nul
+REM Copy fresh build + config into stable deploy dir
+if exist "%SRC_DIR%dist" (
+  if exist "%DEPLOY_DIR%\dist" rmdir /s /q "%DEPLOY_DIR%\dist"
+  xcopy /e /i /y /q "%SRC_DIR%dist" "%DEPLOY_DIR%\dist" >nul
+)
+if not exist "%DEPLOY_DIR%\.env" if exist "%SRC_DIR%.env" copy /y "%SRC_DIR%.env" "%DEPLOY_DIR%\.env" >nul
+if not exist "%DEPLOY_DIR%\node_modules" if exist "%SRC_DIR%node_modules" xcopy /e /i /y /q "%SRC_DIR%node_modules" "%DEPLOY_DIR%\node_modules" >nul
+if exist "D:\Projects\NodeJs\ahha-voucher-engine\.env" copy /y "D:\Projects\NodeJs\ahha-voucher-engine\.env" "%DEPLOY_DIR%\.env" >nul
 
 echo Stopping existing app instances...
 powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*dist\apps*main.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
