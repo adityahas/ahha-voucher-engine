@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mockup C — CMS Create/Edit Voucher</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root[data-theme='dark'] {
+        --color-bg: #0f172a;
+        --color-surface: rgba(255, 255, 255, 0.06);
+        --color-surface-solid: #1e293b;
+        --color-text: #f8fafc;
+        --color-text-muted: #94a3b8;
+        --color-accent: #ec4899;
+        --color-accent-2: #a855f7;
+        --color-border: rgba(255, 255, 255, 0.12);
+        --color-success: #34d399;
+        --color-danger: #f87171;
+      }
+      :root[data-theme='light'] {
+        --color-bg: #f1f5f9;
+        --color-surface: #ffffff;
+        --color-surface-solid: #ffffff;
+        --color-text: #0f172a;
+        --color-text-muted: #64748b;
+        --color-accent: #db2777;
+        --color-accent-2: #9333ea;
+        --color-border: rgba(15, 23, 42, 0.14);
+        --color-success: #059669;
+        --color-danger: #dc2626;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--color-bg);
+        background-image: linear-gradient(
+          135deg,
+          var(--color-bg) 0%,
+          #1e1b4b 50%,
+          #311142 100%
+        );
+        background-attachment: fixed;
+        color: var(--color-text);
+        font-family: 'Inter', system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        transition:
+          background 0.3s ease,
+          color 0.3s ease;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.5rem 0.9rem;
+        cursor: pointer;
+        color: var(--color-text);
+        font-size: 1.1rem;
+        transition:
+          border-color 0.2s,
+          transform 0.15s;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+      .theme-toggle:hover {
+        border-color: var(--color-accent);
+        transform: translateY(-1px);
+      }
+      .theme-toggle:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        width: 100%;
+        max-width: 960px;
+      }
+      .screen-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        font-weight: 600;
+      }
+
+      /* Browser frame */
+      .browser {
+        width: 100%;
+        max-width: 880px;
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        transition: background 0.3s ease;
+      }
+      .browser-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1rem;
+        border-bottom: 1px solid var(--color-border);
+        background: var(--color-surface);
+      }
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .dot.r {
+        background: #f87171;
+      }
+      .dot.y {
+        background: #fbbf24;
+      }
+      .dot.g {
+        background: #34d399;
+      }
+      .url {
+        flex: 1;
+        margin-left: 0.6rem;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.74rem;
+        color: var(--color-text-muted);
+        font-family: 'SF Mono', Menlo, monospace;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .cms-body {
+        display: flex;
+        min-height: 640px;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 210px;
+        flex-shrink: 0;
+        padding: 1.1rem 0.8rem;
+        border-right: 1px solid var(--color-border);
+        display: none;
+      }
+      @media (min-width: 640px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      .brand {
+        font-weight: 800;
+        font-size: 1.05rem;
+        padding: 0.2rem 0.7rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .brand .logo {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.8rem;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.55rem 0.7rem;
+        border-radius: 9px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        margin-bottom: 0.15rem;
+        cursor: pointer;
+        transition: all 0.15s;
+        border: none;
+        background: transparent;
+        width: 100%;
+        font-family: inherit;
+        text-align: left;
+      }
+      .nav-item:hover {
+        background: var(--color-surface);
+        color: var(--color-text);
+      }
+      .nav-item.active {
+        background: linear-gradient(
+          135deg,
+          rgba(236, 72, 153, 0.2),
+          rgba(168, 85, 247, 0.2)
+        );
+        color: var(--color-text);
+        font-weight: 700;
+      }
+      .nav-item:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      /* Main content */
+      .content {
+        flex: 1;
+        padding: 1.4rem 1.6rem;
+        min-width: 0;
+      }
+      .crumb {
+        font-size: 0.72rem;
+        color: var(--color-text-muted);
+        margin-bottom: 0.4rem;
+      }
+      .crumb b {
+        color: var(--color-text);
+      }
+      .content h2 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin-bottom: 0.2rem;
+      }
+      .content .sub {
+        color: var(--color-text-muted);
+        font-size: 0.82rem;
+        margin-bottom: 1.3rem;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .field {
+      }
+      .field-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+      }
+      .field-label .req {
+        color: var(--color-accent);
+      }
+      .field-label .hint {
+        color: var(--color-text-muted);
+        font-weight: 500;
+        font-size: 0.72rem;
+      }
+      input[type='text'],
+      input[type='number'],
+      select,
+      textarea {
+        width: 100%;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        padding: 0.62rem 0.85rem;
+        color: var(--color-text);
+        font-family: inherit;
+        font-size: 0.86rem;
+        transition: border-color 0.2s;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--color-accent);
+      }
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 1px;
+      }
+      .error-msg {
+        color: var(--color-danger);
+        font-size: 0.72rem;
+        margin-top: 0.3rem;
+        display: none;
+      }
+      .error-msg.show {
+        display: block;
+        animation: fadeIn 0.25s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 560px) {
+        .row2 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 0.5rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        padding: 0.3rem;
+      }
+      .radio-opt {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem 0.3rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        transition: all 0.15s;
+      }
+      .radio-opt.active {
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        color: #fff;
+      }
+      .radio-opt:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .tag-input {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        align-items: center;
+      }
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.76rem;
+        font-weight: 600;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.3rem 0.7rem;
+      }
+      .tag button {
+        border: none;
+        background: none;
+        color: var(--color-text-muted);
+        cursor: pointer;
+        font-size: 0.85rem;
+        line-height: 1;
+        font-family: inherit;
+      }
+      .tag button:hover {
+        color: var(--color-danger);
+      }
+      .tag button:focus-visible {
+        outline: 2px solid var(--color-accent);
+        border-radius: 4px;
+      }
+      .tag-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: var(--color-accent);
+        background: none;
+        border: 1px dashed var(--color-border);
+        border-radius: 999px;
+        padding: 0.3rem 0.8rem;
+        cursor: pointer;
+        font-family: inherit;
+        transition: border-color 0.2s;
+      }
+      .tag-add:hover {
+        border-color: var(--color-accent);
+      }
+      .tag-add:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .validity-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+        align-items: end;
+      }
+      .validity-row .from-to {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .validity-row .from-to span {
+        color: var(--color-text-muted);
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.7rem;
+        margin-top: 0.6rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-border);
+      }
+      .btn {
+        padding: 0.7rem 1.4rem;
+        border-radius: 11px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        color: var(--color-text);
+        transition: all 0.15s;
+      }
+      .btn:hover {
+        border-color: var(--color-accent);
+      }
+      .btn:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        color: #fff;
+        border: none;
+        box-shadow: 0 10px 26px rgba(236, 72, 153, 0.35);
+      }
+      .btn-primary:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+      }
+
+      .footnote {
+        color: var(--color-text-muted);
+        font-size: 0.78rem;
+        text-align: center;
+        line-height: 1.6;
+      }
+      .footnote code {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        padding: 0.1rem 0.4rem;
+        border-radius: 6px;
+        font-size: 0.72rem;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translate(-50%, 120%);
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.7rem 1.4rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .toast.show {
+        transform: translate(-50%, 0);
+      }
+      .toast.success {
+        color: var(--color-success);
+      }
+    </style>
+  </head>
+  <body>
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <span class="theme-icon">🌙</span>
+    </button>
+
+    <div class="stage">
+      <div class="screen-label">
+        PRD 4.7 Mockup C · US-1 / US-2 / US-4 · loyalty-admin CRUD (FR-1 – FR-9)
+      </div>
+      <div class="browser">
+        <div class="browser-bar">
+          <span class="dot r"></span><span class="dot y"></span
+          ><span class="dot g"></span>
+          <div class="url">
+            client1.ahha-be.local/loyalty-admin/vouchers/create
+          </div>
+        </div>
+        <div class="cms-body">
+          <aside class="sidebar">
+            <div class="brand"><span class="logo">A</span> Ahha CMS</div>
+            <button class="nav-item">📊 Dashboard</button>
+            <button class="nav-item">👥 Users</button>
+            <button class="nav-item active">🎟️ Vouchers</button>
+            <button class="nav-item">🏷️ Categories</button>
+            <button class="nav-item">🎁 Rewards</button>
+            <button class="nav-item">🏪 Products</button>
+          </aside>
+          <main class="content">
+            <div class="crumb">Vouchers / <b>Create Voucher</b></div>
+            <h2>Create Voucher</h2>
+            <p class="sub">Launch a discount campaign (PRD US-1 · FR-1)</p>
+
+            <form id="voucherForm" novalidate>
+              <div class="field">
+                <div class="field-label">
+                  <label for="code">Voucher Code</label
+                  ><span class="req">required · unique</span>
+                </div>
+                <input
+                  type="text"
+                  id="code"
+                  placeholder="e.g. SUMMER20"
+                  maxlength="50"
+                  required
+                />
+                <div class="error-msg" id="codeErr">
+                  Voucher code is required and must be unique (FR-2)
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">
+                  <label>Voucher Type</label
+                  ><span class="hint">default: Claimable</span>
+                </div>
+                <div
+                  class="radio-group"
+                  role="radiogroup"
+                  aria-label="Voucher type"
+                >
+                  <button class="radio-opt active" data-radio="type">
+                    Claimable
+                  </button>
+                  <button class="radio-opt" data-radio="type">
+                    Unique Code
+                  </button>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">
+                  <label>Discount Type</label><span class="hint">FR-27</span>
+                </div>
+                <div
+                  class="radio-group"
+                  role="radiogroup"
+                  aria-label="Discount type"
+                >
+                  <button class="radio-opt active" data-radio="disc">
+                    Percentage
+                  </button>
+                  <button class="radio-opt" data-radio="disc">
+                    Fixed Amount
+                  </button>
+                </div>
+              </div>
+
+              <div class="row2">
+                <div class="field">
+                  <div class="field-label">
+                    <label for="discValue">Discount Value</label
+                    ><span class="req">required</span>
+                  </div>
+                  <input
+                    type="number"
+                    id="discValue"
+                    value="20"
+                    min="0"
+                    step="any"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <div class="field-label">
+                    <label for="quota">Quota</label
+                    ><span class="req">required</span>
+                  </div>
+                  <input
+                    type="number"
+                    id="quota"
+                    value="200"
+                    min="0"
+                    step="1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">
+                  <label for="desc">Description</label>
+                </div>
+                <textarea
+                  id="desc"
+                  rows="2"
+                  placeholder="Short description shown to customers"
+                >
+Get 20% off all meals this month!</textarea>
+              </div>
+
+              <div class="field">
+                <div class="field-label">
+                  <label>Categories</label
+                  ><span class="hint">group + filter vouchers (US-4)</span>
+                </div>
+                <div class="tag-input" id="catTags">
+                  <span class="tag"
+                    >Food <button aria-label="Remove Food">×</button></span
+                  >
+                  <span class="tag"
+                    >Drinks <button aria-label="Remove Drinks">×</button></span
+                  >
+                  <button class="tag-add" id="addCat">+ add</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">
+                  <label>Validity</label><span class="hint">FR-8</span>
+                </div>
+                <div class="validity-row">
+                  <div class="from-to">
+                    <input
+                      type="text"
+                      value="2026-08-01"
+                      aria-label="Start date"
+                    />
+                    <span>–</span>
+                    <input
+                      type="text"
+                      value="2026-08-31"
+                      aria-label="End date"
+                    />
+                  </div>
+                  <select aria-label="Validity type">
+                    <option>One-time</option>
+                    <option>Daily</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                    <option>Birthday</option>
+                    <option>Custom day weekly</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">
+                  <label>Bindings</label
+                  ><span class="hint"
+                    >FR-9 · product &amp; category enforced at validation</span
+                  >
+                </div>
+                <div class="tag-input" id="bindTags">
+                  <span class="tag"
+                    >Category: Food
+                    <button aria-label="Remove binding">×</button></span
+                  >
+                  <button class="tag-add" id="addBind">+ add</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field-label">
+                  <label>Target Users</label
+                  ><span class="hint">empty = everyone (FR-21)</span>
+                </div>
+                <div class="tag-input" id="userTags">
+                  <button class="tag-add" id="addUser">+ add user</button>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button type="button" class="btn" id="cancelBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">
+                  Save Voucher
+                </button>
+              </div>
+            </form>
+          </main>
+        </div>
+      </div>
+
+      <p class="footnote">
+        Endpoint: <code>POST /loyalty-admin/vouchers</code> (JWT + ACL
+        <code>write:vouchers</code>, FR-7) · duplicate code ditolak (FR-2) ·
+        soft delete via <code>deleted_at</code> (FR-6)
+      </p>
+    </div>
+
+    <div class="toast" id="toast" role="status">
+      <span id="toastIcon">✅</span><span id="toastMsg"></span>
+    </div>
+
+    <script>
+      const toastEl = document.getElementById('toast');
+      let toastTimer = null;
+
+      function showToast(msg, ok) {
+        toastEl.classList.add('show');
+        toastEl.className = 'toast show ' + (ok ? 'success' : '');
+        document.getElementById('toastIcon').textContent = ok ? '✅' : '⛔';
+        document.getElementById('toastMsg').textContent = msg;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+      }
+
+      // Radio groups
+      document.querySelectorAll('.radio-group').forEach((group) => {
+        group.querySelectorAll('.radio-opt').forEach((opt) => {
+          opt.addEventListener('click', () => {
+            group
+              .querySelectorAll('.radio-opt')
+              .forEach((o) => o.classList.remove('active'));
+            opt.classList.add('active');
+            const isPct =
+              group.querySelector('.radio-opt.active').textContent.trim() ===
+              'Percentage';
+            if (group.getAttribute('aria-label') === 'Discount type') {
+              document.getElementById('discValue').placeholder = isPct
+                ? 'e.g. 20 (percent)'
+                : 'e.g. 10000 (Rupiah)';
+            }
+          });
+        });
+      });
+
+      // Add tag (mock)
+      function wireAdd(btnId, placeholder, containerId) {
+        const btn = document.getElementById(btnId);
+        const container = document.getElementById(containerId);
+        btn.addEventListener('click', () => {
+          const val = prompt(placeholder);
+          if (val && val.trim()) {
+            const tag = document.createElement('span');
+            tag.className = 'tag';
+            tag.innerHTML =
+              escapeHTML(val.trim()) +
+              ' <button aria-label="Remove">×</button>';
+            tag
+              .querySelector('button')
+              .addEventListener('click', () => tag.remove());
+            container.insertBefore(tag, btn);
+          }
+        });
+      }
+      function escapeHTML(s) {
+        return s
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+      wireAdd('addCat', 'Category name (e.g. Dessert)', 'catTags');
+      wireAdd(
+        'addBind',
+        'Binding — Type: Value (e.g. product_sku: A-123)',
+        'bindTags',
+      );
+      wireAdd('addUser', 'User UUID', 'userTags');
+
+      // Remove buttons on existing tags
+      document.querySelectorAll('.tag button').forEach((b) => {
+        b.addEventListener('click', () => b.closest('.tag').remove());
+      });
+
+      // Validation mirrors FR-1/FR-2
+      document.getElementById('voucherForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const code = document.getElementById('code').value.trim();
+        const quota = document.getElementById('quota').value;
+        const discValue = document.getElementById('discValue').value;
+        const err = document.getElementById('codeErr');
+        let ok = true;
+        if (!code) {
+          err.textContent = 'Voucher code is required (FR-1)';
+          err.classList.add('show');
+          ok = false;
+        } else if (code.toUpperCase() === 'SUMMER20') {
+          err.textContent = '409 Conflict — code already exists (FR-2)';
+          err.classList.add('show');
+          ok = false;
+        } else {
+          err.classList.remove('show');
+        }
+        if (!ok) {
+          showToast('Validation failed — check highlighted fields', false);
+          return;
+        }
+        if (quota === '' || Number(quota) < 0) {
+          showToast('Quota is required, min 0 (FR-1)', false);
+          return;
+        }
+        if (discValue === '' || Number(discValue) < 0) {
+          showToast('Discount value is required, min 0 (FR-1)', false);
+          return;
+        }
+        showToast('Voucher "' + code + '" created successfully! (FR-1)', true);
+        err.classList.remove('show');
+      });
+
+      document.getElementById('cancelBtn').addEventListener('click', () => {
+        showToast('Cancelled — no changes saved', false);
+      });
+
+      document.querySelector('.theme-toggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        const isDark = html.dataset.theme === 'dark';
+        html.dataset.theme = isDark ? 'light' : 'dark';
+        document.querySelector('.theme-icon').textContent = isDark
+          ? '☀️'
+          : '🌙';
+      });
+    </script>
+  </body>
+</html>

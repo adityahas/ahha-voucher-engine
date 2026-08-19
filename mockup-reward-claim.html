@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mockup D — Customer Reward Claim</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root[data-theme='dark'] {
+        --color-bg: #020617;
+        --color-surface: rgba(15, 23, 42, 0.6);
+        --color-surface-solid: #0f172a;
+        --color-text: #f8fafc;
+        --color-text-muted: #94a3b8;
+        --color-accent: #06b6d4;
+        --color-accent-2: #d946ef;
+        --color-border: rgba(255, 255, 255, 0.1);
+        --color-success: #34d399;
+        --color-danger: #f87171;
+        --color-warn: #fbbf24;
+      }
+      :root[data-theme='light'] {
+        --color-bg: #f1f5f9;
+        --color-surface: #ffffff;
+        --color-surface-solid: #ffffff;
+        --color-text: #0f172a;
+        --color-text-muted: #64748b;
+        --color-accent: #0891b2;
+        --color-accent-2: #c026d3;
+        --color-border: rgba(15, 23, 42, 0.12);
+        --color-success: #059669;
+        --color-danger: #dc2626;
+        --color-warn: #d97706;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        transition:
+          background 0.3s ease,
+          color 0.3s ease;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.5rem 0.9rem;
+        cursor: pointer;
+        color: var(--color-text);
+        font-size: 1.1rem;
+        transition:
+          background 0.2s,
+          border-color 0.2s,
+          transform 0.15s;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
+      .theme-toggle:hover {
+        border-color: var(--color-accent);
+        transform: translateY(-1px);
+      }
+      .theme-toggle:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        width: 100%;
+        max-width: 900px;
+      }
+      .screen-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        font-weight: 600;
+      }
+
+      .phone {
+        width: 400px;
+        max-width: 100%;
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 40px;
+        padding: 14px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        transition: background 0.3s ease;
+      }
+      .screen {
+        background: var(--color-bg);
+        border-radius: 28px;
+        overflow: hidden;
+        min-height: 720px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--color-border);
+      }
+
+      .header {
+        padding: 1.25rem 1.25rem 0.75rem;
+      }
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.6rem;
+      }
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: #fff;
+      }
+      .welcome small {
+        display: block;
+        color: var(--color-text-muted);
+        font-size: 0.72rem;
+        font-weight: 500;
+      }
+      .welcome strong {
+        font-size: 1.02rem;
+        font-weight: 700;
+      }
+      .notif-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .body {
+        padding: 0 1.25rem 1.4rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        overflow-y: auto;
+      }
+      .body h1 {
+        font-size: 1.15rem;
+        font-weight: 800;
+      }
+      .body .sub {
+        color: var(--color-text-muted);
+        font-size: 0.8rem;
+        margin-top: 0.15rem;
+      }
+
+      .rcard {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 18px;
+        padding: 1rem 1.05rem;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        opacity: 1;
+      }
+      .rcard.enter {
+        animation: cardIn 0.4s ease both;
+      }
+      @keyframes cardIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .rcard-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.55rem;
+      }
+      .rname {
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+      .rtype {
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 0.22rem 0.6rem;
+        border-radius: 999px;
+        letter-spacing: 0.03em;
+        background: rgba(217, 70, 239, 0.15);
+        color: var(--color-accent-2);
+      }
+      .rdesc {
+        color: var(--color-text-muted);
+        font-size: 0.8rem;
+        margin-bottom: 0.7rem;
+        line-height: 1.45;
+      }
+      .rstock {
+        font-size: 0.76rem;
+        color: var(--color-text-muted);
+        margin-bottom: 0.8rem;
+      }
+      .rstock b {
+        color: var(--color-text);
+      }
+      .rstock.unlimited b {
+        color: var(--color-success);
+      }
+      .rstock.out b {
+        color: var(--color-danger);
+      }
+      .btn-reward {
+        width: 100%;
+        padding: 0.68rem 0;
+        border: none;
+        border-radius: 13px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        color: #fff;
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        transition:
+          transform 0.15s,
+          opacity 0.2s,
+          filter 0.2s;
+      }
+      .btn-reward:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+      }
+      .btn-reward:focus-visible {
+        outline: 2px solid var(--color-text);
+        outline-offset: 2px;
+      }
+      .btn-reward:disabled {
+        cursor: default;
+        opacity: 0.55;
+        filter: none;
+        transform: none;
+      }
+      .btn-reward.loading {
+        pointer-events: none;
+        opacity: 0.75;
+      }
+      .btn-claimed {
+        width: 100%;
+        padding: 0.68rem 0;
+        border: 1px solid var(--color-border);
+        border-radius: 13px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: default;
+        font-family: inherit;
+        background: var(--color-surface);
+        color: var(--color-success);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+      }
+
+      .code-reveal {
+        margin-top: 0.7rem;
+        border: 1px dashed var(--color-accent);
+        border-radius: 12px;
+        padding: 0.7rem;
+        text-align: center;
+        animation: fadeIn 0.35s ease;
+      }
+      .code-reveal small {
+        display: block;
+        color: var(--color-text-muted);
+        font-size: 0.68rem;
+        margin-bottom: 0.25rem;
+      }
+      .code-reveal b {
+        font-size: 1rem;
+        letter-spacing: 0.14em;
+        font-family: 'SF Mono', Menlo, monospace;
+        color: var(--color-accent);
+        word-break: break-all;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .footnote {
+        color: var(--color-text-muted);
+        font-size: 0.78rem;
+        text-align: center;
+        line-height: 1.6;
+      }
+      .footnote code {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        padding: 0.1rem 0.4rem;
+        border-radius: 6px;
+        font-size: 0.72rem;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translate(-50%, 120%);
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.7rem 1.4rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .toast.show {
+        transform: translate(-50%, 0);
+      }
+      .toast.success {
+        color: var(--color-success);
+      }
+    </style>
+  </head>
+  <body>
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <span class="theme-icon">🌙</span>
+    </button>
+
+    <div class="stage">
+      <div class="screen-label">
+        PRD 4.6 &amp; FR-39 – FR-43 · US-10 · GET /rewards + POST
+        /rewards/claim/:reward_id
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <header class="header">
+            <div class="header-top">
+              <div class="welcome">
+                <small>Hi,</small><strong>Andi Pratama</strong>
+              </div>
+              <div class="notif-badge" aria-label="Notifications">🔔</div>
+            </div>
+          </header>
+          <main class="body" id="rewardList">
+            <div>
+              <h1>Rewards</h1>
+              <p class="sub">
+                Claim exclusive rewards — codes delivered instantly (US-10)
+              </p>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      <p class="footnote">
+        Per PRD: stock <code>-1</code> = unlimited, <code>0</code> = out,
+        <code>&gt;0</code> = limited (FR-36) · provider gagal → rollback, stok
+        pulih (FR-42) · strategi per <code>source_type</code> (FR-43)
+      </p>
+    </div>
+
+    <div class="toast" id="toast" role="status">
+      <span id="toastIcon">✅</span><span id="toastMsg"></span>
+    </div>
+
+    <script>
+      const rewards = [
+        {
+          id: 'r1',
+          name: 'GoPay Credit Rp 25.000',
+          type: 'GoPay',
+          desc: 'Top-up GoPay balance instantly via GoPay API.',
+          stock: 42,
+        },
+        {
+          id: 'r2',
+          name: 'Pulsa 10.000',
+          type: 'Pulsa',
+          desc: 'Mobile credit for any Indonesian carrier.',
+          stock: -1,
+        },
+        {
+          id: 'r3',
+          name: 'Voucher Tokopedia Rp 50.000',
+          type: 'E-Wallet',
+          desc: 'Shopping credit on Tokopedia.',
+          stock: 0,
+        },
+        {
+          id: 'r4',
+          name: 'GoPay Credit Rp 10.000',
+          type: 'GoPay',
+          desc: 'Small top-up for testing the provider timeout path.',
+          stock: 5,
+        },
+      ];
+      const claimed = {};
+      let claimedCount = 0;
+
+      const listEl = document.getElementById('rewardList');
+      const toastEl = document.getElementById('toast');
+      let toastTimer = null;
+
+      function showToast(msg, ok) {
+        toastEl.classList.add('show');
+        toastEl.className = 'toast show ' + (ok ? 'success' : '');
+        document.getElementById('toastIcon').textContent = ok ? '✅' : '⛔';
+        document.getElementById('toastMsg').textContent = msg;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+      }
+
+      function stockHTML(r) {
+        if (r.stock === -1)
+          return '<span class="rstock unlimited">♾️ <b>Unlimited stock</b></span>';
+        if (r.stock === 0)
+          return '<span class="rstock out">● <b>Out of stock</b></span>';
+        return '<span class="rstock">Stock left: <b>' + r.stock + '</b></span>';
+      }
+
+      function render() {
+        listEl.innerHTML =
+          '<div><h1>Rewards</h1><p class="sub">Claim exclusive rewards — codes delivered instantly (US-10)</p></div>' +
+          rewards
+            .map((r, i) => {
+              const out = r.stock === 0;
+              const done = claimed[r.id];
+              let action;
+              if (done) {
+                action =
+                  '<div class="btn-claimed" role="status">🎉 Claimed — code below</div>';
+              } else if (out) {
+                action =
+                  '<button class="btn-reward" disabled>Out of stock</button>';
+              } else {
+                action =
+                  '<button class="btn-reward" data-id="' +
+                  r.id +
+                  '">Claim Reward</button>';
+              }
+              const codeBox = done
+                ? '<div class="code-reveal"><small>Reward code from provider (FR-43)</small><b>' +
+                  claimed[r.id] +
+                  '</b></div>'
+                : '';
+              return (
+                '<article class="rcard enter" style="animation-delay:' +
+                i * 60 +
+                'ms" data-reward="' +
+                r.id +
+                '">' +
+                '<div class="rcard-head"><span class="rname">' +
+                r.name +
+                '</span><span class="rtype">' +
+                r.type +
+                '</span></div>' +
+                '<p class="rdesc">' +
+                r.desc +
+                '</p>' +
+                stockHTML(r) +
+                action +
+                codeBox +
+                '</article>'
+              );
+            })
+            .join('');
+      }
+
+      // Mirrors POST /rewards/claim/:reward_id — transactional with provider call (FR-42)
+      listEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-reward');
+        if (!btn || btn.disabled) return;
+        const id = btn.dataset.id;
+        const r = rewards.find((x) => x.id === id);
+        if (r.stock === 0) {
+          showToast('400: Reward item is out of stock (FR-41)', false);
+          return;
+        }
+
+        btn.classList.add('loading');
+        btn.textContent = 'Calling provider…';
+
+        // Simulate provider latency, then success or failure
+        setTimeout(() => {
+          const fail = id === 'r4'; // simulate provider failure on this one
+          btn.classList.remove('loading');
+          if (fail) {
+            // ROLLBACK — stock restored (FR-42)
+            showToast(
+              'Provider error — transaction rolled back, stock restored (FR-42)',
+              false,
+            );
+            render();
+            return;
+          }
+          if (r.stock > 0) r.stock -= 1;
+          claimed[r.id] =
+            'GP-' +
+            (100000 + claimedCount * 777)
+              .toString(36)
+              .toUpperCase()
+              .slice(0, 8);
+          claimedCount += 1;
+          showToast(
+            'Reward claimed! Code: ' + claimed[r.id] + ' (FR-43)',
+            true,
+          );
+          render();
+        }, 900);
+      });
+
+      document.querySelector('.theme-toggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        const isDark = html.dataset.theme === 'dark';
+        html.dataset.theme = isDark ? 'light' : 'dark';
+        document.querySelector('.theme-icon').textContent = isDark
+          ? '☀️'
+          : '🌙';
+      });
+
+      render();
+    </script>
+  </body>
+</html>

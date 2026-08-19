@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mockup A — Customer Voucher Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root[data-theme='dark'] {
+        --color-bg: #020617;
+        --color-surface: rgba(15, 23, 42, 0.6);
+        --color-surface-solid: #0f172a;
+        --color-text: #f8fafc;
+        --color-text-muted: #94a3b8;
+        --color-accent: #06b6d4;
+        --color-accent-2: #d946ef;
+        --color-border: rgba(255, 255, 255, 0.1);
+        --color-success: #34d399;
+        --color-danger: #f87171;
+        --color-warn: #fbbf24;
+      }
+      :root[data-theme='light'] {
+        --color-bg: #f1f5f9;
+        --color-surface: #ffffff;
+        --color-surface-solid: #ffffff;
+        --color-text: #0f172a;
+        --color-text-muted: #64748b;
+        --color-accent: #0891b2;
+        --color-accent-2: #c026d3;
+        --color-border: rgba(15, 23, 42, 0.12);
+        --color-success: #059669;
+        --color-danger: #dc2626;
+        --color-warn: #d97706;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        transition:
+          background 0.3s ease,
+          color 0.3s ease;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.5rem 0.9rem;
+        cursor: pointer;
+        color: var(--color-text);
+        font-size: 1.1rem;
+        transition:
+          background 0.2s,
+          border-color 0.2s,
+          transform 0.15s;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
+      .theme-toggle:hover {
+        border-color: var(--color-accent);
+        transform: translateY(-1px);
+      }
+      .theme-toggle:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        width: 100%;
+        max-width: 900px;
+      }
+
+      .screen-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        font-weight: 600;
+      }
+
+      /* ── Phone frame ── */
+      .phone {
+        width: 380px;
+        max-width: 100%;
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 40px;
+        padding: 14px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        transition: background 0.3s ease;
+      }
+      .screen {
+        background: var(--color-bg);
+        border-radius: 28px;
+        overflow: hidden;
+        min-height: 700px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--color-border);
+      }
+
+      /* ── Header ── */
+      .header {
+        padding: 1.25rem 1.25rem 0.75rem;
+      }
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.9rem;
+      }
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: #fff;
+      }
+      .welcome small {
+        display: block;
+        color: var(--color-text-muted);
+        font-size: 0.72rem;
+        font-weight: 500;
+      }
+      .welcome strong {
+        font-size: 1.02rem;
+        font-weight: 700;
+      }
+      .notif-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .notif-dot {
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--color-accent-2);
+        border: 2px solid var(--color-bg);
+      }
+
+      /* ── Tabs ── */
+      .tabs {
+        display: flex;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 14px;
+        padding: 4px;
+        margin: 0 1.25rem 1rem;
+      }
+      .tab {
+        flex: 1;
+        text-align: center;
+        padding: 0.55rem 0;
+        border-radius: 10px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .tab.active {
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(6, 182, 212, 0.35);
+      }
+      .tab:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      /* ── Filter chips ── */
+      .chips {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0 1.25rem 0.9rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .chips::-webkit-scrollbar {
+        display: none;
+      }
+      .chip {
+        flex-shrink: 0;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        color: var(--color-text-muted);
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+      }
+      .chip.active {
+        background: var(--color-text);
+        color: var(--color-bg);
+        border-color: var(--color-text);
+      }
+      .chip:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      /* ── Voucher cards ── */
+      .list {
+        padding: 0 1.25rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        flex: 1;
+      }
+      .vcard {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        opacity: 1;
+      }
+      .vcard.enter {
+        animation: cardIn 0.45s ease both;
+      }
+      @keyframes cardIn {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .vcard-body {
+        padding: 1rem 1.1rem 0.95rem;
+      }
+      .vcard-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.7rem;
+      }
+      .vcode {
+        font-weight: 800;
+        font-size: 1.05rem;
+        letter-spacing: 0.02em;
+      }
+      .vtag {
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 0.22rem 0.6rem;
+        border-radius: 999px;
+        letter-spacing: 0.03em;
+      }
+      .vtag.pct {
+        background: rgba(6, 182, 212, 0.15);
+        color: var(--color-accent);
+      }
+      .vtag.fixed {
+        background: rgba(217, 70, 239, 0.15);
+        color: var(--color-accent-2);
+      }
+      .vdesc {
+        color: var(--color-text-muted);
+        font-size: 0.82rem;
+        margin-bottom: 0.8rem;
+        line-height: 1.45;
+      }
+      .vmeta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        font-size: 0.76rem;
+        color: var(--color-text-muted);
+        margin-bottom: 0.9rem;
+      }
+      .vmeta b {
+        color: var(--color-text);
+        font-weight: 600;
+      }
+      .btn-claim {
+        width: 100%;
+        padding: 0.7rem 0;
+        border: none;
+        border-radius: 13px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        color: #fff;
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        transition:
+          transform 0.15s,
+          opacity 0.2s,
+          filter 0.2s;
+      }
+      .btn-claim:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+      }
+      .btn-claim:focus-visible {
+        outline: 2px solid var(--color-text);
+        outline-offset: 2px;
+      }
+      .btn-claim:disabled {
+        cursor: default;
+        opacity: 0.55;
+        filter: none;
+        transform: none;
+      }
+      .btn-claimed {
+        width: 100%;
+        padding: 0.7rem 0;
+        border: 1px solid var(--color-border);
+        border-radius: 13px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: default;
+        font-family: inherit;
+        background: var(--color-surface);
+        color: var(--color-success);
+      }
+      .badge-soldout {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--color-danger);
+      }
+      .progress {
+        height: 5px;
+        border-radius: 999px;
+        background: var(--color-border);
+        overflow: hidden;
+        margin-top: 0.5rem;
+      }
+      .progress > span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+      }
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translate(-50%, 120%);
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.7rem 1.4rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .toast.show {
+        transform: translate(-50%, 0);
+      }
+      .toast.success {
+        color: var(--color-success);
+      }
+
+      .footnote {
+        color: var(--color-text-muted);
+        font-size: 0.78rem;
+        text-align: center;
+        line-height: 1.6;
+      }
+      .footnote code {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        padding: 0.1rem 0.4rem;
+        border-radius: 6px;
+        font-size: 0.72rem;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <span class="theme-icon">🌙</span>
+    </button>
+
+    <div class="stage">
+      <div class="screen-label">
+        PRD 4.7 Mockup A · US-5 / US-9 · POST /loyalty/vouchers/eligible
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <header class="header">
+            <div class="header-top">
+              <div class="welcome">
+                <small>Welcome back,</small>
+                <strong>Andi Pratama</strong>
+              </div>
+              <div class="notif-badge" aria-label="Notifications">
+                <span aria-hidden="true">🔔</span>
+                <span class="notif-dot"></span>
+              </div>
+            </div>
+            <div class="tabs" role="tablist">
+              <button
+                class="tab active"
+                role="tab"
+                aria-selected="true"
+                data-tab="eligible"
+              >
+                🎟️ Vouchers
+              </button>
+              <button
+                class="tab"
+                role="tab"
+                aria-selected="false"
+                data-tab="mine"
+              >
+                My Vouchers
+              </button>
+            </div>
+          </header>
+
+          <div
+            class="chips"
+            id="chipRow"
+            role="group"
+            aria-label="Filter by binding"
+          >
+            <button class="chip active" data-filter="all">All</button>
+            <button class="chip" data-filter="food">Food</button>
+            <button class="chip" data-filter="grocery">Grocery</button>
+            <button class="chip" data-filter="drinks">Drinks</button>
+          </div>
+
+          <main class="list" id="voucherList" aria-live="polite"></main>
+        </div>
+      </div>
+
+      <p class="footnote">
+        Per PRD: eligible list = vouchers matching user bindings · quota menurun
+        saat claim (FR-23) · user hanya bisa claim sekali (FR-22) ·
+        <code>user_id</code> dari token, bukan body (FR-13)
+      </p>
+    </div>
+
+    <div class="toast" id="toast" role="status">
+      <span id="toastIcon">✅</span><span id="toastMsg"></span>
+    </div>
+
+    <script>
+      const vouchers = [
+        {
+          code: 'SUMMER20',
+          tag: '20% OFF',
+          tagType: 'pct',
+          desc: 'Get 20% off all meals — Nasi Goreng, Mie Ayam, Sate.',
+          valid: 'Valid: 01 Aug – 31 Aug',
+          quotaTotal: 150,
+          quotaLeft: 142,
+          filter: 'food',
+          claimed: false,
+          discount: 'discount = subtotal × 20 ÷ 100 (FR-27)',
+        },
+        {
+          code: 'RPL10',
+          tag: 'Rp 10.000',
+          tagType: 'fixed',
+          desc: 'Rp 10.000 off groceries — every day 10:00–12:00.',
+          valid: 'Valid: daily, 10:00 – 12:00',
+          quotaTotal: 200,
+          quotaLeft: 0,
+          filter: 'grocery',
+          claimed: false,
+        },
+        {
+          code: 'DRINK50',
+          tag: '50% OFF',
+          tagType: 'pct',
+          desc: 'Half price on all drinks for first 100 customers.',
+          valid: 'Valid: 01 Sep – 15 Sep',
+          quotaTotal: 100,
+          quotaLeft: 37,
+          filter: 'drinks',
+          claimed: false,
+        },
+        {
+          code: 'STARTER15',
+          tag: '15% OFF',
+          tagType: 'pct',
+          desc: 'New user bonus — 15% off your first order.',
+          valid: 'Valid: one-time, until 31 Dec',
+          quotaTotal: 500,
+          quotaLeft: 488,
+          filter: 'food',
+          claimed: true,
+        },
+      ];
+      const claimedState = { STARTER15: true };
+
+      const listEl = document.getElementById('voucherList');
+      const toastEl = document.getElementById('toast');
+      let toastTimer = null;
+      let activeFilter = 'all';
+
+      function showToast(msg, ok) {
+        toastEl.classList.add('show');
+        toastEl.className = 'toast show ' + (ok ? 'success' : '');
+        document.getElementById('toastIcon').textContent = ok ? '✅' : '⛔';
+        document.getElementById('toastMsg').textContent = msg;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+      }
+
+      function claimVoucher(code) {
+        const v = vouchers.find((x) => x.code === code);
+        if (v.quotaLeft <= 0) {
+          showToast('400: Voucher quota exhausted (FR-20)', false);
+          return;
+        }
+        if (claimedState[code]) {
+          showToast(
+            '400: You have already claimed this voucher (FR-22)',
+            false,
+          );
+          return;
+        }
+        claimedState[code] = true;
+        v.quotaLeft -= 1;
+        v.claimed = true;
+        showToast('Voucher claimed successfully! (FR-23)', true);
+        render();
+      }
+
+      function cardHTML(v, i) {
+        const soldOut = v.quotaLeft <= 0;
+        const claimed = claimedState[v.code];
+        const pct = Math.max(0, Math.round((v.quotaLeft / v.quotaTotal) * 100));
+        let action;
+        if (claimed) {
+          action =
+            '<div class="btn-claimed" role="status">🎉 Claimed — in "My Vouchers"</div>';
+        } else if (soldOut) {
+          action = '<button class="btn-claim" disabled>Sold out</button>';
+        } else {
+          action =
+            '<button class="btn-claim" onclick="claimVoucher(\'' +
+            v.code +
+            '\')">Claim Voucher</button>';
+        }
+        const soldOutBadge = soldOut
+          ? '<span class="badge-soldout">● Quota left: 0 (sold out)</span>'
+          : '<span>Quota left: <b>' +
+            v.quotaLeft +
+            '</b></span><div class="progress"><span style="width:' +
+            pct +
+            '%"></span></div>';
+        return (
+          '<article class="vcard enter" style="animation-delay:' +
+          i * 70 +
+          'ms" aria-label="Voucher ' +
+          v.code +
+          '">' +
+          '<div class="vcard-body">' +
+          '<div class="vcard-head"><span class="vcode">🎟️ ' +
+          v.code +
+          '</span>' +
+          '<span class="vtag ' +
+          v.tagType +
+          '">' +
+          v.tag +
+          '</span></div>' +
+          '<p class="vdesc">' +
+          v.desc +
+          '</p>' +
+          '<div class="vmeta"><span>🕒 ' +
+          v.valid +
+          '</span>' +
+          soldOutBadge +
+          '</div>' +
+          action +
+          '</div>' +
+          '</article>'
+        );
+      }
+
+      function render() {
+        const filtered =
+          activeFilter === 'all'
+            ? vouchers
+            : vouchers.filter((v) => v.filter === activeFilter);
+        listEl.innerHTML = filtered.map(cardHTML).join('');
+      }
+
+      // Tab switching: Vouchers (eligible) vs My Vouchers (claimed)
+      document.querySelectorAll('.tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach((t) => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          if (tab.dataset.tab === 'mine') {
+            const mine = vouchers.filter((v) => claimedState[v.code]);
+            listEl.innerHTML = mine.length
+              ? mine.map(cardHTML).join('')
+              : '<p style="color:var(--color-text-muted);text-align:center;padding:2.5rem 0;font-size:0.85rem">You have not claimed any vouchers yet (US-9).</p>';
+            document.getElementById('chipRow').style.visibility = 'hidden';
+          } else {
+            document.getElementById('chipRow').style.visibility = 'visible';
+            render();
+          }
+        });
+      });
+
+      // Filter chips
+      document.querySelectorAll('.chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          document
+            .querySelectorAll('.chip')
+            .forEach((c) => c.classList.remove('active'));
+          chip.classList.add('active');
+          activeFilter = chip.dataset.filter;
+          render();
+        });
+      });
+
+      document.querySelector('.theme-toggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        const isDark = html.dataset.theme === 'dark';
+        html.dataset.theme = isDark ? 'light' : 'dark';
+        document.querySelector('.theme-icon').textContent = isDark
+          ? '☀️'
+          : '🌙';
+      });
+
+      render();
+    </script>
+  </body>
+</html>

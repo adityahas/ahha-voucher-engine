@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mockup B — Checkout with Discount Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root[data-theme='dark'] {
+        --color-bg: #020617;
+        --color-surface: rgba(15, 23, 42, 0.6);
+        --color-surface-solid: #0f172a;
+        --color-text: #f8fafc;
+        --color-text-muted: #94a3b8;
+        --color-accent: #06b6d4;
+        --color-accent-2: #d946ef;
+        --color-border: rgba(255, 255, 255, 0.1);
+        --color-success: #34d399;
+        --color-danger: #f87171;
+        --color-warn: #fbbf24;
+      }
+      :root[data-theme='light'] {
+        --color-bg: #f1f5f9;
+        --color-surface: #ffffff;
+        --color-surface-solid: #ffffff;
+        --color-text: #0f172a;
+        --color-text-muted: #64748b;
+        --color-accent: #0891b2;
+        --color-accent-2: #c026d3;
+        --color-border: rgba(15, 23, 42, 0.12);
+        --color-success: #059669;
+        --color-danger: #dc2626;
+        --color-warn: #d97706;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        transition:
+          background 0.3s ease,
+          color 0.3s ease;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.5rem 0.9rem;
+        cursor: pointer;
+        color: var(--color-text);
+        font-size: 1.1rem;
+        transition:
+          background 0.2s,
+          border-color 0.2s,
+          transform 0.15s;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
+      .theme-toggle:hover {
+        border-color: var(--color-accent);
+        transform: translateY(-1px);
+      }
+      .theme-toggle:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        width: 100%;
+        max-width: 900px;
+      }
+      .screen-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        font-weight: 600;
+      }
+
+      .phone {
+        width: 400px;
+        max-width: 100%;
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 40px;
+        padding: 14px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        transition: background 0.3s ease;
+      }
+      .screen {
+        background: var(--color-bg);
+        border-radius: 28px;
+        overflow: hidden;
+        min-height: 720px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--color-border);
+      }
+
+      .header {
+        padding: 1.1rem 1.25rem 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+      }
+      .back {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+        color: var(--color-text);
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
+        transition: border-color 0.2s;
+      }
+      .back:hover {
+        border-color: var(--color-accent);
+      }
+      .back:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+      .header h1 {
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+      .header small {
+        display: block;
+        color: var(--color-text-muted);
+        font-size: 0.72rem;
+        font-weight: 500;
+      }
+
+      .body {
+        padding: 0 1.25rem 1.4rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      /* Product line */
+      .product {
+        display: flex;
+        gap: 0.9rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 18px;
+        padding: 0.9rem;
+      }
+      .thumb {
+        width: 58px;
+        height: 58px;
+        border-radius: 13px;
+        flex-shrink: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(6, 182, 212, 0.25),
+          rgba(217, 70, 239, 0.25)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+      .product-info {
+        flex: 1;
+      }
+      .product-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 0.2rem;
+      }
+      .product-price {
+        color: var(--color-text-muted);
+        font-size: 0.82rem;
+      }
+      .qty {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin-top: 0.5rem;
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.2rem 0.7rem;
+      }
+      .qty button {
+        background: none;
+        border: none;
+        color: var(--color-text);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: inherit;
+        padding: 0 0.2rem;
+      }
+      .qty button:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+      .qty span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        min-width: 1.2rem;
+        text-align: center;
+      }
+
+      /* Voucher input */
+      .voucher-box {
+      }
+      .label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-text-muted);
+        font-weight: 700;
+        margin-bottom: 0.45rem;
+      }
+      .voucher-input {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .voucher-input input {
+        flex: 1;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 13px;
+        padding: 0.75rem 0.95rem;
+        color: var(--color-text);
+        font-family: inherit;
+        font-size: 0.88rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        transition: border-color 0.2s;
+      }
+      .voucher-input input:focus {
+        outline: none;
+        border-color: var(--color-accent);
+      }
+      .voucher-input input:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 1px;
+      }
+      .btn-apply {
+        padding: 0.75rem 1.15rem;
+        border: none;
+        border-radius: 13px;
+        font-weight: 700;
+        font-size: 0.84rem;
+        font-family: inherit;
+        cursor: pointer;
+        color: #fff;
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        transition:
+          transform 0.15s,
+          filter 0.2s;
+      }
+      .btn-apply:hover {
+        filter: brightness(1.1);
+      }
+      .btn-apply:focus-visible {
+        outline: 2px solid var(--color-text);
+        outline-offset: 2px;
+      }
+
+      /* Status message */
+      .status {
+        border-radius: 13px;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: fadeIn 0.3s ease;
+        border: 1px solid var(--color-border);
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .status.success {
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--color-success);
+      }
+      .status.error {
+        background: rgba(248, 113, 113, 0.12);
+        color: var(--color-danger);
+      }
+      .status.info {
+        background: var(--color-surface);
+        color: var(--color-text-muted);
+      }
+      .status.hidden {
+        display: none;
+      }
+
+      /* Summary */
+      .summary {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+      }
+      .sum-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.88rem;
+        padding: 0.3rem 0;
+      }
+      .sum-row.muted {
+        color: var(--color-text-muted);
+      }
+      .sum-row.discount {
+        color: var(--color-success);
+        font-weight: 600;
+      }
+      .sum-divider {
+        border-top: 1px dashed var(--color-border);
+        margin: 0.55rem 0;
+      }
+      .sum-row.total {
+        font-weight: 800;
+        font-size: 1rem;
+      }
+      .sum-row.total .amount {
+        font-size: 1.15rem;
+      }
+
+      .btn-buy {
+        width: 100%;
+        padding: 0.95rem 0;
+        border: none;
+        border-radius: 15px;
+        font-size: 0.95rem;
+        font-weight: 800;
+        font-family: inherit;
+        cursor: pointer;
+        color: #fff;
+        background: linear-gradient(
+          135deg,
+          var(--color-accent),
+          var(--color-accent-2)
+        );
+        transition:
+          transform 0.15s,
+          filter 0.2s;
+        box-shadow: 0 12px 30px rgba(6, 182, 212, 0.3);
+      }
+      .btn-buy:hover {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+      }
+      .btn-buy:focus-visible {
+        outline: 2px solid var(--color-text);
+        outline-offset: 2px;
+      }
+
+      .footnote {
+        color: var(--color-text-muted);
+        font-size: 0.78rem;
+        text-align: center;
+        line-height: 1.6;
+      }
+      .footnote code {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        padding: 0.1rem 0.4rem;
+        border-radius: 6px;
+        font-size: 0.72rem;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translate(-50%, 120%);
+        background: var(--color-surface-solid);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.7rem 1.4rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .toast.show {
+        transform: translate(-50%, 0);
+      }
+      .toast.success {
+        color: var(--color-success);
+      }
+    </style>
+  </head>
+  <body>
+    <button class="theme-toggle" aria-label="Toggle theme">
+      <span class="theme-icon">🌙</span>
+    </button>
+
+    <div class="stage">
+      <div class="screen-label">
+        PRD 4.7 Mockup B · US-7 / US-8 · POST
+        /loyalty/vouchers/calculate-discount + /loyalty/purchase
+      </div>
+      <div class="phone">
+        <div class="screen">
+          <header class="header">
+            <button class="back" aria-label="Go back">←</button>
+            <div>
+              <h1>Checkout</h1>
+              <small>Confirm your order</small>
+            </div>
+          </header>
+
+          <main class="body">
+            <div class="product">
+              <div class="thumb" aria-hidden="true">🍛</div>
+              <div class="product-info">
+                <div class="product-name">Nasi Goreng Spesial</div>
+                <div class="product-price">Rp 45.000 / porsi</div>
+                <div class="qty" role="group" aria-label="Quantity">
+                  <button id="qtyMinus" aria-label="Decrease quantity">
+                    −
+                  </button>
+                  <span id="qtyVal">1</span>
+                  <button id="qtyPlus" aria-label="Increase quantity">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="voucher-box">
+              <div class="label">Voucher Code</div>
+              <div class="voucher-input">
+                <input
+                  id="voucherInput"
+                  type="text"
+                  placeholder="SUMMER20"
+                  aria-label="Voucher code"
+                  autocomplete="off"
+                />
+                <button class="btn-apply" id="applyBtn">Apply</button>
+              </div>
+            </div>
+
+            <div class="status info hidden" id="statusBox" role="status"></div>
+
+            <div class="summary" aria-label="Order summary">
+              <div class="sum-row muted">
+                <span>Subtotal</span><span id="sumSubtotal">Rp 45.000</span>
+              </div>
+              <div class="sum-row discount">
+                <span>Discount</span><span id="sumDiscount">− Rp 0</span>
+              </div>
+              <div class="sum-divider"></div>
+              <div class="sum-row total">
+                <span>Total</span
+                ><span class="amount" id="sumTotal">Rp 45.000</span>
+              </div>
+            </div>
+
+            <button class="btn-buy" id="buyBtn">Confirm Purchase</button>
+          </main>
+        </div>
+      </div>
+
+      <p class="footnote">
+        Urutan validasi (FR-25): exist → quota → validity → target users →
+        bindings · discount cap di subtotal, tidak pernah negatif (FR-28) ·
+        voucher usage + order satu transaksi, rollback all-or-nothing (FR-35)
+      </p>
+    </div>
+
+    <div class="toast" id="toast" role="status">
+      <span id="toastIcon">✅</span><span id="toastMsg"></span>
+    </div>
+
+    <script>
+      const PRICE = 45000;
+      let qty = 1;
+      let applied = null; // { code, discount }
+
+      const qtyVal = document.getElementById('qtyVal');
+      const sumSubtotal = document.getElementById('sumSubtotal');
+      const sumDiscount = document.getElementById('sumDiscount');
+      const sumTotal = document.getElementById('sumTotal');
+      const statusBox = document.getElementById('statusBox');
+      const toastEl = document.getElementById('toast');
+      let toastTimer = null;
+
+      // Mock "backend" — validation logic mirrors FR-25..FR-29
+      const voucherRules = {
+        SUMMER20: {
+          type: 'pct',
+          value: 20,
+          quota: 142,
+          valid: true,
+          targeted: false,
+        },
+        RPL10: {
+          type: 'fixed',
+          value: 10000,
+          quota: 0,
+          valid: true,
+          targeted: false,
+        },
+        VIP50: {
+          type: 'pct',
+          value: 50,
+          quota: 10,
+          valid: true,
+          targeted: true,
+        },
+        EXPIRED1: {
+          type: 'pct',
+          value: 10,
+          quota: 50,
+          valid: false,
+          targeted: false,
+        },
+      };
+
+      function fmt(n) {
+        return 'Rp ' + n.toLocaleString('id-ID');
+      }
+
+      function setStatus(msg, kind) {
+        statusBox.className = 'status ' + kind;
+        statusBox.textContent = msg;
+        statusBox.classList.remove('hidden');
+      }
+
+      function showToast(msg, ok) {
+        toastEl.classList.add('show');
+        toastEl.className = 'toast show ' + (ok ? 'success' : '');
+        document.getElementById('toastIcon').textContent = ok ? '✅' : '⛔';
+        document.getElementById('toastMsg').textContent = msg;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+      }
+
+      function subtotal() {
+        return PRICE * qty;
+      }
+
+      // Mirrors POST /loyalty/vouchers/calculate-discount
+      function calculateDiscount(code) {
+        const rule = voucherRules[code];
+        if (!rule) return { isValid: false, message: 'Voucher not found' };
+        if (rule.quota <= 0)
+          return { isValid: false, message: 'Voucher quota exhausted' };
+        if (!rule.valid)
+          return {
+            isValid: false,
+            message: 'Voucher is not valid at this time',
+          };
+        if (rule.targeted)
+          return {
+            isValid: false,
+            message: 'Voucher is not valid for this user',
+          };
+        const st = subtotal();
+        let discount =
+          rule.type === 'pct' ? (st * rule.value) / 100 : rule.value;
+        discount = Math.min(discount, st); // cap at subtotal (FR-28)
+        return {
+          isValid: true,
+          discountAmount: discount,
+          finalPrice: st - discount,
+        };
+      }
+
+      function updateSummary() {
+        const st = subtotal();
+        const disc = applied ? applied.discount : 0;
+        sumSubtotal.textContent = fmt(st);
+        sumDiscount.textContent = '− ' + fmt(disc);
+        sumTotal.textContent = fmt(st - disc);
+      }
+
+      document.getElementById('applyBtn').addEventListener('click', () => {
+        const code = document
+          .getElementById('voucherInput')
+          .value.trim()
+          .toUpperCase();
+        if (!code) {
+          setStatus('Enter a voucher code first', 'info');
+          return;
+        }
+        const res = calculateDiscount(code);
+        if (res.isValid) {
+          applied = { code: code, discount: res.discountAmount };
+          setStatus(
+            '✅ ' +
+              code +
+              ' applied — discount ' +
+              fmt(res.discountAmount) +
+              ' (FR-29)',
+            'success',
+          );
+        } else {
+          applied = null;
+          setStatus('⛔ ' + res.message, 'error');
+        }
+        updateSummary();
+      });
+
+      document.getElementById('voucherInput').addEventListener('input', () => {
+        if (!applied) return;
+        applied = null;
+        setStatus('Voucher removed — re-apply to recalculate', 'info');
+        updateSummary();
+      });
+
+      document.getElementById('qtyMinus').addEventListener('click', () => {
+        qty = Math.max(1, qty - 1);
+        qtyVal.textContent = qty;
+        if (applied) {
+          const res = calculateDiscount(applied.code);
+          applied.discount = res.isValid ? res.discountAmount : 0;
+        }
+        updateSummary();
+      });
+
+      document.getElementById('qtyPlus').addEventListener('click', () => {
+        qty += 1;
+        qtyVal.textContent = qty;
+        if (applied) {
+          const res = calculateDiscount(applied.code);
+          applied.discount = res.isValid ? res.discountAmount : 0;
+        }
+        updateSummary();
+      });
+
+      // Mirrors POST /loyalty/purchase — usage + order in one transaction (FR-33, FR-35)
+      document.getElementById('buyBtn').addEventListener('click', () => {
+        if (applied) {
+          const res = calculateDiscount(applied.code);
+          if (!res.isValid) {
+            applied = null;
+            setStatus(
+              '⛔ Voucher invalid at purchase time — order NOT created (FR-32)',
+              'error',
+            );
+            updateSummary();
+            showToast('400: ' + res.message + ' — order not created', false);
+            return;
+          }
+          showToast(
+            'Order created! voucher_code: ' + applied.code + ' (FR-34)',
+            true,
+          );
+        } else {
+          showToast('Order created! (no voucher)', true);
+        }
+        setStatus(
+          'Order created — ' +
+            fmt(subtotal() - (applied ? applied.discount : 0)),
+          'success',
+        );
+      });
+
+      document.querySelector('.theme-toggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        const isDark = html.dataset.theme === 'dark';
+        html.dataset.theme = isDark ? 'light' : 'dark';
+        document.querySelector('.theme-icon').textContent = isDark
+          ? '☀️'
+          : '🌙';
+      });
+
+      updateSummary();
+    </script>
+  </body>
+</html>

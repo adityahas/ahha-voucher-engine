@@ -21,7 +21,10 @@ const MIME_TYPES = {
 function createStaticServer(rootDirectory, port, name) {
   const server = http.createServer((req, res) => {
     const urlPath = req.url.split('?')[0];
-    let filePath = path.join(rootDirectory, urlPath === '/' ? 'index.html' : urlPath);
+    let filePath = path.join(
+      rootDirectory,
+      urlPath === '/' ? 'index.html' : urlPath,
+    );
 
     // Prevent directory traversal
     if (!filePath.startsWith(rootDirectory)) {
@@ -56,7 +59,9 @@ function createStaticServer(rootDirectory, port, name) {
   });
 
   server.listen(port, () => {
-    console.log(`[${name}] Static server listening on http://localhost:${port}`);
+    console.log(
+      `[${name}] Static server listening on http://localhost:${port}`,
+    );
   });
 
   return server;

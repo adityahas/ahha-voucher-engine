@@ -36,12 +36,14 @@ Design doc: `docs/superpowers/specs/2026-08-15-tier-level-up-voucher-design.md`
 ### Task 1: Data model — `level_up_voucher_code` column + migration
 
 **Files:**
+
 - Modify: `libs/loyalty/src/tier/entities/loyalty-tier.entity.ts`
 - Modify: `apps/loyalty-admin/src/tier/dto/create-tier.dto.ts` (UpdateTierDto extends it via `PartialType`, so no separate change needed)
 - Create: `apps/loyalty-admin/src/migrations/20260815-tier-level-up-voucher.ts`
 - Test: `apps/loyalty-admin/src/migrations/20260815-tier-level-up-voucher.spec.ts`
 
 **Interfaces:**
+
 - Produces: `LoyaltyTierEntity.level_up_voucher_code: string | null` (nullable varchar). `CreateTierDto.level_up_voucher_code?: string`. Used by Task 2 (`grantLevelUpVoucher`), Task 3 (purchase), Task 4 (admin tier assign), Task 5 (CMS).
 
 - [ ] **Step 1: Add the entity column**
@@ -151,10 +153,12 @@ git commit -m "feat(loyalty): add level_up_voucher_code to tiers"
 ### Task 2: `TierService.grantLevelUpVoucher` + unit tests
 
 **Files:**
+
 - Modify: `libs/loyalty/src/tier/tier.service.ts`
 - Test: `libs/loyalty/src/tier/tier.service.spec.ts`
 
 **Interfaces:**
+
 - Produces (consumed by Task 3 purchase and Task 4 admin assign):
   ```ts
   type LevelUpGrantResult = {
@@ -210,7 +214,10 @@ describe('TierService.grantLevelUpVoucher', () => {
 
     const result = await service.grantLevelUpVoucher(user, tier, manager);
 
-    expect(result).toEqual({ granted: false, message: 'no-voucher-configured' });
+    expect(result).toEqual({
+      granted: false,
+      message: 'no-voucher-configured',
+    });
   });
 
   it('returns already-claimed when a claim row already exists for the code', async () => {
@@ -219,7 +226,11 @@ describe('TierService.grantLevelUpVoucher', () => {
     const tier = new LoyaltyTierEntity();
     tier.level_up_voucher_code = 'GOLD2030';
 
-    const result = await service.grantLevelUpVoucher(user, tier, manager as any);
+    const result = await service.grantLevelUpVoucher(
+      user,
+      tier,
+      manager as any,
+    );
 
     expect(claimRepo.findOne).toHaveBeenCalledWith({
       where: { voucher: { code: 'GOLD2030' }, user: { id: 'u1' } },
@@ -236,7 +247,11 @@ describe('TierService.grantLevelUpVoucher', () => {
     const tier = new LoyaltyTierEntity();
     tier.level_up_voucher_code = 'DELETE ME';
 
-    const result = await service.grantLevelUpVoucher(user, tier, manager as any);
+    const result = await service.grantLevelUpVoucher(
+      user,
+      tier,
+      manager as any,
+    );
 
     expect(result).toEqual({ granted: false, message: 'voucher-missing' });
   });
@@ -250,7 +265,11 @@ describe('TierService.grantLevelUpVoucher', () => {
     const tier = new LoyaltyTierEntity();
     tier.level_up_voucher_code = 'X';
 
-    const result = await service.grantLevelUpVoucher(user, tier, manager as any);
+    const result = await service.grantLevelUpVoucher(
+      user,
+      tier,
+      manager as any,
+    );
 
     expect(result).toEqual({ granted: false, message: 'quota-exhausted' });
   });
@@ -270,7 +289,11 @@ describe('TierService.grantLevelUpVoucher', () => {
     const tier = new LoyaltyTierEntity();
     tier.level_up_voucher_code = 'GOLD2030';
 
-    const result = await service.grantLevelUpVoucher(user, tier, manager as any);
+    const result = await service.grantLevelUpVoucher(
+      user,
+      tier,
+      manager as any,
+    );
 
     expect(claimRepo.create).toHaveBeenCalledWith({
       voucher: { code: 'GOLD2030' },
@@ -379,16 +402,19 @@ git commit -m "feat(loyalty): grantLevelUpVoucher in TierService"
 ### Task 3: Wire purchase level-up → grant + response field
 
 **Files:**
+
 - Modify: `apps/loyalty-consumer/src/voucher/purchase.controller.ts`
 - Test: `apps/loyalty-consumer/src/voucher/purchase.controller.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `TierService.grantLevelUpVoucher(user, tier, manager): Promise<LevelUpGrantResult>` (Task 2); `LevelUpGrantResult` type.
 - Produces: purchase response includes `level_up_grant: LevelUpGrantResult | null`.
 
 - [ ] **Step 1: Add the level-up-grant tests**
 
 In `apps/loyalty-consumer/src/voucher/purchase.controller.spec.ts`:
+
 - add `grantLevelUpVoucher: jest.fn(),` to `mockTierService` (near `findHighestTierAtOrBelow`).
 - in `beforeEach`, after `mockTierService.findHighestTierAtOrBelow.mockResolvedValue(null);` add:
   ```ts
@@ -401,46 +427,46 @@ In `apps/loyalty-consumer/src/voucher/purchase.controller.spec.ts`:
 - add a new test to the `describe('purchase')` block:
 
 ```ts
-    it('grants the tier level-up voucher and returns level_up_grant', async () => {
-      mockTierService.findHighestTierAtOrBelow.mockResolvedValue({
-        id: 'gold',
-        name: 'Gold',
-        level_up_voucher_code: 'GOLD2030',
-      });
-      mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
-        isValid: true,
-        discountAmount: 0,
-        finalPrice: 1000,
-      });
+it('grants the tier level-up voucher and returns level_up_grant', async () => {
+  mockTierService.findHighestTierAtOrBelow.mockResolvedValue({
+    id: 'gold',
+    name: 'Gold',
+    level_up_voucher_code: 'GOLD2030',
+  });
+  mockVoucherService.validateAndCalculateDiscount.mockResolvedValue({
+    isValid: true,
+    discountAmount: 0,
+    finalPrice: 1000,
+  });
 
-      const result = await controller.purchase(
-        mockReq,
-        { product_id: 'prod-id', quantity: 1 },
-      );
+  const result = await controller.purchase(mockReq, {
+    product_id: 'prod-id',
+    quantity: 1,
+  });
 
-      expect(mockPointService.recordTierChange).toHaveBeenCalledWith(
-        expect.anything(),
-        null,
-        expect.objectContaining({ id: 'gold' }),
-        TierChangeReason.POINTS_THRESHOLD,
-        mockEntityManager,
-      );
-      expect(mockTierService.grantLevelUpVoucher).toHaveBeenCalled();
-      expect(result.level_up_grant).toEqual({
-        granted: true,
-        voucherCode: 'GOLD2030',
-        message: 'granted',
-      });
-    });
+  expect(mockPointService.recordTierChange).toHaveBeenCalledWith(
+    expect.anything(),
+    null,
+    expect.objectContaining({ id: 'gold' }),
+    TierChangeReason.POINTS_THRESHOLD,
+    mockEntityManager,
+  );
+  expect(mockTierService.grantLevelUpVoucher).toHaveBeenCalled();
+  expect(result.level_up_grant).toEqual({
+    granted: true,
+    voucherCode: 'GOLD2030',
+    message: 'granted',
+  });
+});
 
-    it('returns level_up_grant: null when no level-up occurs', async () => {
-      const result = await controller.purchase(
-        mockReq,
-        { product_id: 'prod-id', quantity: 1 },
-      );
-      expect(mockTierService.grantLevelUpVoucher).not.toHaveBeenCalled();
-      expect(result.level_up_grant).toBeNull();
-    });
+it('returns level_up_grant: null when no level-up occurs', async () => {
+  const result = await controller.purchase(mockReq, {
+    product_id: 'prod-id',
+    quantity: 1,
+  });
+  expect(mockTierService.grantLevelUpVoucher).not.toHaveBeenCalled();
+  expect(result.level_up_grant).toBeNull();
+});
 ```
 
 - [ ] **Step 2: Run tests to verify they fail**
@@ -498,12 +524,12 @@ In `apps/loyalty-consumer/src/voucher/purchase.controller.ts`:
 - add `level_up_grant` to the purchase return object:
 
 ```ts
-      return {
-        ...order,
-        points_earned: pointsEarned,
-        tier: tier ? { id: tier.id, name: tier.name } : null,
-        level_up_grant: levelUpGrant,
-      };
+return {
+  ...order,
+  points_earned: pointsEarned,
+  tier: tier ? { id: tier.id, name: tier.name } : null,
+  level_up_grant: levelUpGrant,
+};
 ```
 
 - [ ] **Step 4: Run tests to verify they pass**
@@ -526,6 +552,7 @@ git commit -m "feat(loyalty): grant level-up voucher on purchase"
 ### Task 4: Admin tier-assign endpoint
 
 **Files:**
+
 - Create: `apps/loyalty-admin/src/user-points/dto/assign-tier.dto.ts`
 - Modify: `apps/loyalty-admin/src/user-points/user-points.controller.ts`
 - Modify: `apps/loyalty-admin/src/user-points/user-points.service.ts`
@@ -533,6 +560,7 @@ git commit -m "feat(loyalty): grant level-up voucher on purchase"
 - Test: `apps/loyalty-admin/src/user-points/user-points.service.spec.ts`
 
 **Interfaces:**
+
 - Consumes: `TierService.grantLevelUpVoucher` + `LevelUpGrantResult` (Task 2); `PointService.recordTierChange`.
 - Produces: `UserPointsService.assignTier(coreUserId, tierId): Promise<LevelUpGrantResult>`; `POST /loyalty-admin/users/:coreUserId/tier` (body `{ tier_id: string }`, requires `manage:points`).
 
@@ -722,9 +750,16 @@ In `apps/loyalty-admin/src/user-points/user-points.service.ts`:
 
 - update imports:
   ```ts
-  import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+  import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+  } from '@nestjs/common';
   import { LoyaltyTierEntity } from '@core/loyalty/tier/entities/loyalty-tier.entity';
-  import { TierService, LevelUpGrantResult } from '@core/loyalty/tier/tier.service';
+  import {
+    TierService,
+    LevelUpGrantResult,
+  } from '@core/loyalty/tier/tier.service';
   import { TierChangeReason } from '@core/loyalty/point/entities/tier-history.entity';
   ```
 - add the `TierService` constructor param:
@@ -783,6 +818,7 @@ In `apps/loyalty-admin/src/user-points/user-points.module.ts`:
 
 - import: `import { TierService } from '@core/loyalty/tier/tier.service';`
 - change the factory line:
+
   ```ts
   useFactory: (dataSource: DataSource) =>
     new UserPointsService(dataSource, new PointService(), new TierService()),
@@ -808,12 +844,14 @@ git commit -m "feat(loyalty-admin): assign tier endpoint with level-up voucher g
 ### Task 5: CMS — tier form `level_up_voucher_code` field
 
 **Files:**
+
 - Modify: `apps/frontend-cms/src/api/tiers.ts`
 - Modify: `apps/frontend-cms/src/components/TierForm.tsx`
 - Modify: `apps/frontend-cms/src/pages/TierList.tsx`
 - Create: `apps/frontend-cms/src/components/TierForm.spec.tsx`
 
 **Interfaces:**
+
 - Consumes: `TierInput.level_up_voucher_code`, `Tier.level_up_voucher_code` (produced here).
 - Produces: `createTier`/`updateTier` payloads include `level_up_voucher_code`.
 
@@ -832,7 +870,9 @@ describe('TierForm', () => {
 
     render(<TierForm onSubmit={onSubmit} />);
 
-    const field = screen.getByLabelText('Level-Up Voucher Code') as HTMLInputElement;
+    const field = screen.getByLabelText(
+      'Level-Up Voucher Code',
+    ) as HTMLInputElement;
     fireEvent.change(field, { target: { value: 'GOLD2030' } });
     fireEvent.click(screen.getByRole('button', { name: /save/i }));
 
@@ -857,17 +897,18 @@ In `apps/frontend-cms/src/api/tiers.ts`, add `level_up_voucher_code?: string | n
 - [ ] **Step 4: Add the field to TierForm**
 
 In `apps/frontend-cms/src/components/TierForm.tsx`:
+
 - add `level_up_voucher_code: initial?.level_up_voucher_code ?? ''` to the `form` state.
 - add an `Input` after the "Exclusive Window" field:
 
 ```tsx
-      <Input
-        label="Level-Up Voucher Code"
-        value={form.level_up_voucher_code ?? ''}
-        onChange={(e) => set('level_up_voucher_code', e.target.value)}
-        placeholder="e.g. GOLD2030"
-        helperText="Auto-granted free voucher when a user reaches this tier."
-      />
+<Input
+  label="Level-Up Voucher Code"
+  value={form.level_up_voucher_code ?? ''}
+  onChange={(e) => set('level_up_voucher_code', e.target.value)}
+  placeholder="e.g. GOLD2030"
+  helperText="Auto-granted free voucher when a user reaches this tier."
+/>
 ```
 
 (No autocomplete/datalist needed — a plain text input satisfies the design's "autocomplete/text input"; the implementer may add a `<datalist>` later if desired, but it is out of scope here.)
@@ -877,9 +918,9 @@ In `apps/frontend-cms/src/components/TierForm.tsx`:
 In `apps/frontend-cms/src/pages/TierList.tsx`, add a new `<TableHead>` "Level-Up Voucher" between "Extra Disc %" and "Active", and a matching `<TableCell>`:
 
 ```tsx
-                      <TableCell className="font-mono text-slate-300">
-                        {t.level_up_voucher_code || '—'}
-                      </TableCell>
+<TableCell className="font-mono text-slate-300">
+  {t.level_up_voucher_code || '—'}
+</TableCell>
 ```
 
 - [ ] **Step 6: Run tests to verify they pass + type-check**
@@ -899,11 +940,13 @@ git commit -m "feat(cms): level-up voucher code on tier form"
 ### Task 6: CMS — UserDetail assign-tier control
 
 **Files:**
+
 - Create: `apps/frontend-cms/src/api/user-points.ts`
 - Modify: `apps/frontend-cms/src/pages/UserDetail.tsx`
 - Modify: `apps/frontend-cms/src/pages/UserDetail.spec.tsx`
 
 **Interfaces:**
+
 - Consumes: `getTiers()` from `../api/tiers`; new `assignUserTier(coreUserId, tierId)`.
 - Produces: `assignUserTier(coreUserId, tierId): Promise<any>` → `POST /loyalty-admin/users/:coreUserId/tier` returning the grant result.
 
@@ -921,26 +964,26 @@ Add imports: `import { assignUserTier } from '../api/user-points'; import { getT
 Add a test to the describe block:
 
 ```tsx
-  it('assigns a tier and shows the grant email-style feedback', async () => {
-    (getTiers as any).mockResolvedValue([
-      { id: 'gold', name: 'Gold' },
-      { id: 'bronze', name: 'Bronze' },
-    ]);
-    (assignUserTier as any).mockResolvedValue({
-      granted: true,
-      voucherCode: 'GOLD2030',
-      message: 'granted',
-    });
-
-    renderWithRouter(<UserDetail />);
-
-    const select = await screen.findByLabelText('Assign Tier');
-    fireEvent.change(select, { target: { value: 'gold' } });
-    fireEvent.click(screen.getByRole('button', { name: /assign tier/i }));
-
-    expect(await screen.findByText(/GOLD2030/)).toBeTruthy();
-    expect(assignUserTier).toHaveBeenCalledWith('test-uuid-123', 'gold');
+it('assigns a tier and shows the grant email-style feedback', async () => {
+  (getTiers as any).mockResolvedValue([
+    { id: 'gold', name: 'Gold' },
+    { id: 'bronze', name: 'Bronze' },
+  ]);
+  (assignUserTier as any).mockResolvedValue({
+    granted: true,
+    voucherCode: 'GOLD2030',
+    message: 'granted',
   });
+
+  renderWithRouter(<UserDetail />);
+
+  const select = await screen.findByLabelText('Assign Tier');
+  fireEvent.change(select, { target: { value: 'gold' } });
+  fireEvent.click(screen.getByRole('button', { name: /assign tier/i }));
+
+  expect(await screen.findByText(/GOLD2030/)).toBeTruthy();
+  expect(assignUserTier).toHaveBeenCalledWith('test-uuid-123', 'gold');
+});
 ```
 
 Adjust the existing `mockUser` fixtures so `getUserById` resolves (the fixtures already do). Note the existing spec must keep `vi.mock('../api/users', ...)`.
@@ -993,6 +1036,7 @@ export const assignUserTier = async (
 - [ ] **Step 4: Add the assign-tier control to UserDetail**
 
 In `apps/frontend-cms/src/pages/UserDetail.tsx`:
+
 - imports: `import { getTiers, Tier } from '../api/tiers';` and `import { assignUserTier } from '../api/user-points';`
 - state:
   ```ts
@@ -1031,55 +1075,53 @@ In `apps/frontend-cms/src/pages/UserDetail.tsx`:
 - render a control card (insert inside the grid, e.g. after the Profile details card):
 
 ```tsx
-        <Card className="border-slate-700/50">
-          <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <UserCog className="w-5 h-5 text-primary-400" />
-              Loyalty Tier
-            </CardTitle>
-            <CardDescription>
-              Assign a loyalty tier and auto-grant its level-up voucher.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-              <label className="flex-1 space-y-1.5">
-                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider ml-1">
-                  Assign Tier
-                </span>
-                <select
-                  className="w-full py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white px-4 focus:ring-2 focus:ring-primary-500"
-                  value={selectedTierId}
-                  onChange={(e) => setSelectedTierId(e.target.value)}
-                >
-                  <option value="">Select tier...</option>
-                  {tiers.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleAssignTier}
-                disabled={!selectedTierId}
-                className="sm:w-40"
-              >
-                Assign Tier
-              </Button>
-            </div>
-            {assignStatus && (
-              <p className="text-sm font-semibold text-primary-300">
-                {assignStatus}
-              </p>
-            )}
-            {assignError && (
-              <p className="text-sm font-semibold text-red-400">{assignError}</p>
-            )}
-          </CardContent>
-        </Card>
+<Card className="border-slate-700/50">
+  <CardHeader>
+    <CardTitle className="text-xl flex items-center gap-2">
+      <UserCog className="w-5 h-5 text-primary-400" />
+      Loyalty Tier
+    </CardTitle>
+    <CardDescription>
+      Assign a loyalty tier and auto-grant its level-up voucher.
+    </CardDescription>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <label className="flex-1 space-y-1.5">
+        <span className="text-xs font-bold text-slate-300 uppercase tracking-wider ml-1">
+          Assign Tier
+        </span>
+        <select
+          className="w-full py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-white px-4 focus:ring-2 focus:ring-primary-500"
+          value={selectedTierId}
+          onChange={(e) => setSelectedTierId(e.target.value)}
+        >
+          <option value="">Select tier...</option>
+          {tiers.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <Button
+        variant="primary"
+        size="sm"
+        onClick={handleAssignTier}
+        disabled={!selectedTierId}
+        className="sm:w-40"
+      >
+        Assign Tier
+      </Button>
+    </div>
+    {assignStatus && (
+      <p className="text-sm font-semibold text-primary-300">{assignStatus}</p>
+    )}
+    {assignError && (
+      <p className="text-sm font-semibold text-red-400">{assignError}</p>
+    )}
+  </CardContent>
+</Card>
 ```
 
 - [ ] **Step 5: Run tests to verify they pass + type-check + full CMS suite**
@@ -1104,10 +1146,12 @@ git commit -m "feat(cms): assign loyalty tier from user detail"
 ### Task 7: Consumer — checkout level-up grant toast
 
 **Files:**
+
 - Modify: `apps/frontend-consumer/src/pages/CheckoutView.tsx`
 - Modify: `apps/frontend-consumer/src/pages/CheckoutView.spec.tsx`
 
 **Interfaces:**
+
 - Consumes: purchase response `level_up_grant: { granted, voucher_code, message } | null` + `tier: { name }` (Task 3).
 
 - [ ] **Step 1: Write the failing test**
@@ -1115,32 +1159,32 @@ git commit -m "feat(cms): assign loyalty tier from user detail"
 In `apps/frontend-consumer/src/pages/CheckoutView.spec.tsx`, add a test (reuse the existing describe block's `beforeEach` fixtures; `executePurchase` is already mocked):
 
 ```tsx
-  it('shows a level-up grant message when the purchase grants a free voucher', async () => {
-    (purchaseApi.executePurchase as any).mockResolvedValue({
-      success: true,
-      tier: { id: 'gold', name: 'Gold' },
-      level_up_grant: {
-        granted: true,
-        voucherCode: 'GOLD2030',
-        message: 'granted',
-      },
-    });
-
-    render(
-      <MemoryRouter initialEntries={['/checkout/prod-123']}>
-        <CheckoutView />
-      </MemoryRouter>,
-    );
-
-    const purchaseButton = await screen.findByText('Complete Purchase');
-    fireEvent.click(purchaseButton);
-
-    expect(
-      await screen.findByText(
-        /You reached Gold tier! Here's your free voucher: GOLD2030/,
-      ),
-    ).toBeTruthy();
+it('shows a level-up grant message when the purchase grants a free voucher', async () => {
+  (purchaseApi.executePurchase as any).mockResolvedValue({
+    success: true,
+    tier: { id: 'gold', name: 'Gold' },
+    level_up_grant: {
+      granted: true,
+      voucherCode: 'GOLD2030',
+      message: 'granted',
+    },
   });
+
+  render(
+    <MemoryRouter initialEntries={['/checkout/prod-123']}>
+      <CheckoutView />
+    </MemoryRouter>,
+  );
+
+  const purchaseButton = await screen.findByText('Complete Purchase');
+  fireEvent.click(purchaseButton);
+
+  expect(
+    await screen.findByText(
+      /You reached Gold tier! Here's your free voucher: GOLD2030/,
+    ),
+  ).toBeTruthy();
+});
 ```
 
 Wrap with the same `MemoryRouter`-based render used by the existing tests (match the existing test's render helper exactly — the existing `beforeEach` already provides `getProductById`, `getPointsProfile`, etc.; adjust to that file's render pattern).
@@ -1155,32 +1199,32 @@ Expected: at least the new test FAILS (message missing), others pass.
 In `apps/frontend-consumer/src/pages/CheckoutView.tsx`, update `handlePurchase` to capture the response and append the grant message:
 
 ```tsx
-  const handlePurchase = async () => {
-    if (!product) return;
+const handlePurchase = async () => {
+  if (!product) return;
 
-    try {
-      setTxnStatus('processing');
-      const result = await executePurchase({
-        product_id: product.id,
-        quantity,
-        voucher_code: voucherCode || undefined,
-        points_to_use: pointsToUse > 0 ? pointsToUse : undefined,
-      });
-      setTxnStatus('success');
-      let message = `You've successfully purchased ${quantity}x ${product.name}!`;
-      if (result?.level_up_grant?.granted) {
-        const tierName = result.tier?.name ?? 'new';
-        message += ` You reached ${tierName} tier! Here's your free voucher: ${result.level_up_grant.voucherCode}`;
-      }
-      setTxnMessage(message);
-    } catch (err: any) {
-      setTxnStatus('error');
-      setTxnMessage(
-        err.message ||
-          'Transaction failed. Please check your balance or voucher validity.',
-      );
+  try {
+    setTxnStatus('processing');
+    const result = await executePurchase({
+      product_id: product.id,
+      quantity,
+      voucher_code: voucherCode || undefined,
+      points_to_use: pointsToUse > 0 ? pointsToUse : undefined,
+    });
+    setTxnStatus('success');
+    let message = `You've successfully purchased ${quantity}x ${product.name}!`;
+    if (result?.level_up_grant?.granted) {
+      const tierName = result.tier?.name ?? 'new';
+      message += ` You reached ${tierName} tier! Here's your free voucher: ${result.level_up_grant.voucherCode}`;
     }
-  };
+    setTxnMessage(message);
+  } catch (err: any) {
+    setTxnStatus('error');
+    setTxnMessage(
+      err.message ||
+        'Transaction failed. Please check your balance or voucher validity.',
+    );
+  }
+};
 ```
 
 - [ ] **Step 4: Run test to verify it passes + full consumer suite**

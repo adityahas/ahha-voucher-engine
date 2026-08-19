@@ -26,7 +26,7 @@ reach that tier — consuming normal voucher quota, not points. This makes tier 
   change** (new admin endpoint is required — none exists today).
 - Consumer-facing feedback: **toast/notification** in the checkout UI when a grant happens.
 - Voucher-as-point-buyable-reward idea was raised and **withdrawn by the user** (`nvm, I changed my
-  mind`). Out of scope.
+mind`). Out of scope.
 
 ---
 
@@ -79,7 +79,7 @@ Behavior (all inside the caller-supplied transaction manager):
    not throw**, `{ granted: false, message: 'voucher-missing' }`; the purchase still succeeds.
 4. Happy path: insert `VoucherClaimEntity` (user + voucher) **and** decrement `voucher.quota` by 1 —
    all directly against the `manager` EntityManager. → `{ granted: true, voucherCode, message:
-   'granted' }`.
+'granted' }`.
 
 ### 3.2 Self-contained (no `VoucherService` seam)
 
@@ -178,23 +178,23 @@ Location: `apps/loyalty-consumer/src/voucher/purchase.controller.ts` (~line 188)
 2. Idempotency key: voucher code per loyalty user (single `voucher_claims` row). Scope to tier
    id too if a code is reused across tiers — pin in plan.
 3. UX wording for the toast.
-5. Whether admin grant feedback needs a UI surface beyond a toast/alert in `UserDetail`.
+4. Whether admin grant feedback needs a UI surface beyond a toast/alert in `UserDetail`.
 
 ---
 
 ## 8. Files touched (summary)
 
-| Layer       | File                                                          | Change                                  |
-| ----------- | ------------------------------------------------------------- | --------------------------------------- |
-| lib         | `libs/loyalty/src/tier/entities/loyalty-tier.entity.ts`       | add `level_up_voucher_code` column      |
-| lib         | `libs/loyalty/src/tier/tier.service.ts`                       | add `grantLevelUpVoucher()`             |
-| lib         | `libs/loyalty/src/tier/tier.service.spec.ts`                  | new unit tests                          |
-| admin       | `apps/loyalty-admin/src/migrations/*-tier-level-up-voucher.ts`| ALTER TABLE (add column)                |
-| admin       | `apps/loyalty-admin/src/user-points/user-points.controller.ts`| `POST /loyalty-admin/users/:id/tier`    |
-| admin       | `apps/loyalty-admin/src/user-points/user-points.service.ts`   | assign-tier service logic               |
-| consumer    | `apps/loyalty-consumer/src/voucher/purchase.controller.ts`    | `maybeLevelUp` → grant; response field  |
-| cms         | `apps/frontend-cms/src/components/TierForm.tsx`               | `level_up_voucher_code` field           |
-| cms         | `apps/frontend-cms/src/pages/TierCreate/Edit/List`            | pass-through / display                  |
-| cms         | `apps/frontend-cms/src/pages/UserDetail.tsx`                  | Assign Tier control + grant feedback    |
-| consumer fe | `apps/frontend-consumer/src/pages/CheckoutView.tsx`           | toast on `level_up_grant`               |
-| tests       | spec files above                                              | unit + component coverage               |
+| Layer       | File                                                           | Change                                 |
+| ----------- | -------------------------------------------------------------- | -------------------------------------- |
+| lib         | `libs/loyalty/src/tier/entities/loyalty-tier.entity.ts`        | add `level_up_voucher_code` column     |
+| lib         | `libs/loyalty/src/tier/tier.service.ts`                        | add `grantLevelUpVoucher()`            |
+| lib         | `libs/loyalty/src/tier/tier.service.spec.ts`                   | new unit tests                         |
+| admin       | `apps/loyalty-admin/src/migrations/*-tier-level-up-voucher.ts` | ALTER TABLE (add column)               |
+| admin       | `apps/loyalty-admin/src/user-points/user-points.controller.ts` | `POST /loyalty-admin/users/:id/tier`   |
+| admin       | `apps/loyalty-admin/src/user-points/user-points.service.ts`    | assign-tier service logic              |
+| consumer    | `apps/loyalty-consumer/src/voucher/purchase.controller.ts`     | `maybeLevelUp` → grant; response field |
+| cms         | `apps/frontend-cms/src/components/TierForm.tsx`                | `level_up_voucher_code` field          |
+| cms         | `apps/frontend-cms/src/pages/TierCreate/Edit/List`             | pass-through / display                 |
+| cms         | `apps/frontend-cms/src/pages/UserDetail.tsx`                   | Assign Tier control + grant feedback   |
+| consumer fe | `apps/frontend-consumer/src/pages/CheckoutView.tsx`            | toast on `level_up_grant`              |
+| tests       | spec files above                                               | unit + component coverage              |
