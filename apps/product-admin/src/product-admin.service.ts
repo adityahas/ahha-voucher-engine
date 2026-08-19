@@ -7,15 +7,15 @@ import { ProductCategoryService } from './product-category.service';
 
 @Injectable()
 export class ProductAdminService {
-  private productRepository: Repository<ProductEntity>;
+  private get productRepository(): Repository<ProductEntity> {
+    return this.dataSource.getRepository(ProductEntity);
+  }
 
   constructor(
     @Inject('PRODUCT_ADMIN_CONNECTION')
     private dataSource: DataSource,
     private readonly productCategoryService: ProductCategoryService,
-  ) {
-    this.productRepository = this.dataSource.getRepository(ProductEntity);
-  }
+  ) {}
 
   async create(createProductDto: CreateProductDto): Promise<ProductEntity> {
     const { categories, ...rest } = createProductDto;

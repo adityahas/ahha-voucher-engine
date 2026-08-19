@@ -6,14 +6,14 @@ import { UpdateProductCategoryDto } from './dto/update-product-category.dto';
 
 @Injectable()
 export class ProductCategoryService {
-  private repository: Repository<ProductCategoryEntity>;
+  private get repository(): Repository<ProductCategoryEntity> {
+    return this.dataSource.getRepository(ProductCategoryEntity);
+  }
 
   constructor(
     @Inject('PRODUCT_ADMIN_CONNECTION')
     private dataSource: DataSource,
-  ) {
-    this.repository = this.dataSource.getRepository(ProductCategoryEntity);
-  }
+  ) {}
 
   async create(
     createProductCategoryDto: CreateProductCategoryDto,
