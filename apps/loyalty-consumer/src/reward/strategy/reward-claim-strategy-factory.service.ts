@@ -11,10 +11,12 @@ export class RewardClaimStrategyFactory {
   ) {}
 
   getStrategy(sourceType: string): RewardClaimStrategy {
-    switch (sourceType) {
+    switch (sourceType?.toLowerCase()) {
       case 'gopay':
         return this.goPayStrategy;
       case 'synthetic':
+      case 'voucher':
+      case 'pulsa':
         return this.syntheticStrategy;
       default:
         throw new Error(`No strategy for type ${sourceType}`);

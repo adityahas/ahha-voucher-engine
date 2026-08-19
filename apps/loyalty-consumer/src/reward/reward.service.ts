@@ -12,17 +12,19 @@ import { RewardClaimStrategyFactory } from './strategy/reward-claim-strategy-fac
 
 @Injectable()
 export class RewardService {
-  private rewardItemRepo: Repository<RewardItemEntity>;
-  private userRepo: Repository<LoyaltyUserEntity>;
+  private get rewardItemRepo(): Repository<RewardItemEntity> {
+    return this.dataSource.getRepository(RewardItemEntity);
+  }
+
+  private get userRepo(): Repository<LoyaltyUserEntity> {
+    return this.dataSource.getRepository(LoyaltyUserEntity);
+  }
 
   constructor(
     private dataSource: DataSource,
     private readonly strategyFactory: RewardClaimStrategyFactory,
     private readonly pointService: PointService,
-  ) {
-    this.rewardItemRepo = dataSource.getRepository(RewardItemEntity);
-    this.userRepo = dataSource.getRepository(LoyaltyUserEntity);
-  }
+  ) {}
 
   async claimReward(userId: string, rewardItemId: string) {
     return await this.dataSource.transaction(
@@ -82,9 +84,9 @@ export class RewardService {
             .save(rewardItem);
         }
 
-        const strategy = this.strategyFactory.getStrategy(
-          rewardItem.source.source_type,
-        );
+        const sourceType =
+          rewardItem.source?.source_type || rewardItem.type || 'synthetic';
+        const strategy = this.strategyFactory.getStrategy(sourceType);
         const claimResult = await strategy.claim(userId, rewardItem);
 
         if (claimResult.status === 'FAILED') {
