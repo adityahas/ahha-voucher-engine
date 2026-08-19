@@ -13,7 +13,7 @@ export const executePurchase = async (dto: CreatePurchaseDto): Promise<any> => {
 
   const { token, apiKey } = useAuthStore.getState();
 
-  const response = await fetch(`${BASE_URL}/product/purchase`, {
+  const response = await fetch(`${BASE_URL}/loyalty/purchase`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
