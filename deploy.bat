@@ -32,6 +32,9 @@ if exist "%SRC_DIR%apps\frontend-consumer\dist" (
 )
 if exist "%SRC_DIR%frontend-servers.js" copy /y "%SRC_DIR%frontend-servers.js" "%DEPLOY_DIR%\frontend-servers.js" >nul
 
+echo Running database seeder...
+node "%DEPLOY_DIR%\dist\apps\admin\src\seeder\main.seeder.js"
+
 echo Stopping existing app instances...
 powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*dist\apps*main.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
 powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*frontend-servers.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
