@@ -31,6 +31,10 @@ if exist "%SRC_DIR%apps\frontend-consumer\dist" (
   xcopy /e /i /y /q "%SRC_DIR%apps\frontend-consumer\dist" "%DEPLOY_DIR%\frontend-consumer-dist" >nul
 )
 if exist "%SRC_DIR%frontend-servers.js" copy /y "%SRC_DIR%frontend-servers.js" "%DEPLOY_DIR%\frontend-servers.js" >nul
+if exist "%SRC_DIR%scripts" (
+  if not exist "%DEPLOY_DIR%\scripts" mkdir "%DEPLOY_DIR%\scripts"
+  xcopy /e /i /y /q "%SRC_DIR%scripts" "%DEPLOY_DIR%\scripts" >nul
+)
 
 echo Running database seeder...
 node "%DEPLOY_DIR%\dist\apps\admin\src\seeder\main.seeder.js"
@@ -44,6 +48,12 @@ echo Starting apps via scheduled task (detached from Jenkins)...
 schtasks /create /f /tn "AhhaStartApps" /tr "\"C:\ahha-deploy\start-apps.bat\"" /sc once /st 00:00 /ru "" >nul 2>&1
 schtasks /run /tn "AhhaStartApps"
 schtasks /delete /f /tn "AhhaStartApps" >nul 2>&1
+
+echo Waiting for services to initialize...
+powershell -NoProfile -Command "Start-Sleep -Seconds 10"
+
+echo Running HTTP API Seeder...
+node "%DEPLOY_DIR%\scripts\seed-via-api.js"
 
 echo Deploy complete. Apps starting in background. Logs in %LOG_DIR%
 exit /b 0
