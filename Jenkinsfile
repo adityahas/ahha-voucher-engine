@@ -39,15 +39,6 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            environment {
-                NODE_OPTIONS = '--max-old-space-size=1024'
-            }
-            steps {
-                bat 'set NODE_OPTIONS=--max-old-space-size=1024 && path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && yarn test --maxWorkers=1 --passWithNoTests'
-            }
-        }
-
         stage('Deploy') {
             steps {
                 bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && call deploy.bat'

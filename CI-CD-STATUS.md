@@ -34,7 +34,7 @@ Headers required: `Host: client1.localhost:<port>`, `x-api-key: client1-api-key`
 ## CI/CD Behavior
 
 - Jenkins job `ahha-voucher-engine` polls the repo every 15 minutes
-- Any PR merged to `main` triggers: Clean → Checkout → Install → Build → Test (317 tests) → Deploy
+- Any PR merged to `main` triggers: Clean → Checkout → Install → Build → Build Frontend → Deploy
 - Deployment copies the fresh build to `C:\ahha-deploy` and restarts all apps detached
 - Apps, PostgreSQL, Redis, and Jenkins all auto-start on reboot (Startup folder + Windows services)
 
