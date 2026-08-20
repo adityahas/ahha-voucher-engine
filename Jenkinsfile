@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         // Ensure node/yarn/npm are on PATH for the Jenkins service (LocalSystem)
-        PATH+nodejs = 'C:\\Program Files\\nodejs'
-        PATH+npm = 'C:\\Users\\adity\\AppData\\Roaming\\npm'
+        PATH = 'C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH%'
         NODE_OPTIONS = '--max-old-space-size=2048'
     }
 
