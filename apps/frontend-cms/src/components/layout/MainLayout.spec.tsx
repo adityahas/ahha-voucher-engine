@@ -29,8 +29,8 @@ describe('MainLayout side menu grouping', () => {
     renderLayout();
 
     expect(screen.getByText('Overview')).toBeInTheDocument();
-    expect(screen.getByText('Users')).toBeInTheDocument();
-    expect(screen.getByText('Vouchers')).toBeInTheDocument();
+    expect(screen.getAllByText('Users')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Vouchers')[0]).toBeInTheDocument();
     expect(screen.getByText('Catalog')).toBeInTheDocument();
     expect(screen.getByText('Loyalty')).toBeInTheDocument();
     expect(screen.getByText('System')).toBeInTheDocument();
@@ -52,8 +52,32 @@ describe('MainLayout side menu grouping', () => {
     ];
 
     expected.forEach(([label, to]) => {
-      expect(screen.getByText(label)).toBeInTheDocument();
-      expect(screen.getByText(label).closest('a')).toHaveAttribute('href', to);
+      const el = screen.getAllByText(label)[0];
+      expect(el).toBeInTheDocument();
+      expect(el.closest('a')).toHaveAttribute('href', to);
+    });
+  });
+
+  it('renders mobile navigation bar with core links', () => {
+    renderLayout();
+
+    const mobileNav = screen.getByRole('navigation', {
+      name: 'Mobile Navigation',
+    });
+    expect(mobileNav).toBeInTheDocument();
+
+    const mobileLinks: Array<[string, string]> = [
+      ['Dashboard', '/dashboard'],
+      ['Products', '/products'],
+      ['Vouchers', '/vouchers'],
+      ['Rewards', '/rewards'],
+      ['Users', '/users'],
+      ['Settings', '/settings/currency'],
+    ];
+
+    mobileLinks.forEach(([label, to]) => {
+      const link = mobileNav.querySelector(`a[href="${to}"]`);
+      expect(link).toBeInTheDocument();
     });
   });
 });

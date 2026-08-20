@@ -81,8 +81,33 @@ export const MainLayout: React.FC = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-900/20 rounded-full mix-blend-screen filter blur-[120px] opacity-50"></div>
       </div>
 
-      <div className="relative z-10 flex h-screen">
-        {/* Sidebar */}
+      {/* Top Mobile Header (Mobile Only) */}
+      <header className="md:hidden sticky top-0 z-40 glass-dark border-b border-slate-700/50 px-4 py-3 flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">
+            Ahha Engine
+          </h1>
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            Workspace: {tenant}
+          </p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white shadow-md">
+            {user?.email.charAt(0).toUpperCase()}
+          </div>
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+            title="Sign Out"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      </header>
+
+      <div className="relative z-10 flex h-screen md:h-screen">
+        {/* Desktop Sidebar */}
         <aside className="w-64 glass-dark border-r border-slate-700/50 hidden md:flex flex-col">
           <div className="p-6 border-b border-slate-700/50">
             <h1 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-purple-400">
@@ -145,12 +170,55 @@ export const MainLayout: React.FC = () => {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-8 relative">
+        <main className="flex-1 overflow-y-auto p-4 pb-28 md:p-8 relative">
           <div className="max-w-6xl mx-auto">
             <Outlet />
           </div>
         </main>
       </div>
+
+      {/* Mobile Bottom Navbar (Mobile Only) */}
+      <nav
+        aria-label="Mobile Navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-dark border-t border-slate-700/50 px-2 py-2 flex items-center justify-around shadow-2xl backdrop-blur-xl bg-slate-950/80"
+      >
+        {[
+          { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+          { to: '/products', label: 'Products', icon: Package },
+          { to: '/vouchers', label: 'Vouchers', icon: Ticket },
+          { to: '/rewards', label: 'Rewards', icon: Gift },
+          { to: '/users', label: 'Users', icon: Users },
+          { to: '/settings/currency', label: 'Settings', icon: Settings },
+        ].map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center py-1 px-2 rounded-xl transition-all duration-200 ${
+                isActive
+                  ? 'text-primary-400 scale-105 font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <Icon
+                  size={20}
+                  className={
+                    isActive
+                      ? 'stroke-[2.5px] drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]'
+                      : 'stroke-[1.75px]'
+                  }
+                />
+                <span className="text-[10px] mt-1 tracking-tight truncate max-w-[56px] text-center">
+                  {label}
+                </span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
     </div>
   );
 };
