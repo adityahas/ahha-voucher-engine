@@ -1,6 +1,5 @@
 @echo off
-REM Deploy script for Ahha Voucher Engine
-REM Copies the freshly-built dist to a stable location and starts apps detached via scheduled task
+REM Deploy script for Ahha Voucher Engine with Selective Service Deployment
 setlocal
 
 REM Where this script runs (Jenkins workspace)
@@ -12,9 +11,12 @@ set LOG_DIR=%DEPLOY_DIR%\logs
 if not exist "%DEPLOY_DIR%" mkdir "%DEPLOY_DIR%"
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
+REM Copy build state & helper scripts
+if exist "%SRC_DIR%changed-services.json" copy /y "%SRC_DIR%changed-services.json" "%DEPLOY_DIR%\changed-services.json" >nul
+if exist "%SRC_DIR%start-all.ps1" copy /y "%SRC_DIR%start-all.ps1" "%DEPLOY_DIR%\start-all.ps1" >nul
+
 REM Copy fresh build + config into stable deploy dir
 if exist "%SRC_DIR%dist" (
-  if exist "%DEPLOY_DIR%\dist" rmdir /s /q "%DEPLOY_DIR%\dist"
   xcopy /e /i /y /q "%SRC_DIR%dist" "%DEPLOY_DIR%\dist" >nul
 )
 if not exist "%DEPLOY_DIR%\.env" if exist "%SRC_DIR%.env" copy /y "%SRC_DIR%.env" "%DEPLOY_DIR%\.env" >nul
@@ -39,21 +41,17 @@ if exist "%SRC_DIR%scripts" (
 echo Running database seeder...
 node "%DEPLOY_DIR%\dist\apps\admin\src\seeder\main.seeder.js"
 
-echo Stopping existing app instances...
-powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*dist\apps*main.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
-powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*frontend-servers.js*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
-powershell -NoProfile -Command "Start-Sleep -Seconds 3"
-
-echo Starting apps via scheduled task (detached from Jenkins)...
-schtasks /create /f /tn "AhhaStartApps" /tr "\"C:\ahha-deploy\start-apps.bat\"" /sc once /st 00:00 /ru "" >nul 2>&1
-schtasks /run /tn "AhhaStartApps"
-schtasks /delete /f /tn "AhhaStartApps" >nul 2>&1
+echo Restarting targeted services via PowerShell...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%DEPLOY_DIR%\start-all.ps1"
 
 echo Waiting for services to initialize...
-powershell -NoProfile -Command "Start-Sleep -Seconds 10"
+powershell -NoProfile -Command "Start-Sleep -Seconds 8"
 
 echo Running HTTP API Seeder...
 node "%DEPLOY_DIR%\scripts\seed-via-api.js"
 
-echo Deploy complete. Apps starting in background. Logs in %LOG_DIR%
+REM Record current deployed commit hash
+git rev-parse HEAD > "%DEPLOY_DIR%\.last_deployed_commit"
+
+echo Selective deploy complete. Logs in %LOG_DIR%
 exit /b 0
