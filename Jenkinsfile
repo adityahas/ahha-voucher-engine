@@ -2,8 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Ensure node/yarn/npm are on PATH for the Jenkins service (LocalSystem)
-        PATH = 'C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH%'
         NODE_OPTIONS = '--max-old-space-size=2048'
     }
 
@@ -22,22 +20,22 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                bat 'yarn install --ignore-engines --network-timeout 600000'
+                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && yarn install --ignore-engines --network-timeout 600000'
             }
         }
 
         stage('Build') {
             steps {
-                bat 'yarn build'
+                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && yarn build'
             }
         }
 
         stage('Build Frontend') {
             steps {
-                bat 'cd apps/frontend-cms && yarn install --ignore-engines --network-timeout 600000'
-                bat 'cd apps/frontend-cms && npx vite build'
-                bat 'cd apps/frontend-consumer && npm install --no-audit --no-fund'
-                bat 'cd apps/frontend-consumer && npx vite build'
+                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && cd apps/frontend-cms && yarn install --ignore-engines --network-timeout 600000'
+                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && cd apps/frontend-cms && npx vite build'
+                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && cd apps/frontend-consumer && npm install --no-audit --no-fund'
+                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && cd apps/frontend-consumer && npx vite build'
             }
         }
 
@@ -46,13 +44,13 @@ pipeline {
                 NODE_OPTIONS = '--max-old-space-size=1024'
             }
             steps {
-                bat 'set NODE_OPTIONS=--max-old-space-size=1024 && yarn test --maxWorkers=1 --passWithNoTests'
+                bat 'set NODE_OPTIONS=--max-old-space-size=1024 && path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && yarn test --maxWorkers=1 --passWithNoTests'
             }
         }
 
         stage('Deploy') {
             steps {
-                bat 'call deploy.bat'
+                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && call deploy.bat'
             }
         }
     }
