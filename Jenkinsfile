@@ -28,18 +28,9 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Selective Build & Detect') {
             steps {
-                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && yarn build'
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && cd apps/frontend-cms && yarn install --ignore-engines --network-timeout 600000'
-                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && cd apps/frontend-cms && npx vite build'
-                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && cd apps/frontend-consumer && npm install --no-audit --no-fund'
-                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && cd apps/frontend-consumer && npx vite build'
+                bat 'path C:\\Program Files\\nodejs;C:\\Users\\adity\\AppData\\Roaming\\npm;%PATH% && node scripts/detect-changed-services.js --build'
             }
         }
 
@@ -52,7 +43,7 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment completed successfully'
+            echo 'Selective deployment completed successfully'
         }
         failure {
             echo 'Deployment failed - check build logs'
