@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        // Ensure node/yarn/npm are on PATH for the Jenkins service (LocalSystem)
+        PATH+nodejs = 'C:\\Program Files\\nodejs'
+        PATH+npm = 'C:\\Users\\adity\\AppData\\Roaming\\npm'
+        NODE_OPTIONS = '--max-old-space-size=2048'
+    }
+
     stages {
         stage('Clean Workspace') {
             steps {
