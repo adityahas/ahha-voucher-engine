@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+
     environment {
         NODE_OPTIONS = '--max-old-space-size=2048'
     }
