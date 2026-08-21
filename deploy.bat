@@ -1,6 +1,8 @@
 @echo off
 REM Deploy script for Ahha Voucher Engine with Selective Service Deployment
 setlocal
+set BUILD_ID=dontKillMe
+set JENKINS_NODE_COOKIE=dontKillMe
 
 REM Where this script runs (Jenkins workspace)
 set SRC_DIR=%~dp0
@@ -39,18 +41,23 @@ if exist "%SRC_DIR%scripts" (
 )
 
 echo Running database seeder...
+cd /d "%DEPLOY_DIR%"
 node "%DEPLOY_DIR%\dist\apps\admin\src\seeder\main.seeder.js"
 
-echo Restarting targeted services via PowerShell...
-powershell -NoProfile -ExecutionPolicy Bypass -File "%DEPLOY_DIR%\start-all.ps1"
+echo Restarting targeted services via Scheduled Task (detached from Jenkins)...
+schtasks /create /f /tn "AhhaStartApps" /tr "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\ahha-deploy\start-all.ps1\"" /sc once /st 00:00 /ru "" >nul 2>&1
+schtasks /run /tn "AhhaStartApps"
+schtasks /delete /f /tn "AhhaStartApps" >nul 2>&1
 
 echo Waiting for services to initialize...
-powershell -NoProfile -Command "Start-Sleep -Seconds 8"
+powershell -NoProfile -Command "Start-Sleep -Seconds 10"
 
 echo Running HTTP API Seeder...
+cd /d "%DEPLOY_DIR%"
 node "%DEPLOY_DIR%\scripts\seed-via-api.js"
 
 REM Record current deployed commit hash
+cd /d "%SRC_DIR%"
 git rev-parse HEAD > "%DEPLOY_DIR%\.last_deployed_commit"
 
 echo Selective deploy complete. Logs in %LOG_DIR%

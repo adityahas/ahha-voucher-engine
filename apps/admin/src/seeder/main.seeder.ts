@@ -1,4 +1,9 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config();
+dotenv.config({ path: 'C:\\ahha-deploy\\.env' });
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 import { DataSource } from 'typeorm';
 import { seedAdmins } from './admins.seeder';
 import { seedClients } from './clients.seeder';

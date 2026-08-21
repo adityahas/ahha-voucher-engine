@@ -7,6 +7,8 @@ pipeline {
 
     environment {
         NODE_OPTIONS = '--max-old-space-size=2048'
+        BUILD_ID = 'dontKillMe'
+        JENKINS_NODE_COOKIE = 'dontKillMe'
     }
 
     stages {

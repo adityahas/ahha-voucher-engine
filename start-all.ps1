@@ -49,14 +49,16 @@ Write-Output "Restarting target services: $($backendToStart.Name -join ', ')"
 
 # Stop and restart specified backend microservices
 foreach ($svc in $backendToStart) {
-    $scriptPattern = "*$($svc.Script.Replace('\', '/'))*"
-    Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*$($svc.Script)*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+    $svcName = $svc.Name
+    $svcScript = $svc.Script
+    
+    Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*apps*$svcName*main.js*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
     
     Start-Process -FilePath "node" `
-        -ArgumentList $svc.Script `
+        -ArgumentList $svcScript `
         -WorkingDirectory $deployDir `
-        -RedirectStandardOutput "$logDir\$($svc.Name).log" `
-        -RedirectStandardError "$logDir\$($svc.Name).err.log" `
+        -RedirectStandardOutput "$logDir\$svcName.log" `
+        -RedirectStandardError "$logDir\$svcName.err.log" `
         -WindowStyle Hidden
 }
 
